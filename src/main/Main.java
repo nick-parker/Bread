@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.swing.JPanel;
 
+import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
 import mesh3d.Model3D;
 import mesh3d.Stli;

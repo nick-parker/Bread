@@ -1,5 +1,7 @@
 package mesh3d;
 
+import java.util.Arrays;
+
 import math.geom2d.Point2D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
@@ -13,6 +15,7 @@ public class Tri3D{
 	private Vector3D[] vs;	//Vectors describing u,v coordinate system of triangle.
 	private double uv;
 	private double denom;
+	private double originDot; //baked in value for testing which side of the plane a point is on.
 	private Plane3D pl;
 	/**
 	 * Create a Tri3D with CCW normal.
@@ -29,6 +32,7 @@ public class Tri3D{
 		LineSegment3D e1 = new LineSegment3D(p1, p2);
 		LineSegment3D e2 = new LineSegment3D(p2, p0);
 		this.es = new LineSegment3D[]{e0,e1,e2};
+		this.originDot = PointDot(pl.normal(), pl.origin());
 	}
 	public Tri3D move(Vector3D v) {
 		Point3D pA = ps[0].plus(v);
@@ -86,63 +90,64 @@ public class Tri3D{
 	 * @return A point3D[2] representing the segment, or null if the Tris don't intersect.
 	 */
 	public Point3D[] overlap(Tri3D t){
-		//Get all 6 intersections of the edges with the two planes. Some of these will be null for nonintersection.
-		Point3D[] hs = new Point3D[]{SegmentPlaneIntersection(t.es[0]),
-				SegmentPlaneIntersection(t.es[1]),
-				SegmentPlaneIntersection(t.es[2]),
-				t.SegmentPlaneIntersection(es[0]),
-				t.SegmentPlaneIntersection(es[1]),
-				t.SegmentPlaneIntersection(es[2])};
-		//Get the four actual intersections if they exist.
-		Point3D[] hits = new Point3D[4];
-		int i=0;
-		for(Point3D h:hs){
-			if(h!=null&&notIn(hits,h)){
-				hits[i] = h;
-				i++;
+//		1. Compute plane equation of triangle 2.
+		//Already baked in other triangle
+//		2. Reject as trivial if all points of triangle 1 are on same side.
+		//Dot them all with the normal and test against the origin of the plane
+		Vector3D n2 = t.normal();
+		double[] dots1 = new double[]{PointDot(n2,ps[0]),PointDot(n2,ps[1]),PointDot(n2,ps[2])};
+		if(allSameSide(dots1,t.originDot)) return null;	//This triangle doesn't intersect the other's plane.
+//		3. Compute plane equation of triangle 1.
+		//Baked in this triangle
+//		4. Reject as trivial if all points of triangle 2 are on same side.
+		Vector3D n = normal();
+		double[] dots2 = new double[]{PointDot(n,t.ps[0]),PointDot(n,t.ps[1]),PointDot(n,t.ps[2])};
+		if(allSameSide(dots2,originDot)) return null; //The other doesn't intersect this triangle's plane.
+		//Check they aren't coplanar
+		if(Vector3D.isColinear(n,n2)) return null;
+//		5. Compute intersection line and project onto largest axis.
+//		6. Compute the intervals for each triangle.
+//		7. Intersect the intervals.
+		/* I'm deviating here, at the risk of writing something inefficient or wrong,
+		 * because I want to understand my code. Also, the method described by Thomas Moller
+		 * is a boolean intersection test, and doesn't yield the intersection itself.
+		 * Steps below this are my own. */
+//		5. Calculate the intersections of the edges with the opposite plane for each triangle
+		Point3D[] hitsA = PlaneTriangleIntersection(this.pl,t.es);
+		Point3D[] hitsB = PlaneTriangleIntersection(t.pl, this.es);
+//		6. Dot the intersections with normalized n1 x n2 to get their positions along the intersection line
+		Vector3D dir = Vector3D.crossProduct(n, n2).normalize();
+		double[] dotsA = new double[]{PointDot(dir,hitsA[0]), PointDot(dir,hitsA[1])};
+		double lineOrigin = dotsA[0];
+		double[] dotsB = new double[]{PointDot(dir,hitsB[0]), PointDot(dir,hitsB[1])};
+		if(dotsA[0]>dotsA[1]) flipVals(dotsA,0,1);
+		if(dotsB[0]>dotsB[1]) flipVals(dotsB,0,1);
+//		7. Find the overlap between the two intervals on the intersection line
+		double[] overlap = new double[]{Math.max(dotsA[0], dotsB[0]),Math.min(dotsA[1], dotsB[1])};
+		if(overlap[0]>=overlap[1]) return null;	//Ranges don't overlap
+//		8. Using one intersection as an origin, add multiples of normalized n1 x n2 to get the two points
+		Vector3D add0 = dir.times(overlap[0]-lineOrigin);
+		Vector3D add1 = dir.times(overlap[1]-lineOrigin);
+//		9. Return the two points representing the intersection as an ordered pair along n1 x n2.
+		return new Point3D[]{hitsA[0].plus(add0),hitsA[0].plus(add1)};
+	}
+	/**
+	 * @param pl Plane to intersect
+	 * @param lines Triangle of line segments to intersect
+	 * @return The pair of points where the triangle intersects the plane. 
+	 */
+	private static Point3D[] PlaneTriangleIntersection(Plane3D pl, LineSegment3D[] lines){
+		Point3D[] output = new Point3D[2];
+		int k = 0;
+		for(LineSegment3D ls:lines){
+			Point3D p = SegmentPlaneIntersection(pl, ls);
+			if(p!=null&&notIn(output,p)){
+//				if(k==2) break;
+				output[k] = p;
+				k++;
 			}
 		}
-		if(i!=4) return null;	//Return null for no intersection if either tri doesn't intersect the other's plane
-		//Sort hits along 
-		Vector3D dir = Vector3D.crossProduct(this.normal(),t.normal());
-		double[] dots = new double[]{PointDot(dir,hits[0]),
-				PointDot(dir,hits[1]),
-				PointDot(dir,hits[2]),
-				PointDot(dir,hits[3])};
-		//Fast sort for length 4 array
-		if(dots[0]>dots[3]) {
-			flipVals(hits,0,3);
-			flipVals(dots,0,3);
-		}
-		if(dots[1]>dots[2]) {
-			flipVals(hits,1,2);
-			flipVals(dots,1,2);
-		}
-		if(dots[0]>dots[1])	{
-			flipVals(hits,0,1);
-			flipVals(dots,0,1);
-		}
-		if(dots[2]>dots[3]){
-			flipVals(hits,2,3);
-			flipVals(dots,2,3);
-		}
-		if(dots[1]>dots[2]) {
-			flipVals(hits,1,2);
-			flipVals(dots,1,2);
-		}
-		return this.contains(hits[0])&&t.contains(hits[0])&&this.contains(hits[1])&&t.contains(hits[1]) ? new Point3D[]{hits[1],hits[2]} : null;
-//		int i = 0;
-//		Point3D[] hits = new Point3D[2];
-//		for(Point3D h:hs){
-//			if(h!=null&&this.contains(h)&&t.contains(h)){
-//				if((hits[0]!=null&&h.distance(hits[0])<Constants.tol)||(hits[1]!=null&&h.distance(hits[1])<Constants.tol)){
-//					continue;
-//				}
-//				hits[i]=h;
-//				i++;
-//			}
-//		}
-//		return i==2 ? hits : null;	
+		return output;
 	}
 	private static boolean notIn(Point3D[] ps,Point3D p){
 		for(Point3D p2:ps){
@@ -154,8 +159,8 @@ public class Tri3D{
 	 * @param l Line segment to intersect with the plane of this triangle.
 	 * @return Intersection or null if it does not exist.
 	 */
-	public Point3D SegmentPlaneIntersection(LineSegment3D l) {
-		Point3D p = pl.lineIntersection(l.supportingLine());
+	public static Point3D SegmentPlaneIntersection(Plane3D plane, LineSegment3D l) {
+		Point3D p = plane.lineIntersection(l.supportingLine());
 		return l.contains(p) ? p : null;
 	}
 	/**
@@ -196,5 +201,27 @@ public class Tri3D{
 	}
 	public static double length(LineSegment3D l){
 		return l.firstPoint().distance(l.lastPoint());
+	}
+	/**
+	 * Check that either all values of a are > than v or all
+	 * values of a are <= v.
+	 * @return whether all values are on the same side.
+	 */
+	public static boolean allSameSide(double[] a, double v){
+		boolean great = true;
+		for(double i:a){
+			if(i<=v) great=false; 
+		}
+		if(great) return true;
+		for(double i:a){
+			if(i>v) return false;
+		}
+		return true;
+	}
+	/**
+	 * @return Backing plane, breaking abstraction barrier. Should be fine since planes are immutable?
+	 */
+	public Plane3D plane() {
+		return pl;
 	}
 }

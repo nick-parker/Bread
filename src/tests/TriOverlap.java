@@ -28,7 +28,7 @@ public class TriOverlap {
 		Tri3D t2 = new Tri3D(p4,p5,p6);
 		Point3D[] ps = t1.overlap(t2);
 		//t1 normal points up, t2 normal is [-1,0]
-		//overlap should return points ordered along leftNormal x rightNormal, so
+		//overlap should return points ordered along leftNormal x rightNormal, so should be oriented in -y dir
 		//output should be 0,6,1 to 0,3,1
 		Point3D pA = new Point3D(0,6,1);
 		Point3D pB = new Point3D(0,3,1);
@@ -62,7 +62,7 @@ public class TriOverlap {
 		Point3D p4 = new Point3D(3,3,3);
 		Point3D p5 = new Point3D(3,3,2);
 		LineSegment3D l = new LineSegment3D(p4, p5);
-		assertNull(t1.SegmentPlaneIntersection(l));
+		assertNull(Tri3D.SegmentPlaneIntersection(t1.plane(),l));
 		assertNull(t1.SegmentIntersection(l));
 	}
 	@Test
@@ -74,24 +74,23 @@ public class TriOverlap {
 		assertTrue(t1.normal().getZ()>0);
 	}
 	@Test public void MeshOverlap() throws NumberFormatException, IOException{
-		for(double z=1;z<15;z+=0.1){
-			Model3D m1 = Stli.importModel("model.stl", true);
-			Point3D p1 = new Point3D(0,0,z);
-			Point3D p2 = new Point3D(80,0,z);
-			Point3D p3 = new Point3D(0,80,z);
-			Tri3D t1 = new Tri3D(p1,p2,p3);
-//			Point3D q1 = new Point3D(-10,-10,z);
-//			Point3D q2 = new Point3D(50,50,z);
-//			Point3D q3 = new Point3D(-10,50,z);
-//			Tri3D t2 = new Tri3D(q1,q2,q3);
-			Surface3D m2 = new Surface3D(new Tri3D[]{t1});
-			LineSegment3D[] over = m2.overlap(m1);
-			double sum = 0;
-			for(LineSegment3D l:over){
-				sum += Tri3D.length(l);
-			}
-			System.out.println(sum);
+		int z = 4;
+		Model3D m1 = Stli.importModel("model.stl", true);
+		Point3D p1 = new Point3D(50,50,z);
+		Point3D p2 = new Point3D(-10,-10,z);
+		Point3D p3 = new Point3D(50,-10,z);
+		Tri3D t1 = new Tri3D(p1,p2,p3);
+		Point3D q1 = new Point3D(-10,-10,z);
+		Point3D q2 = new Point3D(50,50,z);
+		Point3D q3 = new Point3D(-10,50,z);
+		Tri3D t2 = new Tri3D(q1,q2,q3);
+		Surface3D m2 = new Surface3D(new Tri3D[]{t1,t2});
+		LineSegment3D[] over = m2.overlap(m1);
+		double sum = 0;
+		for(LineSegment3D l:over){
+			sum += Tri3D.length(l);
 		}
-//		assertTrue(Math.abs(sum-60)<Constants.tol);
+		System.out.println(sum);
+		assertTrue(Math.abs(sum-60)<Constants.tol);
 	}
 }
