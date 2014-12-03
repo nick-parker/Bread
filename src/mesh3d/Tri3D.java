@@ -1,7 +1,5 @@
 package mesh3d;
 
-import java.util.Arrays;
-
 import math.geom2d.Point2D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
@@ -224,4 +222,5 @@ public class Tri3D{
 	public Plane3D plane() {
 		return pl;
 	}
+	static public boolean equiv(Point3D a, Point3D b){return a.distance(b)<Constants.tol;}
 }

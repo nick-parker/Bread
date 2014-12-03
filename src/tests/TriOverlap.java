@@ -3,16 +3,24 @@ package tests;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import math.geom2d.line.LineSegment2D;
 import math.geom3d.Point3D;
+import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
 import mesh3d.Constants;
 import mesh3d.Model3D;
+import mesh3d.SimplePlane;
 import mesh3d.Stli;
 import mesh3d.Surface3D;
 import mesh3d.Tri3D;
 
 import org.junit.Test;
+
+import process.Flatten;
+import process.Loop;
+import process.Order;
 
 public class TriOverlap {
 
@@ -73,18 +81,10 @@ public class TriOverlap {
 		Tri3D t1 = new Tri3D(p1,p2,p3);
 		assertTrue(t1.normal().getZ()>0);
 	}
-	@Test public void MeshOverlap() throws NumberFormatException, IOException{
-		int z = 4;
+	@Test 
+	public void MeshOverlap() throws NumberFormatException, IOException{
 		Model3D m1 = Stli.importModel("model.stl", true);
-		Point3D p1 = new Point3D(50,50,z);
-		Point3D p2 = new Point3D(-10,-10,z);
-		Point3D p3 = new Point3D(50,-10,z);
-		Tri3D t1 = new Tri3D(p1,p2,p3);
-		Point3D q1 = new Point3D(-10,-10,z);
-		Point3D q2 = new Point3D(50,50,z);
-		Point3D q3 = new Point3D(-10,50,z);
-		Tri3D t2 = new Tri3D(q1,q2,q3);
-		Surface3D m2 = new Surface3D(new Tri3D[]{t1,t2});
+		Surface3D m2 = SimplePlane.MakePlane(-10,-10,50,50,4);
 		LineSegment3D[] over = m2.overlap(m1);
 		double sum = 0;
 		for(LineSegment3D l:over){
@@ -93,4 +93,28 @@ public class TriOverlap {
 		System.out.println(sum);
 		assertTrue(Math.abs(sum-60)<Constants.tol);
 	}
+	@Test
+	public void Order() throws NumberFormatException, IOException{
+		Model3D m1 = Stli.importModel("model.stl", true);
+		Surface3D m2 = SimplePlane.MakePlane(-10,-10,50,50,4);
+		LineSegment3D[] over = m2.overlap(m1);
+		LineSegment2D[] ls = Flatten.FlattenZ(over);
+		ArrayList<Loop> loops = Order.ListOrder(ls);
+		assertEquals(1, loops.size());
+	}
+	@Test
+	public void crinkleorder() throws NumberFormatException, IOException{
+		Model3D m1 = Stli.importModel("model.stl", true);
+		Surface3D m2 = Stli.importSurface("crinkle3.stl", true);
+		LineSegment3D[] over = m2.overlap(m1);
+		LineSegment2D[] ls = Flatten.FlattenZ(over);
+		ArrayList<Loop> loops = Order.ListOrder(ls);
+		assertEquals(1,loops.size());
+		m2.move(new Vector3D(0,0,-5.5));
+		LineSegment3D[] over2 = m2.overlap(m1);
+		LineSegment2D[] ls2 = Flatten.FlattenZ(over2);
+		ArrayList<Loop> loops2 = Order.ListOrder(ls2);
+		assertEquals(4,loops2.size());
+	}
+	
 }

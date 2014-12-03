@@ -4,7 +4,6 @@ import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.Shape3D;
 import math.geom3d.Vector3D;
-import math.geom3d.line.LineSegment3D;
 import math.geom3d.transform.AffineTransform3D;
 
 abstract class Mesh3D implements Shape3D{
@@ -19,7 +18,13 @@ abstract class Mesh3D implements Shape3D{
 	 * Move the mesh by the specified vector.
 	 */
 	public void move(Vector3D v){{
-		for(Tri3D t:tris){t.move(v);}
+		Tri3D[] newTris = new Tri3D[tris.length];
+		int i=0;
+		for(Tri3D t:tris){
+			newTris[i]=t.move(v);
+			i++;
+			}
+		tris=newTris;
 		makeBB();
 		};
 	}
@@ -65,7 +70,6 @@ abstract class Mesh3D implements Shape3D{
 	 * @return Return a duplicate of point p.
 	 */
 	static public Point3D copyPoint(Point3D p){return new Point3D(p.getX(),p.getY(),p.getZ());}
-	
 	//Unimplemented inherited methods below this point.	
 	
 	/**
