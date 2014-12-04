@@ -4,5 +4,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="src/javaGeom-0.11.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/CampSkeletonInsetter.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/vecmath-1.3.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/Jama-1.0.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/gpcj-2.2.0-full.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

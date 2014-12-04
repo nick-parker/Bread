@@ -77,4 +77,10 @@ public class Loop {
 	public int getLength() {
 		return loop.size();
 	}
+	public ArrayList<Point2D> getPointLoop() {
+		ArrayList<Point2D> output = new ArrayList<Point2D>();
+		output.add(loop.get(0).firstPoint());
+		for(LineSegment2D l:loop) output.add(l.lastPoint());
+		return output;
+	}
 }

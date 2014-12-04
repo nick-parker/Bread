@@ -10,8 +10,10 @@ import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
 
 public class Surface3D extends Mesh3D{
+	double offset;	//Z offset applied to this surface.
 	public Surface3D(Tri3D[] ts) {
 		this.tris = ts;
+		offset = 0;
 		makeBB();
 	}
 
@@ -67,5 +69,13 @@ public class Surface3D extends Mesh3D{
 			}
 		}
 		return output.toArray(new LineSegment2D[output.size()]);
+	}
+	/**
+	 * Set the amount by which this surface is offset in the Z axis.
+	 * @param z Amount to offset from original position.
+	 */
+	public void setOffset(double z){
+		this.move(new Vector3D(0,0,z-offset));
+		offset = z;
 	}
 }

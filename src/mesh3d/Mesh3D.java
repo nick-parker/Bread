@@ -8,12 +8,11 @@ import math.geom3d.transform.AffineTransform3D;
 
 abstract class Mesh3D implements Shape3D{
 	protected Tri3D[] tris;
-	protected Box3D bb;
 	/**
 	 * Generate the smallest possible box which contains this mesh.
 	 */
 	@Override
-	public Box3D boundingBox(){return bb;};
+	public Box3D boundingBox(){return makeBB();}
 	/**
 	 * Move the mesh by the specified vector.
 	 */
@@ -25,11 +24,10 @@ abstract class Mesh3D implements Shape3D{
 			i++;
 			}
 		tris=newTris;
-		makeBB();
 		};
 	}
-	protected void makeBB(){
-		bb = new Box3D(getMax(Constants.xminus).getX(),getMax(Constants.xplus).getX(),
+	protected Box3D makeBB(){
+		return new Box3D(getMax(Constants.xminus).getX(),getMax(Constants.xplus).getX(),
 				getMax(Constants.yminus).getY(),getMax(Constants.yplus).getY(),
 				getMax(Constants.zminus).getZ(),getMax(Constants.zplus).getZ());
 	};
