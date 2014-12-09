@@ -1,12 +1,13 @@
 package process;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import mesh3d.Constants;
 
-public class Loop {
+public class Loop implements Iterable<LineSegment2D>{
 	ArrayList<LineSegment2D> loop;
 	LineSegment2D end;
 	public Loop(LineSegment2D l){
@@ -70,10 +71,6 @@ public class Loop {
 		}
 		return false;
 	}
-	static public boolean equiv2D(Point2D a, Point2D b){return a.distance(b)<Constants.tol;}
-	public ArrayList<LineSegment2D> getLoop() {
-		return loop;
-	}
 	public int getLength() {
 		return loop.size();
 	}
@@ -83,4 +80,9 @@ public class Loop {
 		for(LineSegment2D l:loop) output.add(l.lastPoint());
 		return output;
 	}
+	public Iterator<LineSegment2D> iterator(){
+		return loop.iterator();
+	}
+	
+	static public boolean equiv2D(Point2D a, Point2D b){return a.distance(b)<Constants.tol;}
 }

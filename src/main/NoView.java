@@ -35,7 +35,7 @@ public class NoView {
 		int i=0;
 		for(Loop lp:loops){
 			System.out.println(lp.checkClosure());
-			for(LineSegment2D l:lp.getLoop()){
+			for(LineSegment2D l:lp){
 				ps[i]=l.lastPoint();
 				i++;
 			}
@@ -45,6 +45,7 @@ public class NoView {
 		LoopL<Corner> ssShell = Inset.inset(polies, -1);
 		utils.Loop<Corner> l0 = ssShell.get(0);
 		Point2D[] disp = new Point2D[16];
+		i=0;
 		for(Corner c:l0){
 			disp[i]=new Point2D(c.x,c.y);
 			i++;

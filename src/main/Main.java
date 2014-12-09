@@ -11,11 +11,11 @@ import javax.swing.JPanel;
 
 import process.Flatten;
 import process.Loop;
+import process.NativeInset;
 import process.Order;
 import straightskeleton.Corner;
 import utils.LoopL;
 import math.geom2d.Point2D;
-import math.geom2d.circulinear.CirculinearDomain2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom2d.polygon.SimplePolygon2D;
 import math.geom3d.line.LineSegment3D;
@@ -36,9 +36,9 @@ public class Main extends JPanel {
 		Model3D m1 = null;
 		Surface3D m2 = null;		
 		try {
-			m1 = Stli.importModel("model.stl", true);
+			m1 = Stli.importModel("big.stl", true);
 //			m2 = Stli.importSurface("crinkle3.stl", true);
-			m2 = SimplePlane.MakePlane(-10, -10, 50, 50, 4);
+			m2 = SimplePlane.MakePlane(-10, -10, 500, 500, 4);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -46,19 +46,32 @@ public class Main extends JPanel {
 		LineSegment3D[] over = m2.overlap(m1);
 		LineSegment2D[] ls = Flatten.FlattenZ(over);
 		ArrayList<Loop> loops = Order.ListOrder(ls);
-		Point2D[] ps = new Point2D[ls.length];
-		int i=0;
-		for(Loop lp:loops){
-			System.out.println(lp.checkClosure());
-			for(LineSegment2D l:lp.getLoop()){
-				ps[i]=l.lastPoint();
-				i++;
-			}
-		}
-		ArrayList<ArrayList<Point2D>> polies = new ArrayList<ArrayList<Point2D>>();
-		for(Loop l:loops) polies.add(l.getPointLoop());
-		LoopL<Corner> ssShell = Inset.inset(polies, -1);
-		SimplePolygon2D poly =  new SimplePolygon2D(ps);
+//		Point2D[] ps = new Point2D[ls.length];
+//		int i=0;
+//		for(Loop lp:loops){
+//			System.out.println(lp.checkClosure());
+//			for(LineSegment2D l:lp){
+//				ps[i]=l.lastPoint();
+//				i++;
+//			}
+//		}
+//		ArrayList<ArrayList<Point2D>> polies = new ArrayList<ArrayList<Point2D>>();
+//		for(Loop l:loops) polies.add(l.getPointLoop());
+//		LoopL<Corner> ssShell = Inset.inset(polies, 20);
+//		utils.Loop<Corner> l0 = ssShell.get(0);
+//		Point2D[] disp = new Point2D[l0.count()];
+//		int i=0;
+//		for(Corner c:l0){
+//			disp[i]=new Point2D(c.x,c.y);
+//			i++;
+//		}
+		ArrayList<ArrayList<Point2D>> output = NativeInset.inset(loops, ls.length, 20);
+		Point2D[] disp = output.get(0).toArray(new Point2D[1]);
+		ArrayList<ArrayList<Point2D>> output2 = NativeInset.inset(loops, ls.length, 10);
+		Point2D[] disp2 = output2.get(0).toArray(new Point2D[1]);
+		SimplePolygon2D poly =  new SimplePolygon2D(disp);
+		SimplePolygon2D poly2 =  new SimplePolygon2D(disp2);
+		poly2.draw(g2);
 		poly.draw(g2);
 	}
 	public static void main(String[] args) throws NumberFormatException, IOException{
