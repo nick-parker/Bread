@@ -27,30 +27,7 @@ public class NoView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		m2.move(new Vector3D(0,0,-5.5));
-		LineSegment3D[] over = m2.overlap(m1);
-		LineSegment2D[] ls = Flatten.FlattenZ(over);
-		ArrayList<Loop> loops = Order.ListOrder(ls);
-		Point2D[] ps = new Point2D[ls.length];
-		int i=0;
-		for(Loop lp:loops){
-			System.out.println(lp.checkClosure());
-			for(LineSegment2D l:lp){
-				ps[i]=l.lastPoint();
-				i++;
-			}
-		}
-		ArrayList<ArrayList<Point2D>> polies = new ArrayList<ArrayList<Point2D>>();
-		for(Loop l:loops) polies.add(l.getPointLoop());
-		LoopL<Corner> ssShell = Inset.inset(polies, -1);
-		utils.Loop<Corner> l0 = ssShell.get(0);
-		Point2D[] disp = new Point2D[16];
-		i=0;
-		for(Corner c:l0){
-			disp[i]=new Point2D(c.x,c.y);
-			i++;
-		}
-		System.out.println("Foo");
+		System.out.println(m2.topology().length);
 
 	}
 

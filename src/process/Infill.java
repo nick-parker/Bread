@@ -2,10 +2,6 @@ package process;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-
-import utils2D.PointDotPair;
-import utils2D.PointDotPairComp;
 import utils2D.Utils2D;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
@@ -24,7 +20,7 @@ public class Infill {
 	 * @param layerNumber The number of this layer, for infill orientation.
 	 * @return
 	 */
-	public static ArrayList<LineSegment2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber){
+	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber){
 		//Generate the inset, as a set of rings of points.
 		ArrayList<ArrayList<Point2D>> regionPs = NativeInset.inset(loops, distance);
 		MultiPolygon2D region = NativeInset.GetRegion(regionPs);	//Convert to a multipolygon for some convenience.
@@ -40,13 +36,13 @@ public class Infill {
 		System.out.println(firstP);
 		StraightLine2D l = new StraightLine2D(firstP, dir);
 		System.out.println(dir + " is perpendicular to " + move);
-		ArrayList<LineSegment2D> output = new ArrayList<LineSegment2D>();
+		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		System.out.println(getWidth(move, regionPs));
 		Box2D b = region.boundingBox();
 		int lineCount = (int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/s.infillWidth);
 		System.out.println(lineCount);
 		for(int i=0;i<lineCount;i++){
-			ArrayList<LineSegment2D> es = getEdges(l,edges,dir);
+			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,1);
 			output.addAll(es);
 			l = l.parallel(s.infillWidth);
 		}
@@ -99,9 +95,9 @@ public class Infill {
 	 * @param edges Set of edges to intersect with
 	 * @return Segments of l inside the domain represented by edges. Empty list if segments don't intersect.
 	 */
-	public static ArrayList<LineSegment2D> getEdges(StraightLine2D l, Collection<LineSegment2D> edges, Vector2D v){
+	public static ArrayList<Extrusion2D> getEdges(StraightLine2D l, Collection<LineSegment2D> edges, Vector2D v, int type){
 		ArrayList<Point2D> ps = new ArrayList<Point2D>();
-		ArrayList<LineSegment2D> output = new ArrayList<LineSegment2D>();
+		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		//Generate the intersections of l with the edges
 		for(LineSegment2D ls:edges){
 			Point2D hit = l.intersection(ls);
@@ -127,13 +123,9 @@ public class Infill {
 			return output;
 		}
 		//Sort the intersections along l
-		ArrayList<PointDotPair> sortedPs = new ArrayList<PointDotPair>();
-		for(Point2D p:truePs){
-			sortedPs.add(new PointDotPair(p,v));
-		}
-		Collections.sort(sortedPs,new PointDotPairComp());		
-		for(int k=0;k<sortedPs.size()-1;k+=2){
-			output.add(new LineSegment2D(sortedPs.get(k).p,sortedPs.get(k+1).p));
+		ArrayList<Point2D> sorted = Utils2D.orderPoints(v, truePs);
+		for(int k=0;k<sorted.size()-1;k+=2){
+			output.add(new Extrusion2D(sorted.get(k),sorted.get(k+1),type));
 		}
 		return output;
 	}
