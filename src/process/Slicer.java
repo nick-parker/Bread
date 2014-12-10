@@ -3,7 +3,6 @@ package process;
 import java.io.IOException;
 
 import mesh3d.Model3D;
-import mesh3d.Stli;
 import mesh3d.Surface3D;
 
 /**
@@ -19,12 +18,14 @@ public class Slicer {
 	public final int printTemp;
 	public final double Speed;
 	public final double infillWidth;
+	public final double infillDir;	//Direction of infill on layer 0;
+	public final double infillAngle;	//Amount to change infill direction each layer, radians CW.
 	//Inputs below are optional, above are mandatory.
-	public double shellSpeed;
-	public double bottomSpeedMult;
-	public int DegreesPerFacet; //Used for turning the circular corners of inset shells into linear ones.	
-	public Slicer(String part, String shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
-			int printTemp, double speed, double infillWidth) throws IOException{
+	public double shellSpeedMult = 1;
+	public double bottomSpeedMult = 1;
+	public int bottomLayerCount = 0;
+	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
+			int printTemp, double speed, double infillWidth, double infillDir, double infillAngle) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
 		this.extrusionWidth = extrusionWidth;
@@ -32,7 +33,9 @@ public class Slicer {
 		this.Speed = speed;
 		this.infillWidth = infillWidth;
 		this.layerHeight = layerHeight;
-		this.part = Stli.importModel(part, true);
-		this.shape = Stli.importSurface(shape, true);
+		this.infillDir = infillDir;
+		this.infillAngle = infillAngle;
+		this.part = part;
+		this.shape = shape;
 	}
 }
