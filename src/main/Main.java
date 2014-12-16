@@ -3,6 +3,7 @@ package main;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -12,7 +13,6 @@ import javax.swing.JPanel;
 import process.Extrusion2D;
 import process.Layer;
 import process.Slicer;
-import math.geom2d.Point2D;
 import math.geom2d.ShapeArray2D;
 import math.geom2d.line.LineSegment2D;
 import mesh3d.Model3D;
@@ -25,10 +25,20 @@ public class Main extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -1311630393667993010L;
+	
+	BufferedImage paths;
+	
 	public Main(){
 	}
 	public void paint(Graphics g){
 		Graphics2D g2 = (Graphics2D) g;
+		if(paths==null) drawImage();
+		g2.drawImage(paths, null, 0, 0);
+		
+	}
+	public void drawImage(){
+		paths = new BufferedImage(500,500,BufferedImage.TYPE_BYTE_GRAY);
+		Graphics2D g2 = paths.createGraphics();
 		Model3D m1 = null;
 		Surface3D m2 = null;		
 		Slicer s = null;
@@ -40,16 +50,10 @@ public class Main extends JPanel {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		Layer layer1 = new Layer(s,2);
-		ArrayList<Extrusion2D> infill = layer1.getInfill(20);
-		ShapeArray2D<LineSegment2D> sa2d = new ShapeArray2D<LineSegment2D>(infill);
-		sa2d.draw(g2);
-		ArrayList<Extrusion2D> shells = layer1.getShells();
-		ShapeArray2D<LineSegment2D> sa2d2 = new ShapeArray2D<LineSegment2D>(shells);
+		Layer layer1 = new Layer(s,3);
+		ArrayList<Extrusion2D> path = layer1.getPath();
+		ShapeArray2D<LineSegment2D> sa2d2 = new ShapeArray2D<LineSegment2D>(path);
 		sa2d2.draw(g2);
-		Point2D start = new Point2D(300,300);
-		start.draw(g2);
 	}
 	public static void main(String[] args) throws NumberFormatException, IOException{
 		JPanel panel = new Main();

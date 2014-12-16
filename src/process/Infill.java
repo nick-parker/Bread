@@ -43,7 +43,13 @@ public class Infill {
 		System.out.println(lineCount);
 		for(int i=0;i<lineCount;i++){
 			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,1);
-			output.addAll(es);
+			if(i%2==0) output.addAll(es);
+			else{	//Add them flipped and in reverse order. This way the lines form a zig zag pattern across part.
+				for(int q=es.size()-1;q>=0;q--){
+					Extrusion2D e = es.get(q);
+					output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),1));
+				}
+			}
 			l = l.parallel(s.infillWidth);
 		}
 		return output;

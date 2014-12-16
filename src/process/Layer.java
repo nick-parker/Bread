@@ -3,6 +3,7 @@ package process;
 import java.util.ArrayList;
 
 import math.geom2d.line.LineSegment2D;
+import mesh3d.Constants;
 
 /**
  * Stores information on a single layer and outputs a modular chunk of gcode to print
@@ -58,6 +59,21 @@ public class Layer {
 		ArrayList<Extrusion2D> infill = getInfill(infillDistance);
 		ArrayList<Extrusion2D> shells = getShells();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
-		return null;
+		Extrusion2D last = null;	//Last segment added to output.
+		for(Extrusion2D e: infill){
+			ConnectAndAppend(last,e,output);
+			last = e;
+		}
+		for(Extrusion2D e: shells){
+			ConnectAndAppend(last,e,output);
+			last = e;
+		}
+		return output;
+	}
+	private static void ConnectAndAppend(Extrusion2D last, Extrusion2D e, ArrayList<Extrusion2D> output){
+		if(last!=null&&!last.lastPoint().almostEquals(e.firstPoint(), Constants.tol)){
+			output.add(new Extrusion2D(last.lastPoint(),e.firstPoint(),0));
+		}
+		output.add(e);
 	}
 }
