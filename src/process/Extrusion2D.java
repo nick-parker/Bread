@@ -28,14 +28,18 @@ public class Extrusion2D extends LineSegment2D{
 	 */
 	public ArrayList<Extrusion2D> splitExtrusion(LineSegment2D[] topology){
 		ArrayList<Point2D> hits = new ArrayList<Point2D>();
-		hits.add(this.firstPoint());
 		for(LineSegment2D l: topology){
 			if(l==null) continue;
 			Point2D hit = this.intersection(l);
 			if(hit!=null) hits.add(hit);
 		}
-		hits.add(this.lastPoint());
+		if(hits.isEmpty()||!Utils2D.equiv(this.firstPoint(),hits.get(0))) hits.add(0,this.firstPoint());
+		if(!Utils2D.equiv(this.lastPoint(), hits.get(hits.size()-1))) hits.add(this.lastPoint());
 		ArrayList<Point2D> sorted = Utils2D.orderPoints(this.direction(), hits);
 		return Utils2D.ConnectPoints(sorted,this.ExtrusionType);
+	}
+	@Override
+	public String toString(){
+		return "Extrusion2D[("+this.x0+", "+this.y0+")-("+(x0+dx)+", "+(y0+dy)+") "+ExtrusionType+"]";
 	}
 }

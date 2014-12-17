@@ -18,7 +18,7 @@ public class GcodeExport {
 		this.s = s;
 		try {
 			this.w = new PrintWriter(new FileWriter(fileLoc));
-			w.println("Testing the printwriter.");
+//			w.println("Testing the printwriter.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -30,12 +30,14 @@ public class GcodeExport {
 		for(Extrusion3D e: path){
 			if(!Tri3D.equiv(last,e.firstPoint())){
 				System.out.println("Discontinuous path! Something's probably wrong!");
+				System.out.println("Jump from "+Tri3D.PointToStr(last)+" to "+Tri3D.PointToStr(e.firstPoint()));
 			}
 			if(e.ExtrusionType==1||e.ExtrusionType==2){
 				//Infill or shell.
 				currE +=s.EperL*Tri3D.length(e);
 			}
 			G1(e.lastPoint(),currE);
+			last = e.lastPoint();
 		}
 	}
 	public void writeFromFile(String fileLoc){

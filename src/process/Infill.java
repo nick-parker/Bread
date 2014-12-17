@@ -21,8 +21,15 @@ public class Infill {
 	 * @return
 	 */
 	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber){
-		//Generate the inset, as a set of rings of points.
-		ArrayList<ArrayList<Point2D>> regionPs = NativeInset.inset(loops, distance);
+		if(loops.size()==0) return null;
+		ArrayList<ArrayList<Point2D>> regionPs;
+		if(distance!=0){
+			//Generate the inset, as a set of rings of points.
+			regionPs = NativeInset.inset(loops, distance);
+		}
+		else{
+			regionPs = ToPoints(loops);
+		}
 		MultiPolygon2D region = NativeInset.GetRegion(regionPs);	//Convert to a multipolygon for some convenience.
 		Collection<LineSegment2D> edges = region.edges();	//Get the edges of the multipolygon
 		//Calculate the CW angle from +x to run infill on this layer.
@@ -51,6 +58,13 @@ public class Infill {
 				}
 			}
 			l = l.parallel(s.infillWidth);
+		}
+		return output;
+	}
+	private static ArrayList<ArrayList<Point2D>> ToPoints(ArrayList<Loop> loops) {
+		ArrayList<ArrayList<Point2D>> output = new ArrayList<ArrayList<Point2D>>();
+		for(Loop l: loops){
+			output.add(l.getPointLoop());
 		}
 		return output;
 	}

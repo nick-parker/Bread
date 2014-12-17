@@ -1,9 +1,15 @@
 package main;
 
+import java.util.ArrayList;
+
 import mesh3d.Model3D;
 import mesh3d.SimplePlane;
 import mesh3d.Stli;
 import mesh3d.Surface3D;
+import process.Extrusion2D;
+import process.Extrusion3D;
+import process.Layer;
+import process.Reproject;
 import process.Slicer;
 
 public class NoView {
@@ -21,7 +27,12 @@ public class NoView {
 			e.printStackTrace();
 		}
 		s.slice("output.gcode");
-
+//		Layer l1 = new Layer(s,4);
+//		Reproject r = new Reproject(l1.offset, s);
+//		ArrayList<Extrusion2D> p2 = l1.getPath();
+//		ArrayList<Extrusion3D> p3 = r.Proj(p2);
+//		System.out.println(p2.size()+" "+p3.size());
+//		System.out.println(p3);
 	}
 
 }

@@ -76,7 +76,9 @@ public class Slicer {
 		for(int n=0;n<lc;n++){
 			Layer l = new Layer(this,n);
 			Reproject r = new Reproject(l.offset,this);
-			ArrayList<Extrusion3D> path = r.Proj(l.getPath());
+			ArrayList<Extrusion2D> p = l.getPath();
+			if(p==null) continue;
+			ArrayList<Extrusion3D> path = r.Proj(p);
 			g.addLayer(path);			
 		}
 		g.writeFromFile("end.gcode");

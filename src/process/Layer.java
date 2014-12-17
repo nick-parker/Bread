@@ -13,7 +13,7 @@ import mesh3d.Constants;
 public class Layer {
 	Slicer s;	//Parent slicer object
 	int layerNo;
-	double offset;
+	public double offset;
 	ArrayList<Loop> loops;
 	private boolean loopsMade = false;
 	
@@ -58,19 +58,20 @@ public class Layer {
 		return output;
 	}
 	public ArrayList<Extrusion2D> getPath(){
-		double infillDistance = (0.5+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
-		ArrayList<Extrusion2D> infill = getInfill(infillDistance);
-		ArrayList<Extrusion2D> shells = getShells();
+//		double infillDistance = (0.5+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
+		ArrayList<Extrusion2D> infill = getInfill(0);
+		if(infill==null) return null;
+//		ArrayList<Extrusion2D> shells = getShells();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Extrusion2D last = null;	//Last segment added to output.
 		for(Extrusion2D e: infill){
 			ConnectSplitAppend(last,e,output);
 			last = e;
 		}
-		for(Extrusion2D e: shells){
-			ConnectSplitAppend(last,e,output);
-			last = e;
-		}
+//		for(Extrusion2D e: shells){
+//			ConnectSplitAppend(last,e,output);
+//			last = e;
+//		}
 		return output;
 	}
 	/**

@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import process.Extrusion2D;
 import process.Layer;
 import process.Slicer;
+import math.geom2d.Point2D;
 import math.geom2d.ShapeArray2D;
 import math.geom2d.line.LineSegment2D;
 import mesh3d.Model3D;
@@ -54,6 +55,8 @@ public class Main extends JPanel {
 		ArrayList<Extrusion2D> path = layer1.getPath();
 		ShapeArray2D<LineSegment2D> sa2d2 = new ShapeArray2D<LineSegment2D>(path);
 		sa2d2.draw(g2);
+		LineSegment2D split = new LineSegment2D(new Point2D(-10,-10),new Point2D(500,500));
+		split.draw(g2);
 	}
 	public static void main(String[] args) throws NumberFormatException, IOException{
 		JPanel panel = new Main();
