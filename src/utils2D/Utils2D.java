@@ -8,6 +8,8 @@ import process.Extrusion2D;
 import math.geom2d.Point2D;
 import math.geom2d.Vector2D;
 import math.geom2d.line.LineSegment2D;
+import math.geom3d.Point3D;
+import mesh3d.Constants;
 
 public class Utils2D {
 	public static double PointDot(Vector2D v, Point2D p){
@@ -46,4 +48,11 @@ public class Utils2D {
 		}
 		return output;
 	}
+	public static boolean equiv(Point2D p1, Point2D p2){
+		return p1.distance(p2)<Constants.tol;
+	}
+	public static Point3D setZ(Point2D p, double z){
+		return new Point3D(p.x(),p.y(),z);
+	}
+	static public boolean within(Point2D p, Point2D point2d, double d){return p.distance(point2d)<d;}
 }

@@ -1,8 +1,6 @@
 package process;
 
 import java.util.ArrayList;
-import java.util.Collection;
-
 import utils2D.Utils2D;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
@@ -24,14 +22,15 @@ public class Extrusion2D extends LineSegment2D{
 	}
 	/**
 	 * Return a set of Extrusion2Ds of the same type as this with the same endpoints,
-	 * split anywhere this intersects topology.
+	 * split anywhere this intersects the lines in topology.
 	 * @param topology
 	 * @return
 	 */
-	public ArrayList<Extrusion2D> splitExtrusion(Collection<LineSegment2D> topology){
+	public ArrayList<Extrusion2D> splitExtrusion(LineSegment2D[] topology){
 		ArrayList<Point2D> hits = new ArrayList<Point2D>();
 		hits.add(this.firstPoint());
 		for(LineSegment2D l: topology){
+			if(l==null) continue;
 			Point2D hit = this.intersection(l);
 			if(hit!=null) hits.add(hit);
 		}

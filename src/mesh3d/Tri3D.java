@@ -14,6 +14,7 @@ public class Tri3D{
 	private double uv;
 	private double denom;
 	private double originDot; //baked in value for testing which side of the plane a point is on.
+	public final double radius;
 	private Plane3D pl;
 	/**
 	 * Create a Tri3D with CCW normal.
@@ -31,6 +32,7 @@ public class Tri3D{
 		LineSegment3D e2 = new LineSegment3D(p2, p0);
 		this.es = new LineSegment3D[]{e0,e1,e2};
 		this.originDot = PointDot(pl.normal(), pl.origin());
+		this.radius = Math.max(length(e0),Math.max(length(e1),length(e2)));
 	}
 	public Tri3D move(Vector3D v) {
 		Point3D pA = ps[0].plus(v);
@@ -171,7 +173,10 @@ public class Tri3D{
 	 * @return the points of this triangle projected into XY.
 	 */
 	public Point2D[] getPoints2D(){
-		return new Point2D[]{new Point2D(ps[0].getX(),ps[0].getY()),new Point2D(ps[1].getX(),ps[1].getY()),new Point2D(ps[2].getX(),ps[2].getY())}; 
+		return new Point2D[]{getPoint(0),getPoint(1),getPoint(2)}; 
+	}
+	public Point2D getPoint(int i){
+		return new Point2D(ps[i].getX(),ps[i].getY());
 	}
 	@Override
 	public String toString(){
@@ -223,4 +228,5 @@ public class Tri3D{
 		return pl;
 	}
 	static public boolean equiv(Point3D a, Point3D b){return a.distance(b)<Constants.tol;}
+	
 }

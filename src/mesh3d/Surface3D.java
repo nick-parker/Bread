@@ -2,19 +2,44 @@ package mesh3d;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 
+import utils2D.Utils2D;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
+import math.geom3d.line.StraightLine3D;
 
 public class Surface3D extends Mesh3D{
 	double offset;	//Z offset applied to this surface.
+	private Hashtable<Point2D,Tri3D> TriMap;
+	private ArrayList<Point2D> ps;
+	private double MaxRad;
 	public Surface3D(Tri3D[] ts) {
 		this.tris = ts;
 		offset = 0;
 		makeBB();
+		makeMaps();
+	}
+	/**
+	 * Generate the list and point->Tri hash table used to
+	 * quickly find the nearest triangles in 2d.
+	 */
+	private void makeMaps() {
+		TriMap = new Hashtable<Point2D,Tri3D>();
+		ArrayList<Point2D> points = new ArrayList<Point2D>();
+		for(Tri3D t: this.tris){
+			Point2D p = t.getPoint(0);
+			TriMap.put(p, t);
+			points.add(p);
+		}
+		ps = points;
+		MaxRad = 0;
+		for(Tri3D t: this.tris){
+			if(t.radius>MaxRad) MaxRad=t.radius;
+		}
 	}
 
 	@Override
@@ -75,7 +100,38 @@ public class Surface3D extends Mesh3D{
 	 * @param z Amount to offset from original position.
 	 */
 	public void setOffset(double z){
-		this.move(new Vector3D(0,0,z-offset));
-		offset = z;
+		if(offset!=z){
+			this.move(new Vector3D(0,0,z-offset));
+			offset = z;
+		}
 	}
+	/**
+	 * Project point P onto this surface in the Z axis.
+	 * @param p Point2D to project
+	 * @return The projected point as a Point3D object, or null if p is not in the domain of
+	 * this surface.
+	 */
+	public Point3D project(Point2D p){
+		StraightLine3D l = new StraightLine3D(new Point3D(p.getX(),p.getY(),0),new Vector3D(0,0,1));
+		for(Point2D tp : ps){
+			//If the largest triangle in the mesh could include both these points
+			if(Utils2D.within(p,tp,MaxRad)){
+				Tri3D t = TriMap.get(tp);
+				Point3D hit = t.lineIntersection(l);
+				if(hit!=null) return hit;
+			}
+		}
+		return null;
+	}
+//	/**
+//	 * Returns the tri whose origin point is the i'th closest to point p in 2D.
+//	 * @param p
+//	 * @return A tri3D from this surface's set of tris.
+//	 */
+//	private Tri3D getNearest(Point2D p, int i){
+//		int index = ps.getIndex(p);
+//		Point2D op = ps.get(index + i%2==0 ? i/2 : -i/2);
+//		if(op==null) return null;
+//		return TriMap.get(op);
+//	}
 }

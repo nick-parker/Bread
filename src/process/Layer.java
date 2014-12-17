@@ -2,6 +2,7 @@ package process;
 
 import java.util.ArrayList;
 
+import utils2D.Utils2D;
 import math.geom2d.line.LineSegment2D;
 import mesh3d.Constants;
 
@@ -12,15 +13,17 @@ import mesh3d.Constants;
 public class Layer {
 	Slicer s;	//Parent slicer object
 	int layerNo;
+	double offset;
 	ArrayList<Loop> loops;
 	private boolean loopsMade = false;
 	
 	public Layer(Slicer s, int layerNo){
 		this.s=s;
 		this.layerNo=layerNo;
+		this.offset = layerNo*s.layerHeight;
 	}
 	private void makeLoops(){
-		s.shape.setOffset(layerNo*s.layerHeight);
+		s.shape.setOffset(offset);
 		LineSegment2D[] ls = Flatten.FlattenZ(s.shape.overlap(s.part));
 		this.loops = Order.ListOrder(ls);
 	}
@@ -61,19 +64,26 @@ public class Layer {
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Extrusion2D last = null;	//Last segment added to output.
 		for(Extrusion2D e: infill){
-			ConnectAndAppend(last,e,output);
+			ConnectSplitAppend(last,e,output);
 			last = e;
 		}
 		for(Extrusion2D e: shells){
-			ConnectAndAppend(last,e,output);
+			ConnectSplitAppend(last,e,output);
 			last = e;
 		}
 		return output;
 	}
-	private static void ConnectAndAppend(Extrusion2D last, Extrusion2D e, ArrayList<Extrusion2D> output){
-		if(last!=null&&!last.lastPoint().almostEquals(e.firstPoint(), Constants.tol)){
-			output.add(new Extrusion2D(last.lastPoint(),e.firstPoint(),0));
+	/**
+	 * Adds e, and a travel from the end of last to the beginning of e if necessary, to output. Both e and the travel
+	 * are split based on the topology of the surface in this layer's slicer.
+	 * @param last Last segment added to output.
+	 * @param e Segment to add to output.
+	 * @param output Continous path composed of Extrusion2D objects.
+	 */
+	private void ConnectSplitAppend(Extrusion2D last, Extrusion2D e, ArrayList<Extrusion2D> output){
+		if(last!=null&&!Utils2D.equiv(last.lastPoint(), e.firstPoint())){
+			output.addAll((new Extrusion2D(last.lastPoint(),e.firstPoint(),0)).splitExtrusion(s.topo));
 		}
-		output.add(e);
+		output.addAll(e.splitExtrusion(s.topo));
 	}
 }
