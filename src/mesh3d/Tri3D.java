@@ -115,6 +115,7 @@ public class Tri3D{
 //		5. Calculate the intersections of the edges with the opposite plane for each triangle
 		Point3D[] hitsA = PlaneTriangleIntersection(this.pl,t.es);
 		Point3D[] hitsB = PlaneTriangleIntersection(t.pl, this.es);
+		if(hitsA==null||hitsB==null) return null;
 //		6. Dot the intersections with normalized n1 x n2 to get their positions along the intersection line
 		Vector3D dir = Vector3D.crossProduct(n, n2).normalize();
 		double[] dotsA = new double[]{PointDot(dir,hitsA[0]), PointDot(dir,hitsA[1])};
@@ -147,6 +148,7 @@ public class Tri3D{
 				k++;
 			}
 		}
+		if(output[0]==null||output[1]==null) return null;
 		return output;
 	}
 	private static boolean notIn(Point3D[] ps,Point3D p){

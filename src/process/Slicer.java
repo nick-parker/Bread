@@ -20,7 +20,7 @@ public class Slicer {
 	public final double nozzleD;
 	public final double extrusionWidth;
 	public final int printTemp;
-	public final double Speed;
+	public final int Speed;
 	public final int numShells;
 	public final double infillWidth;
 	public final double infillDir;	//Direction of infill on layer 0;
@@ -30,11 +30,11 @@ public class Slicer {
 	public final double EperL;	//E increase per unit L increase.
 	//Inputs below are optional, above are mandatory.
 	public double shellSpeedMult = 1;	//unused
-	public double bottomSpeedMult = 0.5;
+	public double bottomSpeedMult = 1;
 	public int bottomLayerCount = 5;
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
-			int printTemp, double speed, int numShells, double infillWidth, double infillDir, double infillAngle, 
+			int printTemp, int speed, int numShells, double infillWidth, double infillDir, double infillAngle, 
 			double lift) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
@@ -50,7 +50,9 @@ public class Slicer {
 		this.shape = shape;
 		this.topo = shape.topology();
 		this.lift = lift;
-		this.EperL = ((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4)*Math.pow(nozzleD, 2)/Math.pow(filD,2);
+		//Cross sectional area of the extrusion is the ratio of plastic volume/XYZ distance, units mm^2
+		//volume rate * filament distance/unit volume = filament rate. filament distance/unit volume is cx area of filament.
+		this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
 	}
 	/**
 	 * Position shape so that its highest point is layerHeight/2 above the part's lowest point.
@@ -75,7 +77,7 @@ public class Slicer {
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
 		for(int n=0;n<lc;n++){
-			if(n<bottomLayerCount) g.SetSpeed(this.Speed*this.bottomSpeedMult);
+			if(n<bottomLayerCount) g.SetSpeed((int)Math.round(this.Speed*this.bottomSpeedMult));
 			else g.SetSpeed(this.Speed);
 			Layer l = new Layer(this,n);
 			System.out.println("Offset: "+l.offset);

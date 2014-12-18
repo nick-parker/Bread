@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import math.geom3d.Point3D;
@@ -15,6 +16,8 @@ import mesh3d.Tri3D;
 public class GcodeExport {
 	private Point3D last;
 	private double currE;
+	DecimalFormat ext = new DecimalFormat("#.#####");
+	DecimalFormat xyz = new DecimalFormat("#.###");
 	PrintWriter w;
 	Slicer s;
 	public GcodeExport(String fileLoc, Slicer s){
@@ -77,7 +80,7 @@ public class GcodeExport {
 		}
 	}
 	private void G1(Point3D p){
-		w.println("G1 X"+p.getX()+" Y"+p.getY()+" Z"+p.getZ()+" E"+currE);
+		w.println("G1 X"+xyz.format(p.getX())+" Y"+xyz.format(p.getY())+" Z"+xyz.format(p.getZ())+" E"+ext.format(currE));
 	}
 	private void zeroE(){
 		w.println("G92 E0");
@@ -87,8 +90,8 @@ public class GcodeExport {
 		w.close();
 		
 	}
-	public void SetSpeed(double d) {
-		w.println("G1 F"+d);
+	public void SetSpeed(int d) {
+		w.println("G1 F"+d*60);
 		
 	}
 	public void setTempAndWait(int printTemp) {

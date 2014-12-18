@@ -20,15 +20,15 @@ public class NoView {
 		Surface3D m2 = null;		
 		Slicer s = null;
 		try {
-			m1 = Stli.importModel("model.stl", true);
-			m2 = Stli.importSurface("crinkle3.stl", true);
+			m1 = Stli.importModel("vtop.stl", true);
+			m2 = Stli.importSurface("v.stl", true);
 //			m2 = SimplePlane.MakePlane(-10, -10, 500, 500, 4);
 			//(Model3D part, Surface3D shape, layerHeight, filD, nozzleD, 
 			//extrusionWidth, PrintTemp, speed, numShells, infillWidth, 
 			//infillDir, infillAngle, lift)
 			s = new Slicer(m1,m2,0.3,1.75,0.4,
-					.55,200,30,0,1,
-					0,Math.PI/4,0.3);
+					.55,200,4,0,0.65,
+					Math.PI/4,Math.PI/2,0.3);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
