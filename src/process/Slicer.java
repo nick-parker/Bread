@@ -29,9 +29,9 @@ public class Slicer {
 	public final LineSegment2D[] topo;
 	public final double EperL;	//E increase per unit L increase.
 	//Inputs below are optional, above are mandatory.
-	public double shellSpeedMult = 1;
-	public double bottomSpeedMult = 1;
-	public int bottomLayerCount = 0;
+	public double shellSpeedMult = 1;	//unused
+	public double bottomSpeedMult = 0.5;
+	public int bottomLayerCount = 5;
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, double speed, int numShells, double infillWidth, double infillDir, double infillAngle, 
@@ -50,7 +50,7 @@ public class Slicer {
 		this.shape = shape;
 		this.topo = shape.topology();
 		this.lift = lift;
-		this.EperL = ((extrusionWidth-layerHeight)*extrusionWidth+3.14*layerHeight*layerHeight/4);
+		this.EperL = ((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4)*Math.pow(nozzleD, 2)/Math.pow(filD,2);
 	}
 	/**
 	 * Position shape so that its highest point is layerHeight/2 above the part's lowest point.
@@ -65,7 +65,7 @@ public class Slicer {
 		Box3D b1 = shape.boundingBox();
 		Box3D b2 = part.boundingBox();
 		//Distance between highest point on part and the lowest point on a properly positioned shape.
-		double distance = b1.getHeight()+b2.getHeight()-layerHeight/2;
+		double distance = b1.getDepth()+b2.getDepth()-layerHeight/2;
 		return (int) Math.ceil(distance/layerHeight);
 	}
 	public void slice(String fileLoc){
@@ -73,8 +73,12 @@ public class Slicer {
 		int lc = layerCount();
 		GcodeExport g = new GcodeExport(fileLoc, this);
 		g.writeFromFile("start.gcode");
+		g.setTempAndWait(this.printTemp);
 		for(int n=0;n<lc;n++){
+			if(n<bottomLayerCount) g.SetSpeed(this.Speed*this.bottomSpeedMult);
+			else g.SetSpeed(this.Speed);
 			Layer l = new Layer(this,n);
+			System.out.println("Offset: "+l.offset);
 			Reproject r = new Reproject(l.offset,this);
 			ArrayList<Extrusion2D> p = l.getPath();
 			if(p==null) continue;

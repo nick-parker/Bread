@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import utils2D.Utils2D;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
+import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
@@ -20,7 +21,6 @@ public class Surface3D extends Mesh3D{
 	public Surface3D(Tri3D[] ts) {
 		this.tris = ts;
 		offset = 0;
-		makeBB();
 		makeMaps();
 	}
 	/**
@@ -102,6 +102,7 @@ public class Surface3D extends Mesh3D{
 	public void setOffset(double z){
 		if(offset!=z){
 			this.move(new Vector3D(0,0,z-offset));
+			makeMaps();
 			offset = z;
 		}
 	}
@@ -112,16 +113,33 @@ public class Surface3D extends Mesh3D{
 	 * this surface.
 	 */
 	public Point3D project(Point2D p){
-		StraightLine3D l = new StraightLine3D(new Point3D(p.getX(),p.getY(),0),new Vector3D(0,0,1));
+		StraightLine3D l = new StraightLine3D(new Point3D(p.getX(),p.getY(),0),Constants.up);
 		for(Point2D tp : ps){
-			//If the largest triangle in the mesh could include both these points
+			//If the largest edge in the mesh could connect these points
 			if(Utils2D.within(p,tp,MaxRad)){
+				//Test the triangle associated with this point.
 				Tri3D t = TriMap.get(tp);
 				Point3D hit = t.lineIntersection(l);
 				if(hit!=null) return hit;
 			}
+			//Otherwise the associated triangle can't possibly reach this point.
 		}
+		Box3D b = this.boundingBox();
+		System.out.println("Point " + p.getX()+" "+p.getY() + " Failed to project.");
+		System.out.println("X bounds: "+ b.getMinX()+" : "+b.getMaxX()+" Y bounds: "+b.getMinY()+" : "+b.getMaxY());
 		return null;
+	}
+	@Override
+	public void move(Vector3D v){{
+		Tri3D[] newTris = new Tri3D[tris.length];
+		int i=0;
+		for(Tri3D t:tris){
+			newTris[i]=t.move(v);
+			i++;
+			}
+		tris=newTris;
+		};
+		makeMaps();
 	}
 //	/**
 //	 * Returns the tri whose origin point is the i'th closest to point p in 2D.

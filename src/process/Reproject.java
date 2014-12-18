@@ -2,6 +2,8 @@ package process;
 
 import java.util.ArrayList;
 
+import math.geom2d.Point2D;
+import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import utils2D.Utils2D;
 
@@ -36,7 +38,7 @@ public class Reproject {
 			}
 			if(!travels.isEmpty()){
 				//End of a series of travels, since we didn't just hit continue.
-				output.addAll(projectTravel(travels));
+				output.addAll(projectTravel(travels,e.firstPoint()));
 				travels.clear();				
 			}
 			output.add(projectExtrusion(e));
@@ -70,31 +72,36 @@ public class Reproject {
 	 * @param s
 	 * @return
 	 */
-	private ArrayList<Extrusion3D> projectTravel(ArrayList<Extrusion2D> travels){
+	private ArrayList<Extrusion3D> projectTravel(ArrayList<Extrusion2D> travels, Point2D end){
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		Extrusion3D first = projectExtrusion(travels.get(0));
 		Vector3D rise = new Vector3D(0,0,s.lift);
 		Extrusion3D lift = new Extrusion3D(first.firstPoint(),first.firstPoint().plus(rise),0);
 		output.add(lift);
-		first = raise(first,s.lift);
-		output.add(first);
-		double z = first.lastPoint().getZ();
-		travels.remove(0);	//So we don't re-add the first segment.
+//		first = raise(first,s.lift);
+//		output.add(first);
+		double z = lift.lastPoint().getZ();
+//		travels.remove(0);	//So we don't re-add the first segment.
 		for(Extrusion2D e : travels){
 			//Nothing happens here if first was the only edge.
 			Extrusion3D proj = projectExtrusion(e);
 			if(proj.lastPoint().getZ()+s.lift>z){
 				//Need to keep sloping up on this one.
-				output.add(raise(proj,s.lift));
+				Point3D last = output.get(output.size()-1).lastPoint();
+				output.add(new Extrusion3D(last,liftP(proj.lastPoint()),0));
 				z = proj.lastPoint().getZ()+s.lift;
 			}
 			else output.add(setZ(e,z));
 		}
 		Extrusion3D last = output.get(output.size()-1);
-		Extrusion3D lower = new Extrusion3D(last.lastPoint(),last.lastPoint().minus(rise),0);
+		Extrusion3D lower = new Extrusion3D(last.lastPoint(),s.shape.project(end),0);
 		output.add(lower);
 		return output;
 	}
+	private Point3D liftP(Point3D p) {
+		return p.plus(new Vector3D(0,0,s.lift));
+	}
+
 	/**
 	 * Raise an Extrusion3D in the Z direction by a given amount.
 	 * @param e extrusion to raise
