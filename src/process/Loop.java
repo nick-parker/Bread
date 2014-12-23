@@ -3,6 +3,7 @@ package process;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import utils2D.Utils2D;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import mesh3d.Constants;
@@ -19,6 +20,7 @@ public class Loop implements Iterable<LineSegment2D>{
 	 * @param l Line segment to append to the end of this loop.
 	 */
 	private void addEnd(LineSegment2D l){
+		if(l.length()<Constants.tol) return;
 		loop.add(l);
 		end = l;
 	}
@@ -26,6 +28,7 @@ public class Loop implements Iterable<LineSegment2D>{
 	 * @param l Line Segment to append to the front of this loop.
 	 */
 	private void addFront(LineSegment2D l){
+		if(l.length()<Constants.tol) return;
 		loop.add(0, l);
 	}
 	/**

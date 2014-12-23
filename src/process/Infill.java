@@ -36,20 +36,20 @@ public class Infill {
 		Collection<LineSegment2D> edges = region.edges();	//Get the edges of the multipolygon
 		//Calculate the CW angle from +x to run infill on this layer.
 		double a = (s.infillDir+layerNumber*s.infillAngle)%(2*Math.PI);	//CW angle infill lines make with x axis.
-		System.out.println("Infill angle: "+ a);
+//		System.out.println("Infill angle: "+ a);
 		//Calculate a perpendicular vector to the infill.
 		Vector2D move = Utils2D.AngleVector(a+Math.PI/2);	//Direction perpendicular to infill to move intersection line.
 		Vector2D dir = Utils2D.AngleVector(a);				//Direction parallel to infill.
 		//Get the point furthest in the -move direction from the set of rings of points.
 		Point2D firstP = getExtreme(move,regionPs,false);
-		System.out.println(firstP);
+//		System.out.println(firstP);
 		StraightLine2D l = new StraightLine2D(firstP, dir);
-		System.out.println(dir + " is perpendicular to " + move);
+//		System.out.println(dir + " is perpendicular to " + move);
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
-		System.out.println(getWidth(move, regionPs));
+//		System.out.println(getWidth(move, regionPs));
 		Box2D b = region.boundingBox();
 		int lineCount = (int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/s.infillWidth);
-		System.out.println(lineCount);
+//		System.out.println(lineCount);
 		for(int i=0;i<lineCount;i++){
 			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,1);
 			if(i%2==0) output.addAll(es);

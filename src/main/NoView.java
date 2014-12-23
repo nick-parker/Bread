@@ -15,8 +15,8 @@ public class NoView {
 		Slicer s = null;
 		try {
 			m1 = Stli.importModel("ring.stl", true);
-//			m2 = Stli.importSurface("wavemodel.stl", true);
-			m2 = SimplePlane.MakePlane(-10, -10, 500, 500, 4);
+			m2 = Stli.importSurface("v.stl", true);
+//			m2 = SimplePlane.MakePlane(-10, -10, 500, 500, 4);
 			//(Model3D part, Surface3D shape, layerHeight, filD, nozzleD, 
 			//extrusionWidth, PrintTemp, xySpeed, zSpeed, numShells, infillWidth, 
 			//infillDir, infillAngle, lift)
