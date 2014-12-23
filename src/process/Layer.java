@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import utils2D.Utils2D;
 import math.geom2d.line.LineSegment2D;
-import mesh3d.Constants;
 
 /**
  * Stores information on a single layer and outputs a modular chunk of gcode to print

@@ -6,7 +6,6 @@ import straightskeleton.Corner;
 import utils.LoopL;
 import main.Inset;
 import math.geom2d.Point2D;
-import math.geom2d.line.LineSegment2D;
 import math.geom2d.polygon.LinearRing2D;
 import math.geom2d.polygon.MultiPolygon2D;
 

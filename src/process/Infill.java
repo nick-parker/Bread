@@ -1,7 +1,6 @@
 package process;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 import utils2D.Utils2D;
@@ -11,7 +10,6 @@ import math.geom2d.Vector2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom2d.line.StraightLine2D;
 import math.geom2d.polygon.MultiPolygon2D;
-import mesh3d.Constants;
 
 public class Infill {
 	/**
@@ -136,6 +134,7 @@ public class Infill {
 		//Sort the intersections along l
 		ArrayList<Point2D> sorted = Utils2D.orderPoints(v, truePs);
 		for(int k=0;k<sorted.size()-1;k+=2){
+			if(Utils2D.equiv(sorted.get(k), sorted.get(k+1))) continue;	//Don't make 0 length edges.
 			output.add(new Extrusion2D(sorted.get(k),sorted.get(k+1),type));
 		}
 		return output;

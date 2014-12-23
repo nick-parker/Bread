@@ -12,6 +12,6 @@ public class Constants {
 	static public final Vector3D yminus = new Vector3D(0,-1,0);
 	static public final Vector3D zplus = new Vector3D(0,0,1);
 	static public final Vector3D zminus = new Vector3D(0,0,-1);
-	static public final double tol = 1e-9;
+	static public final double tol = 1e-4;
 	public static final Vector3D up = new Vector3D(0,0,1);
 }

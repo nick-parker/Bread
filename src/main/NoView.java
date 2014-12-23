@@ -2,7 +2,6 @@ package main;
 
 import math.geom3d.Vector3D;
 import mesh3d.Model3D;
-import mesh3d.SimplePlane;
 import mesh3d.Stli;
 import mesh3d.Surface3D;
 import process.Slicer;
@@ -22,7 +21,7 @@ public class NoView {
 			//infillDir, infillAngle, lift)
 			s = new Slicer(m1,m2,0.3,1.75,0.4,
 					.55,200,12,3,0,0.6,
-					0,0,0.15);
+					0,Math.PI/4,0.15);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

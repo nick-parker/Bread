@@ -79,13 +79,14 @@ public class Surface3D extends Mesh3D{
 			LineSegment2D[] ls = new LineSegment2D[]{new LineSegment2D(ps[0],ps[1]),
 					new LineSegment2D(ps[1],ps[2]),
 					new LineSegment2D(ps[2],ps[0])};
-			//Throw away any lines which we already have in the topology.
+			//Throw away any lines which we already have in the topology. Also, any line which has 0 length.
 			boolean[] checks = new boolean[]{true,true,true};
 			for(LineSegment2D l:output){
 				for(int i=0;i<3;i++){
 					if(checks[i]&&(l.almostEquals(ls[i], Constants.tol)||l.almostEquals(ls[i].reverse(), Constants.tol))){
 						checks[i]=false;
 					}
+					if(l.length()<Constants.tol) checks[i]=false;
 				}				
 			}
 			//Add the lines we want to keep to our topology.
