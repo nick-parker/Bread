@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
+import mesh3d.Constants;
 import mesh3d.Tri3D;
 
 public class GcodeExport {
@@ -80,6 +81,13 @@ public class GcodeExport {
 		}
 	}
 	private void G1(Point3D p){
+		Vector3D mv = new Vector3D(last,p);
+		double cos = Vector3D.dotProduct(mv, Constants.up)/mv.norm();
+		if(mv.norm()==0) SetSpeed(s.zSpeed);
+		else if(Math.abs(Math.abs(cos)-1)<Constants.tol) SetSpeed(s.zSpeed);
+		else{
+			SetSpeed(Math.min(Math.abs(s.zSpeed/cos),s.xySpeed));
+		}
 		w.println("G1 X"+xyz.format(p.getX())+" Y"+xyz.format(p.getY())+" Z"+xyz.format(p.getZ())+" E"+ext.format(currE));
 	}
 	private void zeroE(){
@@ -90,8 +98,9 @@ public class GcodeExport {
 		w.close();
 		
 	}
-	public void SetSpeed(int d) {
-		w.println("G1 F"+d*60);
+	public void SetSpeed(double d) {
+		w.println("G1 F"+xyz.format(d*60));
+		if(xyz.format(d*60).contains("?")) System.out.println(d +" caused a ?");
 		
 	}
 	public void setTempAndWait(int printTemp) {

@@ -20,7 +20,8 @@ public class Slicer {
 	public final double nozzleD;
 	public final double extrusionWidth;
 	public final int printTemp;
-	public final int Speed;
+	public final int xySpeed;
+	public final int zSpeed;
 	public final int numShells;
 	public final double infillWidth;
 	public final double infillDir;	//Direction of infill on layer 0;
@@ -34,13 +35,14 @@ public class Slicer {
 	public int bottomLayerCount = 5;
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
-			int printTemp, int speed, int numShells, double infillWidth, double infillDir, double infillAngle, 
+			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, double infillDir, double infillAngle, 
 			double lift) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
 		this.extrusionWidth = extrusionWidth;
 		this.printTemp = printTemp;
-		this.Speed = speed;
+		this.xySpeed = xySpeed;
+		this.zSpeed = zSpeed;
 		this.numShells = numShells;
 		this.infillWidth = infillWidth;
 		this.layerHeight = layerHeight;
@@ -77,8 +79,8 @@ public class Slicer {
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
 		for(int n=0;n<lc;n++){
-			if(n<bottomLayerCount) g.SetSpeed((int)Math.round(this.Speed*this.bottomSpeedMult));
-			else g.SetSpeed(this.Speed);
+//			if(n<bottomLayerCount) g.SetSpeed((int)Math.round(this.Speed*this.bottomSpeedMult));
+//			else g.SetSpeed(this.Speed);
 			Layer l = new Layer(this,n);
 			System.out.println("Offset: "+l.offset);
 			Reproject r = new Reproject(l.offset,this);

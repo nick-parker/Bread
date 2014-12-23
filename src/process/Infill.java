@@ -1,7 +1,9 @@
 package process;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+
 import utils2D.Utils2D;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
@@ -125,18 +127,7 @@ public class Infill {
 				ps.add(hit);				
 			}
 		}
-		//Throw away any duplicates, which shouldn't exist but I'm not sure.
-		ArrayList<Point2D> truePs = new ArrayList<Point2D>();
-		for(Point2D p: ps){
-			boolean n = true;
-			for(Point2D p2: truePs){
-				if(p.almostEquals(p2, Constants.tol)){
-					System.out.println("Getting rid of a duplicate! Keep this step!");
-					n=false;
-				}
-			}
-			if(n) truePs.add(p);
-		}
+		ArrayList<Point2D> truePs = ps;
 		//Check that there's an even number of intersections.
 		if(truePs.size()%2!=0){
 			System.out.println("Odd number of intersections.");

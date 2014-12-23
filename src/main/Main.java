@@ -47,7 +47,7 @@ public class Main extends JPanel {
 			m1 = Stli.importModel("big.stl", true);
 //			m2 = Stli.importSurface("crinkle3.stl", true);
 			m2 = SimplePlane.MakePlane(-10, -10, 500, 500, 4);
-			s = new Slicer(m1,m2,0.5,1.75,0.4,5,200,50,2,4,0,Math.PI/4,0.3);
+			s = new Slicer(m1,m2,0.5,1.75,0.4,5,200,50,10,2,4,0,Math.PI/4,0.3);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
