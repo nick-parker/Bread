@@ -4,6 +4,14 @@ import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
 import mesh3d.Tri3D;
 
+/**
+ * ExtrusionType marks the type of extrusion this line represents.
+ * 0 - travel
+ * 1 - infill
+ * 2 - shell
+ * @author Nick
+ *
+ */
 public class Extrusion3D extends LineSegment3D {
 	public final int ExtrusionType;
 

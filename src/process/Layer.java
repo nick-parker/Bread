@@ -6,8 +6,7 @@ import utils2D.Utils2D;
 import math.geom2d.line.LineSegment2D;
 
 /**
- * Stores information on a single layer and outputs a modular chunk of gcode to print
- * this layer.
+ * Stores information on a single layer and outputs a continuous 2D path.
  */
 public class Layer {
 	Slicer s;	//Parent slicer object
@@ -41,7 +40,6 @@ public class Layer {
 	 * Generate a set of line segments representing the shells for this layer.
 	 * Ordered innermost shells first in a round robin fashion, so every
 	 * region gets its first shell before any of them get their second.
-	 * @param numShells Number of shells to generate.
 	 * @return The described set in an ArrayList.
 	 */
 	public ArrayList<Extrusion2D> getShells(){

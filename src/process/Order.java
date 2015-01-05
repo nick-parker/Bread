@@ -8,9 +8,10 @@ import math.geom2d.line.LineSegment2D;
 public class Order {
 	/**
 	 * Separate an array of line segments into the continuous curves which
-	 * make it up, and order those curves. Doesn't check for loop closure.
+	 * make it up, and order those curves. Ends curves when they can no longer 
+	 * be extended, with no regard to loop closure.
 	 * @param ls Array of line segments to sort out and order.
-	 * @return A set of ordered loops.
+	 * @return A set of continuous sets of line segments.
 	 */
 	static public ArrayList<Loop> ListOrder(LineSegment2D[] ls){
 		ArrayList<Loop> output = new ArrayList<Loop>();
@@ -20,6 +21,9 @@ public class Order {
 			LineSegment2D active = unsorted.iterator().next();	//Grab a random unsorted seg.
 			unsorted.remove(active);
 			Loop activeLoop = new Loop(active);
+			//Complete loops one at a time. This is inefficient but much easier to debug than
+			//a more intelligent system where segments are built up and merged until no further
+			//merges can be performed. TODO Make Order faster
 			boolean changing = true;
 			while(changing){
 				changing = false;

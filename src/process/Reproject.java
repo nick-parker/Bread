@@ -26,7 +26,12 @@ public class Reproject {
 		this.offset = offset;
 		this.s = s;
 	}
-	
+	/**
+	 * Project a series of 2d extrusions which have already been segmented based on
+	 * the topology of the surface stored in slicer s.
+	 * @param path Path to project.
+	 * @return A continuous path of 3d extrusions.
+	 */
 	public ArrayList<Extrusion3D> Proj(ArrayList<Extrusion2D> path){
 		s.shape.setOffset(offset);
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
@@ -98,18 +103,11 @@ public class Reproject {
 		output.add(lower);
 		return output;
 	}
+	/**
+	 * @param p Point to lift
+	 * @return A copy of p s.lift mm above p's position.
+	 */
 	private Point3D liftP(Point3D p) {
 		return p.plus(new Vector3D(0,0,s.lift));
-	}
-
-	/**
-	 * Raise an Extrusion3D in the Z direction by a given amount.
-	 * @param e extrusion to raise
-	 * @param lift Amount to raise the extrusion
-	 * @return A new Extrusion3D object.
-	 */
-	private static Extrusion3D raise(Extrusion3D e, double lift){
-		Vector3D vec = new Vector3D(0,0,lift);
-		return new Extrusion3D(e.firstPoint().plus(vec), e.lastPoint().plus(vec), e.ExtrusionType);
 	}
 }

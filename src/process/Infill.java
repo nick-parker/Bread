@@ -18,13 +18,13 @@ public class Infill {
 	 * @param loops The set of loops representing the layer domain in 2D.
 	 * @param distance Minimum distance to maintain between infill and loops.
 	 * @param layerNumber The number of this layer, for infill orientation.
-	 * @return
+	 * @return A list of infill extrusions, ordered in a zig zag pattern across the part.
 	 */
 	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber){
 		if(loops.size()==0) return null;
 		ArrayList<ArrayList<Point2D>> regionPs;
 		if(distance!=0){
-			//Generate the inset, as a set of rings of points.
+			//Generate the inset, as a set of rings of points. Currently nonfunctional.
 			regionPs = NativeInset.inset(loops, distance);
 		}
 		else{
@@ -34,20 +34,19 @@ public class Infill {
 		Collection<LineSegment2D> edges = region.edges();	//Get the edges of the multipolygon
 		//Calculate the CW angle from +x to run infill on this layer.
 		double a = (s.infillDir+layerNumber*s.infillAngle)%(2*Math.PI);	//CW angle infill lines make with x axis.
-//		System.out.println("Infill angle: "+ a);
 		//Calculate a perpendicular vector to the infill.
 		Vector2D move = Utils2D.AngleVector(a+Math.PI/2);	//Direction perpendicular to infill to move intersection line.
 		Vector2D dir = Utils2D.AngleVector(a);				//Direction parallel to infill.
 		//Get the point furthest in the -move direction from the set of rings of points.
 		Point2D firstP = getExtreme(move,regionPs,false);
-//		System.out.println(firstP);
 		StraightLine2D l = new StraightLine2D(firstP, dir);
-//		System.out.println(dir + " is perpendicular to " + move);
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
-//		System.out.println(getWidth(move, regionPs));
 		Box2D b = region.boundingBox();
+		//Calculate the worst case scenario number of lines necessary, because calculating width in a given vector direction 
+		//is implemented wrong.
 		int lineCount = (int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/s.infillWidth);
-//		System.out.println(lineCount);
+		//Iterate through lines without checking that they actually intersect. getEdges returns an empty list for nonintersection,
+		//so addAll and iterating through it both do nothing.
 		for(int i=0;i<lineCount;i++){
 			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,1);
 			if(i%2==0) output.addAll(es);
@@ -57,6 +56,7 @@ public class Infill {
 					output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),1));
 				}
 			}
+			//Move the line to the right.
 			l = l.parallel(s.infillWidth);
 		}
 		return output;
@@ -72,7 +72,7 @@ public class Infill {
 	 * 
 	 * @param v
 	 * @param ps
-	 * @return The point in ps farthest in the -v direction.
+	 * @return The point in ps farthest in the given direction.
 	 */
 	public static Point2D getExtreme(Vector2D v, ArrayList<ArrayList<Point2D>> ps, boolean max){
 //		System.out.println("Seeking max? "+max);
@@ -111,9 +111,9 @@ public class Infill {
 	 * Intersect a line with a set of edges, then connect the pairs of intersections.
 	 * 
 	 * @param l Line to intersect
-	 * @param v Direction of l
+	 * @param v Direction of l, passing this in saves some calculations since it's the same for a whole layer.
 	 * @param edges Set of edges to intersect with
-	 * @return Segments of l inside the domain represented by edges. Empty list if segments don't intersect.
+	 * @return Segments of l inside the domain represented by edges. Empty list if edges and l don't intersect.
 	 */
 	public static ArrayList<Extrusion2D> getEdges(StraightLine2D l, Collection<LineSegment2D> edges, Vector2D v, int type){
 		ArrayList<Point2D> ps = new ArrayList<Point2D>();

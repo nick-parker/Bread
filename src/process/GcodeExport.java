@@ -10,14 +10,23 @@ import java.util.ArrayList;
 
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
+import math.geom3d.line.LineSegment3D;
 import mesh3d.Constants;
 import mesh3d.Tri3D;
-
+/**
+ * A Gcode Export function for use with absolute coordinate modes. The most recent position in XYZE coordinates is stored as
+ * state in each instance of the exporter, as well as the location to write the .gcode file and the slicer object which
+ * stores settings relevant to E coordinate calculations.
+ * @author Nick
+ *
+ */
 public class GcodeExport {
 	private Point3D last;
 	private double currE;
-	DecimalFormat ext = new DecimalFormat("#.#####");
-	DecimalFormat xyz = new DecimalFormat("#.###");
+	//Formatting just matches the conventions set by other slicers for precision in various axes.
+	//Cura is compatible with all the popular firmwares, so its conventions are a safe bet.
+	static DecimalFormat ext = new DecimalFormat("#.#####");	//Extrusion
+	static DecimalFormat xyz = new DecimalFormat("#.###");		//Position
 	PrintWriter w;
 	Slicer s;
 	public GcodeExport(String fileLoc, Slicer s){
@@ -30,9 +39,13 @@ public class GcodeExport {
 			e.printStackTrace();
 		}
 	}
-	public static void CheckContinuity(ArrayList<Extrusion3D> path){
+	/**
+	 * Debugging function to check that a series of LineSegment3D objects is continuous.
+	 * @param path A list of LineSegment3D objects or a subtype.
+	 */
+	public static void CheckContinuity(ArrayList<? extends LineSegment3D> path){
 		Point3D l = path.get(0).firstPoint();
-		for(Extrusion3D e: path){
+		for(LineSegment3D e: path){
 			if(!Tri3D.equiv(l,e.firstPoint())){
 				System.out.println("Discontinuous path! Something's probably wrong!");
 				System.out.println("Jump from "+Tri3D.PointToStr(l)+" to "+Tri3D.PointToStr(e.firstPoint()));
@@ -40,9 +53,14 @@ public class GcodeExport {
 			l = e.lastPoint();
 		}
 	}
+	/**
+	 * Convert the final Extrusion3D path of a layer object to gcode, and append it to the output file.
+	 * @param path Layer path to convert
+	 */
 	public void addLayer(ArrayList<Extrusion3D> path){
 		w.println(";layer");
-		last = path.get(0).firstPoint();
+		Extrusion3D prev = path.get(0);
+		last = prev.firstPoint();
 		zeroE();
 		G1(last);
 		for(Extrusion3D e: path){
@@ -54,20 +72,31 @@ public class GcodeExport {
 				//Infill or shell.
 				currE +=s.EperL*Tri3D.length(e);
 			}
+			if(e.ExtrusionType==0&&prev.ExtrusionType!=0){
+				currE -= s.retraction;
+			}
+			if(e.ExtrusionType!=0&&prev.ExtrusionType==0){
+				currE += s.retraction;
+			}
 			G1(e.lastPoint());
+			prev = e;
 			last = e.lastPoint();
 		}
-		lift(2);
+		lift(s.layerHeight);
 	}
 	/**
-	 * Lift the nozzle by i*s.lift. Used before travel moves are expected.
-	 * @param i
+	 * Lift by distance d.
+	 * @param d Distance to lift in +Z direction.
 	 */
-	private void lift(int i) {
-		last = last.plus(new Vector3D(0,0,i*s.lift));
+	private void lift(double d){
+		last = last.plus(new Vector3D(0,0,d));
 		G1(last);
-		
 	}
+	/**
+	 * Copy the contents of a file into the target file of this exporter. Used for pre-print and post-print commands like
+	 * setting coordinate modes and turning off the heaters.
+	 * @param fileLoc Location of the file to copy.
+	 */
 	public void writeFromFile(String fileLoc){
 		BufferedReader f = null;
 		try {
@@ -79,9 +108,14 @@ public class GcodeExport {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * Write a gcode command to move to an absolute position.
+	 * @param p
+	 */
 	private void G1(Point3D p){
 		Vector3D mv = new Vector3D(last,p);
-		double cos = Vector3D.dotProduct(mv, Constants.up)/mv.norm();
+		double cos = Vector3D.dotProduct(mv, Constants.zplus)/mv.norm();
+		//Limit the speed based on the maximum z speed and XY speeds specified in the slicer object.
 		if(mv.norm()==0) SetSpeed(s.zSpeed);
 		else if(Math.abs(Math.abs(cos)-1)<Constants.tol) SetSpeed(s.zSpeed);
 		else{
@@ -89,6 +123,9 @@ public class GcodeExport {
 		}
 		w.println("G1 X"+xyz.format(p.getX())+" Y"+xyz.format(p.getY())+" Z"+xyz.format(p.getZ())+" E"+ext.format(currE));
 	}
+	/**
+	 * Zero the e value both in this exporter's internal state and in gcode.
+	 */
 	private void zeroE(){
 		w.println("G92 E0");
 		currE = 0;
@@ -97,11 +134,20 @@ public class GcodeExport {
 		w.close();
 		
 	}
+	/**
+	 * Set the 3D movement speed in gcode.
+	 * @param d Speed in mm/s
+	 */
 	public void SetSpeed(double d) {
 		w.println("G1 F"+xyz.format(d*60));
 		if(xyz.format(d*60).contains("?")) System.out.println(d +" caused a ?");
 		
 	}
+	/**
+	 * Set the temperature and wait until the temperature is reached before executing more
+	 * commands.
+	 * @param printTemp Temperature in degrees C
+	 */
 	public void setTempAndWait(int printTemp) {
 		w.println("M109 S"+printTemp);
 		

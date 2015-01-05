@@ -17,7 +17,7 @@ public class Surface3D extends Mesh3D{
 	double offset;	//Z offset applied to this surface.
 	private Hashtable<Point2D,Tri3D> TriMap;
 	private ArrayList<Point2D> ps;
-	private double MaxRad;
+	private double MaxRad;	//Length of the longest edge in this mesh, useful for reprojection.
 	public Surface3D(Tri3D[] ts) {
 		this.tris = ts;
 		offset = 0;
@@ -49,12 +49,10 @@ public class Surface3D extends Mesh3D{
 		LineSegment3D[] output = new LineSegment3D[m.triCount()*this.triCount()];
 		int j=0;
 		for(Tri3D tS:tris){
-//			System.out.println("Testing Surface triangle " + tS.toString());
-			for(Tri3D tM:m.getTris()){
+			for(Tri3D tM:m.tris){
+				//Skip any Tris that can't possibly reach each other.
+				if(tS.getPoint(0).distance(tM.getPoint(0))>tS.radius+tM.radius) continue;
 				Point3D[] hits = tS.overlap(tM);
-//				if(Math.abs(tM.normal().getZ())<Constants.tol){
-//					System.out.println("Found a side face, should intersect.");
-//				}
 				if(hits!=null){
 					Vector3D edge = new Vector3D(hits[0],hits[1]);
 					Vector3D cross = Vector3D.crossProduct(tS.normal(), tM.normal());
@@ -62,13 +60,15 @@ public class Surface3D extends Mesh3D{
 					output[j]=Vector3D.dotProduct(edge, cross)>0 ? new LineSegment3D(hits[0],hits[1]) :
 						new LineSegment3D(hits[1],hits[0]);
 					j++;
-//					System.out.println("Face with normal "+Tri3D.VectorToStr(tM.normal())+" intersects " +tS.toString()+" on line segment "+Tri3D.PointToStr(hits[0])+" to " +Tri3D.PointToStr(hits[1]));
 				}
 			}
 		}
 		return Arrays.copyOf(output,j);
 	}
 	/**
+	 * Project the edges which make up this surface into 2D to intersect them with paths which are
+	 * to be projected onto this surface. Duplicate edges (from neighboring triangles) are removed, ie
+	 * the output of this function is a set of 2D line segments.
 	 * @return A 2d projection of this Surface's topology.
 	 */
 	public LineSegment2D[] topology(){
@@ -97,7 +97,7 @@ public class Surface3D extends Mesh3D{
 		return output.toArray(new LineSegment2D[output.size()]);
 	}
 	/**
-	 * Set the amount by which this surface is offset in the Z axis.
+	 * Set the amount by which this surface is offset from its "true" position in the Z axis.
 	 * @param z Amount to offset from original position.
 	 */
 	public void setOffset(double z){
@@ -114,7 +114,7 @@ public class Surface3D extends Mesh3D{
 	 * this surface.
 	 */
 	public Point3D project(Point2D p){
-		StraightLine3D l = new StraightLine3D(new Point3D(p.getX(),p.getY(),0),Constants.up);
+		StraightLine3D l = new StraightLine3D(new Point3D(p.getX(),p.getY(),0),Constants.zplus);
 		for(Point2D tp : ps){
 			//If the largest edge in the mesh could connect these points
 			if(Utils2D.within(p,tp,MaxRad)){
@@ -142,15 +142,4 @@ public class Surface3D extends Mesh3D{
 		};
 		makeMaps();
 	}
-//	/**
-//	 * Returns the tri whose origin point is the i'th closest to point p in 2D.
-//	 * @param p
-//	 * @return A tri3D from this surface's set of tris.
-//	 */
-//	private Tri3D getNearest(Point2D p, int i){
-//		int index = ps.getIndex(p);
-//		Point2D op = ps.get(index + i%2==0 ? i/2 : -i/2);
-//		if(op==null) return null;
-//		return TriMap.get(op);
-//	}
 }

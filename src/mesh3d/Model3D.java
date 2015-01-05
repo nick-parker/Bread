@@ -6,7 +6,6 @@ import math.geom3d.line.LineSegment3D;
 public class Model3D extends Mesh3D{
 	public Model3D(Tri3D[] ts) {
 		this.tris = ts;
-		makeBB();
 	}
 	/**
 	 * @param p Point3D to test

@@ -10,7 +10,8 @@ import mesh3d.Model3D;
 import mesh3d.Surface3D;
 
 /**
- * Stores info on a slice job and the layers which make it up.
+ * Stores info on a slice job and the layers which make it up. Eventually this class should have every
+ * parameter set by its constructor, but for now non-final values are set manually in source code for testing. TODO
  */
 public class Slicer {
 	public final Model3D part;
@@ -29,14 +30,15 @@ public class Slicer {
 	public final double lift;	//Amount to lift for travel moves.
 	public final LineSegment2D[] topo;
 	public final double EperL;	//E increase per unit L increase.
+	public final double retraction;
 	//Inputs below are optional, above are mandatory.
 	public double shellSpeedMult = 1;	//unused
-	public double bottomSpeedMult = 1;
+	public double bottomSpeedMult = 1;	//Currently unused.
 	public int bottomLayerCount = 5;
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, double infillDir, double infillAngle, 
-			double lift) throws IOException{
+			double lift, double retraction) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
 		this.extrusionWidth = extrusionWidth;
@@ -52,6 +54,7 @@ public class Slicer {
 		this.shape = shape;
 		this.topo = shape.topology();
 		this.lift = lift;
+		this.retraction = retraction;
 		//Cross sectional area of the extrusion is the ratio of plastic volume/XYZ distance, units mm^2
 		//volume rate * filament distance/unit volume = filament rate. filament distance/unit volume is cx area of filament.
 		this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);

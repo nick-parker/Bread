@@ -21,10 +21,9 @@ public class Extrusion2D extends LineSegment2D{
 		this.ExtrusionType=ExtrusionType;
 	}
 	/**
-	 * Return a set of Extrusion2Ds of the same type as this with the same endpoints,
-	 * split anywhere this intersects the lines in topology.
 	 * @param topology
-	 * @return
+	 * @return a set of Extrusion2Ds of the same type as this with the same endpoints,
+	 * split anywhere this intersects the lines in topology.
 	 */
 	public ArrayList<Extrusion2D> splitExtrusion(LineSegment2D[] topology){
 		ArrayList<Point2D> hits = new ArrayList<Point2D>();

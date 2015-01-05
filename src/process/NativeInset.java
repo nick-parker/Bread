@@ -8,7 +8,14 @@ import main.Inset;
 import math.geom2d.Point2D;
 import math.geom2d.polygon.LinearRing2D;
 import math.geom2d.polygon.MultiPolygon2D;
-
+/**
+ * Semifunctional wrapper for the CampSkeleton library. CampSkeleton performs straight skeleton based
+ * polygon offsetting operations, but doesn't have support for certain skeleton features necessary to represent some
+ * very common shapes (rectangular regions), and therefore isn't usable in this project. In the future NativeInset should be
+ * replaced with a JNI interface to the Clipper library's C++ implementation.
+ * @author Nick
+ *
+ */
 public class NativeInset {
 	public static ArrayList<ArrayList<Point2D>> inset(ArrayList<Loop> loops, double d){
 		ArrayList<ArrayList<Point2D>> polies = new ArrayList<ArrayList<Point2D>>();

@@ -1,5 +1,7 @@
 package mesh3d;
 
+import java.util.Arrays;
+
 import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.Shape3D;
@@ -9,12 +11,19 @@ import math.geom3d.transform.AffineTransform3D;
 abstract class Mesh3D implements Shape3D{
 	protected Tri3D[] tris;
 	/**
-	 * Generate the smallest possible box which contains this mesh.
+	 * Generate the smallest possible axis aligned box which contains this mesh.
 	 */
 	@Override
-	public Box3D boundingBox(){return makeBB();}
+	public Box3D boundingBox(){
+		return new Box3D(getMax(Constants.xminus).getX(),getMax(Constants.xplus).getX(),
+				getMax(Constants.yminus).getY(),getMax(Constants.yplus).getY(),
+				getMax(Constants.zminus).getZ(),getMax(Constants.zplus).getZ());
+	}
+	
 	/**
-	 * Move the mesh by the specified vector.
+	 * Move the mesh by the specified vector. Equivalent cost to a copy operation because Tris and meshes are immutable.
+	 * This should probably be changed to return a new Mesh to match the functionality of Tri3D.move, and to make multithreading
+	 * step 1 easy/possible.
 	 */
 	public void move(Vector3D v){{
 		Tri3D[] newTris = new Tri3D[tris.length];
@@ -26,11 +35,6 @@ abstract class Mesh3D implements Shape3D{
 		tris=newTris;
 		};
 	}
-	protected Box3D makeBB(){
-		return new Box3D(getMax(Constants.xminus).getX(),getMax(Constants.xplus).getX(),
-				getMax(Constants.yminus).getY(),getMax(Constants.yplus).getY(),
-				getMax(Constants.zminus).getZ(),getMax(Constants.zplus).getZ());
-	};
 	/**
 	 * @param v Direction to search
 	 * @return The point on this mesh furthest in the v direction, or origin if this Mesh has no triangles.
@@ -49,9 +53,9 @@ abstract class Mesh3D implements Shape3D{
 		return max;
 	}
 	/**
-	 * @return the list of tris composing this mesh.
+	 * @return A copy of the tri array backing this Mesh. 
 	 */
-	public Tri3D[] getTris(){ return tris;}
+	public Tri3D[] getTris(){ return Arrays.copyOf(tris, tris.length);}
 	/**
 	 * @return Whether this is a closed shape.
 	 */

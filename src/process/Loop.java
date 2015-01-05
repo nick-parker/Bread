@@ -6,7 +6,12 @@ import java.util.Iterator;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import mesh3d.Constants;
-
+/**
+ * A loop of LineSegment2D objects which will hopefully be closed when finished, but is not guaranteed to be.
+ * Used in the Order function.
+ * @author Nick
+ *
+ */
 public class Loop implements Iterable<LineSegment2D>{
 	ArrayList<LineSegment2D> loop;
 	LineSegment2D end;
