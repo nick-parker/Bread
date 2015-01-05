@@ -11,6 +11,7 @@ import utils2D.Utils2D;
  *  
  * @author Nick
  * Translate an Extrusion2D path into Extrusion3D by projecting it onto the layer shape mesh.
+ * Requires that s.shape.offset==0
  */
 public class Reproject {
 	private double offset;
@@ -27,13 +28,19 @@ public class Reproject {
 		this.s = s;
 	}
 	/**
+	 * Change the offset height of the surface you're projecting onto.
+	 * @param o New offset height.
+	 */
+	public void setOffset(double o){
+		this.offset = o;
+	}
+	/**
 	 * Project a series of 2d extrusions which have already been segmented based on
 	 * the topology of the surface stored in slicer s.
 	 * @param path Path to project.
 	 * @return A continuous path of 3d extrusions.
 	 */
 	public ArrayList<Extrusion3D> Proj(ArrayList<Extrusion2D> path){
-		s.shape.setOffset(offset);
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		ArrayList<Extrusion2D> travels = new ArrayList<Extrusion2D>();
 		for(Extrusion2D e: path){
@@ -57,8 +64,7 @@ public class Reproject {
 	 * @return An Extrusion3D path with the same type as e.
 	 */
 	private Extrusion3D projectExtrusion(Extrusion2D e){
-		s.shape.setOffset(offset);	//In case it's been changed, very low cost operation if it hasn't.
-		return new Extrusion3D(s.shape.project(e.firstPoint()), s.shape.project(e.lastPoint()), e.ExtrusionType);
+		return liftE(new Extrusion3D(s.shape.project(e.firstPoint()), s.shape.project(e.lastPoint()), e.ExtrusionType));
 	}
 	/**
 	 * Place an Extrusion2D at a given z to create a flat Extrusion3D.
@@ -78,36 +84,50 @@ public class Reproject {
 	 * @return
 	 */
 	private ArrayList<Extrusion3D> projectTravel(ArrayList<Extrusion2D> travels, Point2D end){
+		double ModelTop = s.part.boundingBox().getMaxZ()+s.lift;
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		Extrusion3D first = projectExtrusion(travels.get(0));
 		Vector3D rise = new Vector3D(0,0,s.lift);
-		Extrusion3D lift = new Extrusion3D(first.firstPoint(),first.firstPoint().plus(rise),0);
+		Extrusion3D lift = new Extrusion3D(first.firstPoint(),first.firstPoint().plus(rise),0);	//liftE handled by one applied to first.
 		output.add(lift);
-//		first = raise(first,s.lift);
-//		output.add(first);
 		double z = lift.lastPoint().getZ();
-//		travels.remove(0);	//So we don't re-add the first segment.
 		for(Extrusion2D e : travels){
 			//Nothing happens here if first was the only edge.
 			Extrusion3D proj = projectExtrusion(e);
-			if(proj.lastPoint().getZ()+s.lift>z){
+			double newZ = proj.lastPoint().getZ()+s.lift;
+			if(newZ>z&&newZ<ModelTop){	//Don't move up past the top of the part, it's needless.
 				//Need to keep sloping up on this one.
 				Point3D last = output.get(output.size()-1).lastPoint();
-				output.add(new Extrusion3D(last,liftP(proj.lastPoint()),0));
+				output.add(new Extrusion3D(last,liftP(proj.lastPoint(),s.lift),0));
 				z = proj.lastPoint().getZ()+s.lift;
 			}
 			else output.add(setZ(e,z));
 		}
 		Extrusion3D last = output.get(output.size()-1);
-		Extrusion3D lower = new Extrusion3D(last.lastPoint(),s.shape.project(end),0);
+		Extrusion3D lower = new Extrusion3D(last.lastPoint(),liftP(s.shape.project(end),to()),0);
 		output.add(lower);
 		return output;
 	}
 	/**
 	 * @param p Point to lift
+	 * @param d Distance to lift.
 	 * @return A copy of p s.lift mm above p's position.
 	 */
-	private Point3D liftP(Point3D p) {
-		return p.plus(new Vector3D(0,0,s.lift));
+	private Point3D liftP(Point3D p, double d) {
+		return p.plus(new Vector3D(0,0,d));
+	}
+	/**
+	 * Apply the offset of this Reproject instance to the given Extrusion3D.
+	 * @param e Extrusion to offset.
+	 * @return A new Extrusion3D instance moved in the +Z direction.
+	 */
+	private Extrusion3D liftE(Extrusion3D e){
+		return new Extrusion3D(liftP(e.firstPoint(),to()),liftP(e.lastPoint(),to()),e.ExtrusionType);
+	}
+	/**
+	 * @return The difference between this Reproject instance's offset value and shape's current offset.
+	 */
+	private double to(){
+		return offset - s.shape.getOffset();
 	}
 }

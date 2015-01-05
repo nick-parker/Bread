@@ -142,4 +142,7 @@ public class Surface3D extends Mesh3D{
 		};
 		makeMaps();
 	}
+	public double getOffset() {
+		return offset;
+	}
 }

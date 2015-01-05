@@ -86,9 +86,10 @@ public class Slicer {
 //			else g.SetSpeed(this.Speed);
 			Layer l = new Layer(this,n);
 			System.out.println("Offset: "+l.offset);
-			Reproject r = new Reproject(l.offset,this);
+			shape.setOffset(l.offset);			
 			ArrayList<Extrusion2D> p = l.getPath();
 			if(p==null) continue;
+			Reproject r = new Reproject(l.offset,this);
 			ArrayList<Extrusion3D> path = r.Proj(p);
 			g.addLayer(path);			
 		}

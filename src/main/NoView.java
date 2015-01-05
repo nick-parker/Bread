@@ -1,7 +1,5 @@
 package main;
 
-import inset.Insetter;
-
 import java.io.FileNotFoundException;
 
 import math.geom3d.Vector3D;
