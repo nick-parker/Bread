@@ -74,9 +74,11 @@ public class GcodeExport {
 			}
 			if(e.ExtrusionType==0&&prev.ExtrusionType!=0){
 				currE -= s.retraction;
+				G1E(s.retractSpeed);
 			}
 			if(e.ExtrusionType!=0&&prev.ExtrusionType==0){
 				currE += s.retraction;
+				G1E(s.retractSpeed);
 			}
 			G1(e.lastPoint());
 			prev = e;
@@ -124,6 +126,14 @@ public class GcodeExport {
 		w.println("G1 X"+xyz.format(p.getX())+" Y"+xyz.format(p.getY())+" Z"+xyz.format(p.getZ())+" E"+ext.format(currE));
 	}
 	/**
+	 * Send a command to go to the current E position without moving XYZ, at the given speed.
+	 * @param s Speed to retract, in mm/s
+	 */
+	private void G1E(double s){
+		SetSpeed(s);
+		w.println("G1 E"+ext.format(currE));
+	}
+	/**
 	 * Zero the e value both in this exporter's internal state and in gcode.
 	 */
 	private void zeroE(){
@@ -140,7 +150,6 @@ public class GcodeExport {
 	 */
 	public void SetSpeed(double d) {
 		w.println("G1 F"+xyz.format(d*60));
-		if(xyz.format(d*60).contains("?")) System.out.println(d +" caused a ?");
 		
 	}
 	/**

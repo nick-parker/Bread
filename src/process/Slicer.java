@@ -1,5 +1,8 @@
 package process;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -14,23 +17,24 @@ import mesh3d.Surface3D;
  * parameter set by its constructor, but for now non-final values are set manually in source code for testing. TODO
  */
 public class Slicer {
-	public final Model3D part;
-	public final Surface3D shape;
-	public final double layerHeight;
-	public final double filD;
-	public final double nozzleD;
-	public final double extrusionWidth;
-	public final int printTemp;
-	public final int xySpeed;
-	public final int zSpeed;
-	public final int numShells;
-	public final double infillWidth;
-	public final double infillDir;	//Direction of infill on layer 0;
-	public final double infillAngle;	//Amount to change infill direction each layer, radians CW.
-	public final double lift;	//Amount to lift for travel moves.
-	public final LineSegment2D[] topo;
-	public final double EperL;	//E increase per unit L increase.
-	public final double retraction;
+	public Model3D part;
+	public Surface3D shape;
+	public double layerHeight;
+	public double filD;
+	public double nozzleD;
+	public double extrusionWidth;
+	public int printTemp;
+	public int xySpeed;
+	public int zSpeed;
+	public int numShells;
+	public double infillWidth;
+	public double infillDir;	//Direction of infill on layer 0;
+	public double infillAngle;	//Amount to change infill direction each layer, radians CW.
+	public double lift;	//Amount to lift for travel moves.
+	public LineSegment2D[] topo;
+	public double EperL;	//E increase per unit L increase.
+	public double retraction;
+	public double retractSpeed;
 	//Inputs below are optional, above are mandatory.
 	public double shellSpeedMult = 1;	//unused
 	public double bottomSpeedMult = 1;	//Currently unused.
@@ -38,7 +42,7 @@ public class Slicer {
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, double infillDir, double infillAngle, 
-			double lift, double retraction) throws IOException{
+			double lift, double retraction, double retractSpeed) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
 		this.extrusionWidth = extrusionWidth;
@@ -55,9 +59,74 @@ public class Slicer {
 		this.topo = shape.topology();
 		this.lift = lift;
 		this.retraction = retraction;
+		this.retractSpeed = retractSpeed;
 		//Cross sectional area of the extrusion is the ratio of plastic volume/XYZ distance, units mm^2
 		//volume rate * filament distance/unit volume = filament rate. filament distance/unit volume is cx area of filament.
 		this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
+	}
+	/**
+	 * Load a slicer config for the given meshes.
+	 * @param config
+	 */
+	public Slicer(Model3D part, Surface3D shape, String config){
+		this.part = part;
+		this.shape = shape;
+		BufferedReader f;
+		try {
+			f = new BufferedReader(new FileReader(config));
+			while(f.ready()){
+				String[] line = f.readLine().split(" ");
+				switch(line[0]){
+				case "layerHeight":
+					this.layerHeight = Double.parseDouble(line[1]);
+					break;
+				case "filD":
+					this.filD = Double.parseDouble(line[1]);
+					break;
+				case "nozzleD":
+					this.nozzleD = Double.parseDouble(line[1]);
+					break;
+				case "extrusionWidth":
+					this.extrusionWidth = Double.parseDouble(line[1]);
+					break;
+				case "printTemp":
+					this.printTemp = Integer.parseInt(line[1]);
+					break;
+				case "xySpeed":
+					this.xySpeed = Integer.parseInt(line[1]);
+					break;
+				case "zSpeed":
+					this.zSpeed = Integer.parseInt(line[1]);
+					break;
+				case "numShells":
+					this.numShells = Integer.parseInt(line[1]);
+					break;
+				case "infillWidth":
+					this.infillWidth = Double.parseDouble(line[1]);
+					break;
+				case "infillDir":
+					this.infillDir = Double.parseDouble(line[1]);
+					break;
+				case "infillAngle":
+					this.infillAngle = Double.parseDouble(line[1]);
+					break;
+				case "lift":
+					this.lift = Double.parseDouble(line[1]);
+					break;
+				case "retraction":
+					this.retraction = Double.parseDouble(line[1]);
+					break;
+				case "retractSpeed":
+					this.retractSpeed = Double.parseDouble(line[1]);
+					break;
+				}
+			}
+			this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
+			this.topo = shape.topology();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	/**
 	 * Position shape so that its highest point is layerHeight/2 above the part's lowest point.
@@ -88,9 +157,10 @@ public class Slicer {
 			System.out.println("Offset: "+l.offset);
 			shape.setOffset(l.offset);			
 			ArrayList<Extrusion2D> p = l.getPath();
-			if(p==null) continue;
+			if(p==null||p.size()==0) continue;
 			Reproject r = new Reproject(l.offset,this);
 			ArrayList<Extrusion3D> path = r.Proj(p);
+			if(path.size()==0) System.out.println(p);
 			g.addLayer(path);			
 		}
 		g.writeFromFile("end.gcode");

@@ -15,6 +15,7 @@ public class Tri3D{
 	private double denom;
 	private double originDot; //baked in value for testing which side of the plane a point is on.
 	public final double radius;	//Distance from p0 to the furthest point on this triangle.
+	public final double zradius;
 	private Plane3D pl;
 	/**
 	 * Create a Tri3D with CCW normal.
@@ -33,6 +34,7 @@ public class Tri3D{
 		this.es = new LineSegment3D[]{e0,e1,e2};
 		this.originDot = PointDot(pl.normal(), pl.origin());
 		this.radius = Math.max(length(e0),length(e2));
+		this.zradius = Math.max(Math.abs(p0.getZ()-p1.getZ()), Math.abs(p0.getZ()-p2.getZ()));
 	}
 	public Tri3D move(Vector3D v) {
 		Point3D pA = ps[0].plus(v);
@@ -179,6 +181,9 @@ public class Tri3D{
 	}
 	public Point2D getPoint(int i){
 		return new Point2D(ps[i].getX(),ps[i].getY());
+	}
+	public Point3D getPoint3D(int i){
+		return ps[i];
 	}
 	@Override
 	public String toString(){

@@ -51,7 +51,9 @@ public class Surface3D extends Mesh3D{
 		for(Tri3D tS:tris){
 			for(Tri3D tM:m.tris){
 				//Skip any Tris that can't possibly reach each other.
+				if(Math.abs(tS.getPoint3D(0).getZ()-tM.getPoint3D(0).getZ())>tS.zradius+tM.zradius) continue;
 				if(tS.getPoint(0).distance(tM.getPoint(0))>tS.radius+tM.radius) continue;
+//				System.out.println("Passed both prechecks.");
 				Point3D[] hits = tS.overlap(tM);
 				if(hits!=null){
 					Vector3D edge = new Vector3D(hits[0],hits[1]);
