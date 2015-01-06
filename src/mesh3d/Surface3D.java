@@ -1,7 +1,6 @@
 package mesh3d;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 
 import utils2D.Utils2D;
@@ -44,10 +43,15 @@ public class Surface3D extends Mesh3D{
 
 	@Override
 	public boolean closed(){return false;};
-	
-	public LineSegment3D[] overlap(Mesh3D m){
-		LineSegment3D[] output = new LineSegment3D[m.triCount()*this.triCount()];
-		int j=0;
+	/**
+	 * Retrieve the set of 3D line segments representing the surface intersection of
+	 * mesh m with this surface. Assuming neither mesh intersects the boundaries of the
+	 * other, this will be a set of closed 3D shapes.
+	 * @param m Mesh to intersect with.
+	 * @return An unordered list of line segments oriented along this.normal x m.normal.
+	 */
+	public ArrayList<LineSegment3D> overlap(Mesh3D m){
+		ArrayList<LineSegment3D> output = new ArrayList<LineSegment3D>();
 		for(Tri3D tS:tris){
 			for(Tri3D tM:m.tris){
 				//Skip any Tris that can't possibly reach each other.
@@ -59,13 +63,24 @@ public class Surface3D extends Mesh3D{
 					Vector3D edge = new Vector3D(hits[0],hits[1]);
 					Vector3D cross = Vector3D.crossProduct(tS.normal(), tM.normal());
 					//Orient line segments so that the inside of the model is CCW from them, viewed facing the surface normal.
-					output[j]=Vector3D.dotProduct(edge, cross)>0 ? new LineSegment3D(hits[0],hits[1]) :
-						new LineSegment3D(hits[1],hits[0]);
-					j++;
+					output.add(Vector3D.dotProduct(edge, cross)>0 ? new LineSegment3D(hits[0],hits[1]) :
+						new LineSegment3D(hits[1],hits[0]));
 				}
 			}
 		}
-		return Arrays.copyOf(output,j);
+		return output;
+	}
+	/**
+	 * Retrieve the set of 3D line segments representing the surface intersection of
+	 * mesh m with this surface. Assuming neither mesh intersects the boundaries of the
+	 * other, this will be a set of closed 3D shapes. This implementation uses the
+	 * IntervalTree data structure to speed up the operation.
+	 * Requires: m's intervaltree has already been built for this surface.
+	 * @param m Mesh to intersect with.
+	 * @return An unordered list of line segments oriented along this.normal x m.normal.
+	 */
+	public ArrayList<LineSegment3D> fastOverlap(Model3D m){
+		throw new UnsupportedOperationException();		
 	}
 	/**
 	 * Project the edges which make up this surface into 2D to intersect them with paths which are

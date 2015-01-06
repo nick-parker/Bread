@@ -23,5 +23,4 @@ public class Model3D extends Mesh3D{
 	}
 	@Override
 	public boolean closed(){return false;};
-
 }
