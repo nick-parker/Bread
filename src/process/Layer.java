@@ -55,16 +55,16 @@ public class Layer {
 		}
 		return output;
 	}
-	public ArrayList<Extrusion2D> getPath(){
+	public ArrayList<Extrusion2D> getPath(Point2D lastPoint){
 //		double infillDistance = (0.5+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
 		ArrayList<Extrusion2D> infill = getInfill(0);
 		if(infill==null) return null;
 //		ArrayList<Extrusion2D> shells = getShells();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
-		Extrusion2D last = null;	//Last segment added to output.
+		Point2D last = lastPoint;	//Last segment added to output.
 		for(Extrusion2D e: infill){
 			ConnectSplitAppend(last,e,output);
-			last = e;
+			last = e.lastPoint();
 		}
 //		for(Extrusion2D e: shells){
 //			ConnectSplitAppend(last,e,output);
@@ -75,21 +75,18 @@ public class Layer {
 	/**
 	 * Adds e, and a travel from the end of last to the beginning of e if necessary, to output. Both e and the travel
 	 * are split based on the topology of the surface in this layer's slicer.
-	 * @param last Last segment added to output.
+	 * @param lp Last position of the head.
 	 * @param e Segment to add to output.
 	 * @param output Continous path composed of Extrusion2D objects.
 	 */
-	private void ConnectSplitAppend(Extrusion2D last, Extrusion2D e, ArrayList<Extrusion2D> output){
-		if(last!=null){
-			Point2D lp = last.lastPoint();
-			Point2D np = e.firstPoint();
-			if(!Utils2D.equiv(lp, np)){
-				output.addAll((new Extrusion2D(
-						lp,
-						np,
-						lp.distance(np)>s.retractThreshold ? 0 : 3)	//Retract is 0, nonretracting is 3.
-						).splitExtrusion(s.topo));
-			}
+	private void ConnectSplitAppend(Point2D lp, Extrusion2D e, ArrayList<Extrusion2D> output){
+		Point2D np = e.firstPoint();
+		if(!Utils2D.equiv(lp, np)){
+			output.addAll((new Extrusion2D(
+					lp,
+					np,
+					lp.distance(np)>s.retractThreshold ? 0 : 3)	//Retract is 0, nonretracting is 3.
+					).splitExtrusion(s.topo));
 		}
 		output.addAll(e.splitExtrusion(s.topo));
 	}

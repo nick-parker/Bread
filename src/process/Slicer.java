@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom3d.Box3D;
 import math.geom3d.Vector3D;
@@ -152,14 +153,16 @@ public class Slicer {
 		GcodeExport g = new GcodeExport(fileLoc, this);
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
+		Point2D last = new Point2D(0,0);
 		for(int n=0;n<lc;n++){
 //			if(n<bottomLayerCount) g.SetSpeed((int)Math.round(this.Speed*this.bottomSpeedMult));
 //			else g.SetSpeed(this.Speed);
 			Layer l = new Layer(this,n);
 			System.out.println("Offset: "+l.offset);
 			shape.setOffset(l.offset);			
-			ArrayList<Extrusion2D> p = l.getPath();
+			ArrayList<Extrusion2D> p = l.getPath(last);
 			if(p==null||p.size()==0) continue;
+			last = p.get(p.size()-1).lastPoint();
 			Reproject r = new Reproject(l.offset,this);
 			ArrayList<Extrusion3D> path = r.Proj(p);
 			if(path.size()==0) System.out.println(p);
