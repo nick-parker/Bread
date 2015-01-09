@@ -36,11 +36,12 @@ public class Slicer {
 	public double retraction;
 	public double retractSpeed;
 	public double retractThreshold;
-	public boolean FirmwareRetract = true;
+	public double zMin = 0.25;
+	public boolean FirmwareRetract = false;
 	//Inputs below are optional, above are mandatory.
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
-			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, double infillDir, double infillAngle, 
+			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
 			double lift, double retraction, double retractSpeed, double retractThreshold) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
@@ -51,8 +52,8 @@ public class Slicer {
 		this.numShells = numShells;
 		this.infillWidth = infillWidth;
 		this.layerHeight = layerHeight;
-		this.infillDir = infillDir;
-		this.infillAngle = infillAngle;
+		this.infillDir = infillDir*Math.PI/180.0;
+		this.infillAngle = infillAngle*Math.PI/180.0;
 		this.part = part;
 		this.shape = shape;
 		this.topo = shape.topology();
@@ -105,10 +106,10 @@ public class Slicer {
 					this.infillWidth = Double.parseDouble(line[1]);
 					break;
 				case "infillDir":
-					this.infillDir = Double.parseDouble(line[1]);
+					this.infillDir = Double.parseDouble(line[1])*Math.PI/180;
 					break;
 				case "infillAngle":
-					this.infillAngle = Double.parseDouble(line[1]);
+					this.infillAngle = Double.parseDouble(line[1])*Math.PI/180;
 					break;
 				case "lift":
 					this.lift = Double.parseDouble(line[1]);
@@ -149,6 +150,7 @@ public class Slicer {
 	}
 	public void slice(String fileLoc){
 		PositionShape();
+		shape.move(new Vector3D(0,0,zMin));
 		int lc = layerCount();
 		GcodeExport g = new GcodeExport(fileLoc, this);
 		g.writeFromFile("start.gcode");

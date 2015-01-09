@@ -33,7 +33,7 @@ public class Infill {
 		MultiPolygon2D region = NativeInset.GetRegion(regionPs);	//Convert to a multipolygon for some convenience.
 		Collection<LineSegment2D> edges = region.edges();	//Get the edges of the multipolygon
 		//Calculate the CW angle from +x to run infill on this layer.
-		double a = (s.infillDir+layerNumber*s.infillAngle)%(2*Math.PI);	//CW angle infill lines make with x axis.
+		double a = (s.infillDir+layerNumber*s.infillAngle);	//CW angle infill lines make with x axis. %(2*Math.PI)
 		//Calculate a perpendicular vector to the infill.
 		Vector2D move = Utils2D.AngleVector(a+Math.PI/2);	//Direction perpendicular to infill to move intersection line.
 		Vector2D dir = Utils2D.AngleVector(a);				//Direction parallel to infill.

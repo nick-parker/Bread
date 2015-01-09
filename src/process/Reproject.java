@@ -64,7 +64,20 @@ public class Reproject {
 	 * @return An Extrusion3D path with the same type as e.
 	 */
 	private Extrusion3D projectExtrusion(Extrusion2D e){
-		return liftE(new Extrusion3D(s.shape.project(e.firstPoint()), s.shape.project(e.lastPoint()), e.ExtrusionType));
+		return new Extrusion3D(projectPoint(e.firstPoint()), projectPoint(e.lastPoint()), e.ExtrusionType);
+	}
+	/**
+	 * Project point p onto the layer shape, or the plane at z=s.zMin if the
+	 * normal projection falls below it.
+	 * @param p Point to project
+	 * @return A new Point3D object.
+	 */
+	private Point3D projectPoint(Point2D p){
+		Point3D hit = s.shape.project(p);
+		if(hit.getZ()+to()<s.zMin){
+			return new Point3D(hit.getX(),hit.getY(),s.zMin);
+		}
+		return new Point3D(hit.getX(),hit.getY(),hit.getZ()+to());
 	}
 	/**
 	 * Place an Extrusion2D at a given z to create a flat Extrusion3D.

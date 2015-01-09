@@ -17,7 +17,7 @@ public class NoView {
 		Slicer s = null;
 		try {
 			m1 = Stli.importModel("vtop.stl", true);
-			m1.move(new Vector3D(0,0,0.25));
+//			m1.move(new Vector3D(0,0,0.25));
 			m2 = Stli.importSurface("v.stl", true);
 //			m2 = SimplePlane.MakePlane(-200, -200, 200, 200, 4);
 //			m2.move(new Vector3D(2.5,0,0));
@@ -32,6 +32,6 @@ public class NoView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("systemsguy.gcode");
+		s.slice("ccecil.gcode");
 	}
 }
