@@ -1,7 +1,6 @@
 package process;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,14 +34,13 @@ public class Slicer {
 	public double EperL;	//E increase per unit L increase.
 	public double retraction;
 	public double retractSpeed;
+	public double retractThreshold;
+	public boolean FirmwareRetract = true;
 	//Inputs below are optional, above are mandatory.
-	public double shellSpeedMult = 1;	//unused
-	public double bottomSpeedMult = 1;	//Currently unused.
-	public int bottomLayerCount = 5;
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, double infillDir, double infillAngle, 
-			double lift, double retraction, double retractSpeed) throws IOException{
+			double lift, double retraction, double retractSpeed, double retractThreshold) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
 		this.extrusionWidth = extrusionWidth;
@@ -60,6 +58,7 @@ public class Slicer {
 		this.lift = lift;
 		this.retraction = retraction;
 		this.retractSpeed = retractSpeed;
+		this.retractThreshold = retractThreshold;
 		//Cross sectional area of the extrusion is the ratio of plastic volume/XYZ distance, units mm^2
 		//volume rate * filament distance/unit volume = filament rate. filament distance/unit volume is cx area of filament.
 		this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
@@ -118,6 +117,9 @@ public class Slicer {
 					break;
 				case "retractSpeed":
 					this.retractSpeed = Double.parseDouble(line[1]);
+					break;
+				case "retractThreshold":
+					this.retractThreshold = Double.parseDouble(line[1]);
 					break;
 				}
 			}

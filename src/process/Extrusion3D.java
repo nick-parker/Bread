@@ -9,6 +9,7 @@ import mesh3d.Tri3D;
  * 0 - travel
  * 1 - infill
  * 2 - shell
+ * 3 - nonretracting travel
  * @author Nick
  *
  */

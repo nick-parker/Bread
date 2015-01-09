@@ -72,13 +72,19 @@ public class GcodeExport {
 				//Infill or shell.
 				currE +=s.EperL*Tri3D.length(e);
 			}
-			if(e.ExtrusionType==0&&prev.ExtrusionType!=0){
-				currE -= s.retraction;
-				G1E(s.retractSpeed);
+			else if(e.ExtrusionType==0&&prev.ExtrusionType!=0){
+				if(!s.FirmwareRetract){
+					currE -= s.retraction;
+					G1E(s.retractSpeed);
+				}
+				else w.println("G10");
 			}
-			if(e.ExtrusionType!=0&&prev.ExtrusionType==0){
-				currE += s.retraction;
-				G1E(s.retractSpeed);
+			else if(e.ExtrusionType!=0&&prev.ExtrusionType==0){
+				if(!s.FirmwareRetract){
+					currE += s.retraction;
+					G1E(s.retractSpeed);
+				}
+				else w.println("G11");
 			}
 			G1(e.lastPoint());
 			prev = e;

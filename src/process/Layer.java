@@ -3,6 +3,7 @@ package process;
 import java.util.ArrayList;
 
 import utils2D.Utils2D;
+import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 
 /**
@@ -79,8 +80,16 @@ public class Layer {
 	 * @param output Continous path composed of Extrusion2D objects.
 	 */
 	private void ConnectSplitAppend(Extrusion2D last, Extrusion2D e, ArrayList<Extrusion2D> output){
-		if(last!=null&&!Utils2D.equiv(last.lastPoint(), e.firstPoint())){
-			output.addAll((new Extrusion2D(last.lastPoint(),e.firstPoint(),0)).splitExtrusion(s.topo));
+		if(last!=null){
+			Point2D lp = last.lastPoint();
+			Point2D np = e.firstPoint();
+			if(!Utils2D.equiv(lp, np)){
+				output.addAll((new Extrusion2D(
+						lp,
+						np,
+						lp.distance(np)>s.retractThreshold ? 0 : 3)	//Retract is 0, nonretracting is 3.
+						).splitExtrusion(s.topo));
+			}
 		}
 		output.addAll(e.splitExtrusion(s.topo));
 	}

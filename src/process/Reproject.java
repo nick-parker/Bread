@@ -44,7 +44,7 @@ public class Reproject {
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		ArrayList<Extrusion2D> travels = new ArrayList<Extrusion2D>();
 		for(Extrusion2D e: path){
-			if(e.ExtrusionType==0){
+			if(e.ExtrusionType==0||e.ExtrusionType==3){
 				travels.add(e);
 				continue;
 			}
@@ -98,13 +98,13 @@ public class Reproject {
 			if(newZ>z&&newZ<ModelTop){	//Don't move up past the top of the part, it's needless.
 				//Need to keep sloping up on this one.
 				Point3D last = output.get(output.size()-1).lastPoint();
-				output.add(new Extrusion3D(last,liftP(proj.lastPoint(),s.lift),0));
+				output.add(new Extrusion3D(last,liftP(proj.lastPoint(),s.lift),e.ExtrusionType));
 				z = proj.lastPoint().getZ()+s.lift;
 			}
 			else output.add(setZ(e,z));
 		}
 		Extrusion3D last = output.get(output.size()-1);
-		Extrusion3D lower = new Extrusion3D(last.lastPoint(),liftP(s.shape.project(end),to()),0);
+		Extrusion3D lower = new Extrusion3D(last.lastPoint(),liftP(s.shape.project(end),to()),travels.get(travels.size()-1).ExtrusionType);
 		output.add(lower);
 		return output;
 	}

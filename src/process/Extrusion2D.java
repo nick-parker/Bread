@@ -10,6 +10,7 @@ import math.geom2d.line.LineSegment2D;
  * 0 - travel
  * 1 - infill
  * 2 - shell
+ * 3 - nonretracting travel
  * @author Nick
  *
  */
