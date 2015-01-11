@@ -8,6 +8,7 @@ import mesh3d.SimplePlane;
 import mesh3d.Stli;
 import mesh3d.Surface3D;
 import process.Slicer;
+import representation.ClipperJNA;
 
 public class NoView {
 
@@ -16,9 +17,9 @@ public class NoView {
 		Surface3D m2 = null;		
 		Slicer s = null;
 		try {
-			m1 = Stli.importModel("vtop.stl", true);
+			m1 = Stli.importModel("dragon_lowpoly.stl", true);
 //			m1.move(new Vector3D(0,0,0.25));
-			m2 = Stli.importSurface("v.stl", true);
+			m2 = Stli.importSurface("dragonv.stl", true);
 //			m2 = SimplePlane.MakePlane(-200, -200, 200, 200, 4);
 //			m2.move(new Vector3D(2.5,0,0));
 			//(Model3D part, Surface3D shape, layerHeight, filD, nozzleD, 
@@ -32,6 +33,8 @@ public class NoView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("ccecil.gcode");
+		String test = "0 0 200 0 200 200 0 200 :";
+		System.out.println(ClipperJNA.inset(test, -5));
+//		s.slice("ccecil.gcode");
 	}
 }
