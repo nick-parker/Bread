@@ -1,4 +1,3 @@
-//These settings are safe on my Mendel90 which has a very slow Z axis, should work for anyone.
 //Configure accordingly for your machine.
 layerHeight 0.3 mm
 filD 1.75 mm		//filament diameter
