@@ -23,6 +23,7 @@ public class Infill {
 	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber){
 		if(loops.size()==0) return null;
 		ArrayList<ArrayList<Point2D>> regionPs;
+		System.out.println(ToPoints(loops));
 		if(distance!=0){
 			//Generate the inset, as a set of rings of points. Currently nonfunctional.
 			regionPs = NativeInset.inset(loops, distance);
@@ -30,6 +31,7 @@ public class Infill {
 		else{
 			regionPs = ToPoints(loops);
 		}
+		if(regionPs==null) return null;
 		MultiPolygon2D region = NativeInset.GetRegion(regionPs);	//Convert to a multipolygon for some convenience.
 		Collection<LineSegment2D> edges = region.edges();	//Get the edges of the multipolygon
 		//Calculate the CW angle from +x to run infill on this layer.

@@ -161,7 +161,7 @@ public class Slicer {
 //			else g.SetSpeed(this.Speed);
 			Layer l = new Layer(this,n);
 			System.out.println("Offset: "+l.offset);
-			shape.setOffset(l.offset);			
+			shape.setOffset(l.offset);
 			ArrayList<Extrusion2D> p = l.getPath(last);
 			if(p==null||p.size()==0) continue;
 			last = p.get(p.size()-1).lastPoint();

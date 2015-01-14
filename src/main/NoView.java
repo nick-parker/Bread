@@ -1,12 +1,16 @@
 package main;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
+import math.geom2d.Point2D;
 import math.geom3d.Vector3D;
 import mesh3d.Model3D;
 import mesh3d.SimplePlane;
 import mesh3d.Stli;
 import mesh3d.Surface3D;
+import process.Loop;
+import process.NativeInset;
 import process.Slicer;
 import representation.ClipperJNA;
 
@@ -33,8 +37,6 @@ public class NoView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		String test = "0 0 200 0 200 200 0 200 :";
-		System.out.println(ClipperJNA.inset(test, -5));
 		s.slice("shells.gcode");
 	}
 }

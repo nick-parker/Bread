@@ -2,9 +2,9 @@ package process;
 
 import java.util.ArrayList;
 
-import straightskeleton.Corner;
-import utils.LoopL;
-import main.Inset;
+import representation.ClipperJNA;
+import representation.Domain;
+import representation.IntPoint;
 import math.geom2d.Point2D;
 import math.geom2d.polygon.LinearRing2D;
 import math.geom2d.polygon.MultiPolygon2D;
@@ -17,22 +17,25 @@ import math.geom2d.polygon.MultiPolygon2D;
  *
  */
 public class NativeInset {
+	/**
+	 * Inset the provided paths by the given distance d.
+	 * @param loops An ArrayList of Loop objects passed out of the Order function
+	 * @param d A distance in mm to inset the loops.
+	 * @return A new set of loops represented as an arraylist of arraylists of points.
+	 */
 	public static ArrayList<ArrayList<Point2D>> inset(ArrayList<Loop> loops, double d){
-		ArrayList<ArrayList<Point2D>> polies = new ArrayList<ArrayList<Point2D>>();
+		ArrayList<ArrayList<Point2D>> points = new ArrayList<ArrayList<Point2D>>();
 		for(Loop l:loops){
 			if(!l.checkClosure()) System.out.println("Unclosed loop in NativeInset");
-			polies.add(l.getPointLoop());
+			points.add(l.getPointLoop());
 		}
-		LoopL<Corner> Shell = Inset.inset(polies, d);
-		ArrayList<ArrayList<Point2D>> output = new ArrayList<ArrayList<Point2D>>();
-		for(utils.Loop<Corner> l:Shell){
-			ArrayList<Point2D> ps = new ArrayList<Point2D>();
-			for(Corner c:l){
-				ps.add(new Point2D(c.x,c.y));
-			}
-			output.add(ps);
-		}
-		return output;		
+		return inset(d,points);
+	}
+	public static ArrayList<ArrayList<Point2D>> inset(double d, ArrayList<ArrayList<Point2D>> ps){
+		Domain LoopDom = new Domain(ps);
+		Domain output = Domain.parse(ClipperJNA.inset(LoopDom.toString(),(int)Math.round(d*-1*IntPoint.conv)));
+		System.out.println(output);
+		return output==null ? null : output.conv();
 	}
 	public static MultiPolygon2D GetRegion(ArrayList<ArrayList<Point2D>> regionPs){
 		ArrayList<LinearRing2D> rs = new ArrayList<LinearRing2D>();
@@ -43,6 +46,7 @@ public class NativeInset {
 	}
 	public static ArrayList<ArrayList<Extrusion2D>> insetLines(ArrayList<Loop> loops, double d,int type){
 		ArrayList<ArrayList<Point2D>> ps = inset(loops,d);
+		if(ps==null) return null;
 		ArrayList<ArrayList<Extrusion2D>> output = new ArrayList<ArrayList<Extrusion2D>>();
 		for(ArrayList<Point2D> a: ps){
 			ArrayList<Extrusion2D> thisLoop = new ArrayList<Extrusion2D>();

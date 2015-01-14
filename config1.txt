@@ -6,10 +6,10 @@ extrusionWidth .55 mm
 printTemp 200 C	
 xySpeed 20 mm/s	//Max speed on XY, i just set this low for the first prints.
 zSpeed 4 mm/s	//Maximum speed on your z axis. I might be using the wrong units here because my mendel90 tops out at 4.
-numShells 0 		//Can't be nonzero right now. Somebody wanna port clipper to java for me?
+numShells 1 		//Can't be nonzero right now. Somebody wanna port clipper to java for me?
 infillWidth 0.6 mm		//Distance between lines of infill
-infillDir 0 radians		//Infill direction on layer 0, CW from +X axis
-infillAngle 0.785398 radians	//Infill direction change on each subsequent layer
+infillDir 0 degrees		//Infill direction on layer 0, CW from +X axis
+infillAngle 45 degrees	//Infill direction change on each subsequent layer
 lift 0.15 mm		//Z lift for travels, should be half the layer height or slightly less.
 retraction 2 mm		//retraction
 retractSpeed 50 mm/s

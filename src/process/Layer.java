@@ -49,6 +49,7 @@ public class Layer {
 		for(int i=s.numShells-1;i>=0;i--){
 			double dist = (i+0.5)*s.extrusionWidth;
 			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,2);
+			if(shells==null) continue;
 			for(ArrayList<Extrusion2D> shell : shells){
 				output.addAll(shell);
 			}
@@ -56,20 +57,24 @@ public class Layer {
 		return output;
 	}
 	public ArrayList<Extrusion2D> getPath(Point2D lastPoint){
-//		double infillDistance = (0.5+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
-		ArrayList<Extrusion2D> infill = getInfill(0);
-		if(infill==null) return null;
-//		ArrayList<Extrusion2D> shells = getShells();
+		double infillDistance = (0.5+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
+		ArrayList<Extrusion2D> infill = getInfill(infillDistance);
+		ArrayList<Extrusion2D> shells = getShells();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Point2D last = lastPoint;	//Last segment added to output.
-		for(Extrusion2D e: infill){
-			ConnectSplitAppend(last,e,output);
-			last = e.lastPoint();
+		if(infill!=null){
+			for(Extrusion2D e: infill){
+				ConnectSplitAppend(last,e,output);
+				last = e.lastPoint();
+			}
 		}
-//		for(Extrusion2D e: shells){
-//			ConnectSplitAppend(last,e,output);
-//			last = e;
-//		}
+		if(shells!=null){
+			for(Extrusion2D e: shells){
+				ConnectSplitAppend(last,e,output);
+				last = e.lastPoint();
+			}
+		}
+		if(output.size()==0) return null;
 		return output;
 	}
 	/**
