@@ -8,6 +8,10 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import javax.sound.midi.Track;
+import javax.swing.plaf.basic.BasicTreeUI.TreeTraverseAction;
+
+import process.Extrusion2D.ET;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
@@ -25,8 +29,6 @@ public class GcodeExport {
 	private double currE;
 	//Formatting just matches the conventions set by other slicers for precision in various axes.
 	//Cura is compatible with all the popular firmwares, so its conventions are a safe bet.
-	static DecimalFormat ext = new DecimalFormat("#.#####");	//Extrusion
-	static DecimalFormat xyz = new DecimalFormat("#.###");		//Position
 	PrintWriter w;
 	Slicer s;
 	public GcodeExport(String fileLoc, Slicer s){
@@ -68,29 +70,41 @@ public class GcodeExport {
 				System.out.println("Discontinuous path! Something's probably wrong!");
 				System.out.println("Jump from "+Tri3D.PointToStr(last)+" to "+Tri3D.PointToStr(e.firstPoint()));
 			}
-			if(e.ExtrusionType==1||e.ExtrusionType==2){
+			if(e.ExtrusionType!=ET.travel&&prev.ExtrusionType==ET.travel){
+				retract(false);
+			}
+			if(e.ExtrusionType==ET.travel&&prev.ExtrusionType!=ET.travel){
+				retract(true);
+			}
+			else if(e.ExtrusionType==ET.infill||e.ExtrusionType==ET.shell){
 				//Infill or shell.
 				currE +=s.EperL*Tri3D.length(e);
-			}
-			else if(e.ExtrusionType==0&&prev.ExtrusionType!=0){
-				if(!s.FirmwareRetract){
-					currE -= s.retraction;
-					G1E(s.retractSpeed);
-				}
-				else w.println("G10");
-			}
-			else if(e.ExtrusionType!=0&&prev.ExtrusionType==0){
-				if(!s.FirmwareRetract){
-					currE += s.retraction;
-					G1E(s.retractSpeed);
-				}
-				else w.println("G11");
 			}
 			G1(e.lastPoint());
 			prev = e;
 			last = e.lastPoint();
 		}
 		lift(s.layerHeight);
+	}
+	/**
+	 * Encapsulates retraction functionality.
+	 * @param pull Whether to pull filament out or push it back in. True retracts.
+	 */
+	private void retract(boolean pull){
+		if(pull){
+			if(s.FirmwareRetract) w.println("G10");
+			else{
+				currE-=s.retraction;
+				G1E(s.retractSpeed);
+			}
+		}
+		else{
+			if(s.FirmwareRetract) w.println("G11");
+			else{
+				currE+=s.retraction;
+				G1E(s.retractSpeed);
+			}
+		}
 	}
 	/**
 	 * Lift by distance d.
@@ -129,7 +143,7 @@ public class GcodeExport {
 		else{
 			SetSpeed(Math.min(Math.abs(s.zSpeed/cos),s.xySpeed));
 		}
-		w.println("G1 X"+xyz.format(p.getX())+" Y"+xyz.format(p.getY())+" Z"+xyz.format(p.getZ())+" E"+ext.format(currE));
+		w.println("G1 X"+Constants.xyz.format(p.getX())+" Y"+Constants.xyz.format(p.getY())+" Z"+Constants.xyz.format(p.getZ())+" E"+Constants.ext.format(currE));
 	}
 	/**
 	 * Send a command to go to the current E position without moving XYZ, at the given speed.
@@ -137,7 +151,7 @@ public class GcodeExport {
 	 */
 	private void G1E(double s){
 		SetSpeed(s);
-		w.println("G1 E"+ext.format(currE));
+		w.println("G1 E"+Constants.ext.format(currE));
 	}
 	/**
 	 * Zero the e value both in this exporter's internal state and in gcode.
@@ -155,7 +169,7 @@ public class GcodeExport {
 	 * @param d Speed in mm/s
 	 */
 	public void SetSpeed(double d) {
-		w.println("G1 F"+xyz.format(d*60));
+		w.println("G1 F"+Constants.xyz.format(d*60));
 		
 	}
 	/**

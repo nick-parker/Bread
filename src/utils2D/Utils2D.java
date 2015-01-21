@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import process.Extrusion2D;
+import process.Extrusion2D.ET;
 import math.geom2d.Point2D;
 import math.geom2d.Vector2D;
 import math.geom2d.line.LineSegment2D;
@@ -41,10 +42,10 @@ public class Utils2D {
 		}
 		return output;
 	}
-	public static ArrayList<Extrusion2D> ConnectPoints(ArrayList<Point2D> ps, int type){
+	public static ArrayList<Extrusion2D> ConnectPoints(ArrayList<Point2D> ps, ET extrusionType){
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		for(int k=0;k<ps.size()-1;k++){
-			output.add(new Extrusion2D(ps.get(k),ps.get(k+1),type));
+			output.add(new Extrusion2D(ps.get(k),ps.get(k+1),extrusionType));
 		}
 		return output;
 	}

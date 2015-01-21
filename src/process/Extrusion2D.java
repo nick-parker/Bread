@@ -1,9 +1,11 @@
 package process;
 
 import java.util.ArrayList;
+
 import utils2D.Utils2D;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
+import mesh3d.Constants;
 
 /**
  * ExtrusionType marks the type of extrusion this line represents.
@@ -15,9 +17,15 @@ import math.geom2d.line.LineSegment2D;
  *
  */
 public class Extrusion2D extends LineSegment2D{
-	public final int ExtrusionType;
+	public final ET ExtrusionType;
 	
-	public Extrusion2D(Point2D point1, Point2D point2, int ExtrusionType) {
+	public static enum ET{
+		travel,
+		infill,
+		shell,
+		nonretracting
+	}
+	public Extrusion2D(Point2D point1, Point2D point2, ET ExtrusionType) {
 		super(point1, point2);
 		this.ExtrusionType=ExtrusionType;
 	}
@@ -40,6 +48,6 @@ public class Extrusion2D extends LineSegment2D{
 	}
 	@Override
 	public String toString(){
-		return "Extrusion2D[("+this.x0+", "+this.y0+")-("+(x0+dx)+", "+(y0+dy)+") "+ExtrusionType+"]";
+		return "E2D[("+Constants.xyz.format(this.x0)+", "+Constants.xyz.format(this.y0)+")-("+Constants.xyz.format(x0+dx)+", "+Constants.xyz.format(y0+dy)+") "+ExtrusionType+"]";
 	}
 }

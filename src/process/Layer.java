@@ -2,6 +2,7 @@ package process;
 
 import java.util.ArrayList;
 
+import process.Extrusion2D.ET;
 import utils2D.Utils2D;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
@@ -48,7 +49,7 @@ public class Layer {
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		for(int i=s.numShells-1;i>=0;i--){
 			double dist = (i+0.5)*s.extrusionWidth;
-			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,2);
+			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,ET.shell);
 			if(shells==null) continue;
 			for(ArrayList<Extrusion2D> shell : shells){
 				output.addAll(shell);
@@ -57,23 +58,29 @@ public class Layer {
 		return output;
 	}
 	public ArrayList<Extrusion2D> getPath(Point2D lastPoint){
-		double infillDistance = (0.5+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
-		ArrayList<Extrusion2D> infill = getInfill(infillDistance);
+		double infillDistance = (0.25+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
+		ArrayList<Extrusion2D> infill = s.infillWidth==0 ? null : getInfill(infillDistance); //TODO Something smarter here
 		ArrayList<Extrusion2D> shells = getShells();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Point2D last = lastPoint;	//Last segment added to output.
-		if(infill!=null){
-			for(Extrusion2D e: infill){
-				ConnectSplitAppend(last,e,output);
-				last = e.lastPoint();
-			}
-		}
 		if(shells!=null){
 			for(Extrusion2D e: shells){
 				ConnectSplitAppend(last,e,output);
 				last = e.lastPoint();
 			}
 		}
+		if(infill!=null){
+			for(Extrusion2D e: infill){
+				ConnectSplitAppend(last,e,output);
+				last = e.lastPoint();
+			}
+		}
+//		if(shells!=null){
+//			for(Extrusion2D e: shells){
+//				ConnectSplitAppend(last,e,output);
+//				last = e.lastPoint();
+//			}
+//		}
 		if(output.size()==0) return null;
 		return output;
 	}
@@ -82,15 +89,16 @@ public class Layer {
 	 * are split based on the topology of the surface in this layer's slicer.
 	 * @param lp Last position of the head.
 	 * @param e Segment to add to output.
-	 * @param output Continous path composed of Extrusion2D objects.
+	 * @param output Continuous path composed of Extrusion2D objects.
 	 */
 	private void ConnectSplitAppend(Point2D lp, Extrusion2D e, ArrayList<Extrusion2D> output){
+		//If last point isn't the start of e, add a travel between them and retract if necessary.
 		Point2D np = e.firstPoint();
 		if(!Utils2D.equiv(lp, np)){
 			output.addAll((new Extrusion2D(
 					lp,
 					np,
-					lp.distance(np)>s.retractThreshold ? 0 : 3)	//Retract is 0, nonretracting is 3.
+					lp.distance(np)>s.retractThreshold ? ET.travel : ET.nonretracting)	//Retract is 0, nonretracting is 3.
 					).splitExtrusion(s.topo));
 		}
 		output.addAll(e.splitExtrusion(s.topo));

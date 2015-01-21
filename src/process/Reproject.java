@@ -2,6 +2,7 @@ package process;
 
 import java.util.ArrayList;
 
+import process.Extrusion2D.ET;
 import math.geom2d.Point2D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
@@ -44,7 +45,7 @@ public class Reproject {
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		ArrayList<Extrusion2D> travels = new ArrayList<Extrusion2D>();
 		for(Extrusion2D e: path){
-			if(e.ExtrusionType==0||e.ExtrusionType==3){
+			if(e.ExtrusionType==ET.travel||e.ExtrusionType==ET.nonretracting){
 				travels.add(e);
 				continue;
 			}
@@ -74,7 +75,7 @@ public class Reproject {
 	 */
 	private Point3D projectPoint(Point2D p){
 		Point3D hit = s.shape.project(p);
-//		if(hit.getZ()+to()<s.zMin){	TODO reimplement this check in a way that doesn't cause discontinuities.
+//		if(hit.getZ()+to()<s.zMin){	//TODO reimplement this check in a way that doesn't cause discontinuities.
 //			return new Point3D(hit.getX(),hit.getY(),s.zMin);
 //		}
 		return new Point3D(hit.getX(),hit.getY(),hit.getZ()+to());
@@ -101,7 +102,7 @@ public class Reproject {
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		Extrusion3D first = projectExtrusion(travels.get(0));
 		Vector3D rise = new Vector3D(0,0,s.lift);
-		Extrusion3D lift = new Extrusion3D(first.firstPoint(),first.firstPoint().plus(rise),0);	//liftE handled by one applied to first.
+		Extrusion3D lift = new Extrusion3D(first.firstPoint(),first.firstPoint().plus(rise),ET.nonretracting);	//liftE handled by one applied to first.
 		output.add(lift);
 		double z = lift.lastPoint().getZ();
 		for(Extrusion2D e : travels){

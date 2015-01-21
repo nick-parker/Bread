@@ -3,6 +3,7 @@ package process;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import process.Extrusion2D.ET;
 import utils2D.Utils2D;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
@@ -23,7 +24,7 @@ public class Infill {
 	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber){
 		if(loops.size()==0) return null;
 		ArrayList<ArrayList<Point2D>> regionPs;
-		System.out.println(ToPoints(loops));
+//		System.out.println(ToPoints(loops));
 		if(distance!=0){
 			//Generate the inset, as a set of rings of points. Currently nonfunctional.
 			regionPs = NativeInset.inset(loops, distance);
@@ -50,12 +51,12 @@ public class Infill {
 		//Iterate through lines without checking that they actually intersect. getEdges returns an empty list for nonintersection,
 		//so addAll and iterating through it both do nothing.
 		for(int i=0;i<lineCount;i++){
-			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,1);
+			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,ET.infill);
 			if(i%2==0) output.addAll(es);
 			else{	//Add them flipped and in reverse order. This way the lines form a zig zag pattern across part.
 				for(int q=es.size()-1;q>=0;q--){
 					Extrusion2D e = es.get(q);
-					output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),1));
+					output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),ET.infill));
 				}
 			}
 			//Move the line to the right.
@@ -117,7 +118,7 @@ public class Infill {
 	 * @param edges Set of edges to intersect with
 	 * @return Segments of l inside the domain represented by edges. Empty list if edges and l don't intersect.
 	 */
-	public static ArrayList<Extrusion2D> getEdges(StraightLine2D l, Collection<LineSegment2D> edges, Vector2D v, int type){
+	public static ArrayList<Extrusion2D> getEdges(StraightLine2D l, Collection<LineSegment2D> edges, Vector2D v, ET type){
 		ArrayList<Point2D> ps = new ArrayList<Point2D>();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		//Generate the intersections of l with the edges

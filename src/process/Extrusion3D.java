@@ -1,5 +1,6 @@
 package process;
 
+import process.Extrusion2D.ET;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
 import mesh3d.Tri3D;
@@ -14,9 +15,9 @@ import mesh3d.Tri3D;
  *
  */
 public class Extrusion3D extends LineSegment3D {
-	public final int ExtrusionType;
+	public final ET ExtrusionType;
 
-	public Extrusion3D(Point3D p1, Point3D p2, int ExtrusionType) {
+	public Extrusion3D(Point3D p1, Point3D p2, ET ExtrusionType) {
 		super(p1, p2);
 		this.ExtrusionType = ExtrusionType;
 	}

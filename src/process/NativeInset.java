@@ -2,6 +2,7 @@ package process;
 
 import java.util.ArrayList;
 
+import process.Extrusion2D.ET;
 import representation.ClipperJNA;
 import representation.Domain;
 import representation.IntPoint;
@@ -34,7 +35,7 @@ public class NativeInset {
 	public static ArrayList<ArrayList<Point2D>> inset(double d, ArrayList<ArrayList<Point2D>> ps){
 		Domain LoopDom = new Domain(ps);
 		Domain output = Domain.parse(ClipperJNA.inset(LoopDom.toString(),(int)Math.round(d*-1*IntPoint.conv)));
-		System.out.println(output);
+//		System.out.println(output);
 		return output==null ? null : output.conv();
 	}
 	public static MultiPolygon2D GetRegion(ArrayList<ArrayList<Point2D>> regionPs){
@@ -44,7 +45,7 @@ public class NativeInset {
 		}
 		return new MultiPolygon2D(rs);
 	}
-	public static ArrayList<ArrayList<Extrusion2D>> insetLines(ArrayList<Loop> loops, double d,int type){
+	public static ArrayList<ArrayList<Extrusion2D>> insetLines(ArrayList<Loop> loops, double d, ET type){
 		ArrayList<ArrayList<Point2D>> ps = inset(loops,d);
 		if(ps==null) return null;
 		ArrayList<ArrayList<Extrusion2D>> output = new ArrayList<ArrayList<Extrusion2D>>();
