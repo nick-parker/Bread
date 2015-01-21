@@ -37,6 +37,6 @@ public class NoView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("2015-21-1-1456.gcode");
+		s.slice("2015-21-1-1521.gcode");
 	}
 }

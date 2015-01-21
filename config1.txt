@@ -10,7 +10,7 @@ numShells 1 		//Can't be nonzero right now. Somebody wanna port clipper to java 
 infillWidth 0.6 mm		//Distance between lines of infill
 infillDir 0 degrees		//Infill direction on layer 0, CW from +X axis
 infillAngle 45 degrees	//Infill direction change on each subsequent layer
-lift 0.15 mm		//Z lift for travels, should be half the layer height or slightly less.
+lift 0 mm		//Z lift for travels, should be half the layer height or slightly less.
 retraction 2 mm		//retraction
 retractSpeed 50 mm/s
 retractThreshold 6 mm	//Minimum travel distance to trigger retraction.
