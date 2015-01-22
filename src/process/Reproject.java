@@ -65,6 +65,7 @@ public class Reproject {
 	 * @return An Extrusion3D path with the same type as e.
 	 */
 	private Extrusion3D projectExtrusion(Extrusion2D e){
+//		System.out.println(e);
 		return new Extrusion3D(projectPoint(e.firstPoint()), projectPoint(e.lastPoint()), e.ExtrusionType);
 	}
 	/**

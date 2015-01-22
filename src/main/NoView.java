@@ -21,11 +21,13 @@ public class NoView {
 		Surface3D m2 = null;		
 		Slicer s = null;
 		try {
-			m1 = Stli.importModel("vtop.stl", true);
+//			m1 = Stli.importModel("ASTM D638-10-1.stl", true);
+			m1 = Stli.importModel("25mm.stl", true);
 //			m1.move(new Vector3D(0,0,0.25));
-			m2 = Stli.importSurface("v.stl", true);
+			m2 = Stli.importSurface("20deg.stl", true);
 //			m2 = SimplePlane.MakePlane(-200, -200, 200, 200, 4);
-//			m2.move(new Vector3D(2.5,0,0));
+			m1.move(new Vector3D(20,0,0));
+			m2.move(new Vector3D(20,0,0));
 			//(Model3D part, Surface3D shape, layerHeight, filD, nozzleD, 
 			//extrusionWidth, PrintTemp, xySpeed, zSpeed, numShells, infillWidth, 
 			//infillDir, infillAngle, lift, retraction)
@@ -37,6 +39,6 @@ public class NoView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("2015-21-1-1521.gcode");
+		s.slice("2015-22-1-1620.gcode");
 	}
 }

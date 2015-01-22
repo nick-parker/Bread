@@ -76,7 +76,8 @@ public class Tri3D{
 		Vector3D v = new Vector3D(ps[0],p);
 		double[] p2d = new double[]{(uv*Vector3D.dotProduct(v,vs[0])-vs[1].normSq()*Vector3D.dotProduct(v, vs[0]))/denom,
 				(uv*Vector3D.dotProduct(v,vs[0])-vs[0].normSq()*Vector3D.dotProduct(v, vs[1]))/denom};
-		return p2d[0]>=0&&p2d[1]>=0&&p2d[0]<=1&&p2d[1]<=1&&p2d[0]+p2d[1]<=1;
+		return p2d[0]>=-1*Constants.tol&&p2d[1]>=-1*Constants.tol&&p2d[0]<=1+Constants.tol&&p2d[1]<=1+Constants.tol&&p2d[0]+p2d[1]<=1+Constants.tol;
+		//TODO Figure out if adding tolerances here hurts us.
 	}
 	public Point3D getMax(Vector3D v) {
 		double d1 = Vector3D.dotProduct(vs[0], v);
