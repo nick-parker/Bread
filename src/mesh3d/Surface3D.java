@@ -38,8 +38,9 @@ public class Surface3D extends Mesh3D{
 		ps = points;
 		MaxRad = 0;
 		for(Tri3D t: this.tris){
-			if(t.radius>MaxRad) MaxRad=t.radius;
+			if(t.xyradius>MaxRad) MaxRad=t.xyradius;
 		}
+		MaxRad+=Constants.tol;
 	}
 
 	@Override
@@ -130,6 +131,7 @@ public class Surface3D extends Mesh3D{
 		Box3D b = this.boundingBox();
 		System.out.println("Point " + p.getX()+" "+p.getY() + " Failed to project.");
 		System.out.println("X bounds: "+ b.getMinX()+" : "+b.getMaxX()+" Y bounds: "+b.getMinY()+" : "+b.getMaxY());
+//		return project(p);
 		return null;
 	}
 	@Override

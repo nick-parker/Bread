@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import tests.IntersectTest;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom3d.Box3D;
@@ -157,20 +158,33 @@ public class Slicer {
 		g.setTempAndWait(this.printTemp);
 		Point2D last = new Point2D(0,0);
 		for(int n=0;n<lc;n++){
-//			if(n<bottomLayerCount) g.SetSpeed((int)Math.round(this.Speed*this.bottomSpeedMult));
-//			else g.SetSpeed(this.Speed);
-			Layer l = new Layer(this,n);
-			System.out.println("Offset: "+l.offset);
-			shape.setOffset(l.offset);
-			ArrayList<Extrusion2D> p = l.getPath(last);
-			if(p==null||p.size()==0) continue;
-			last = p.get(p.size()-1).lastPoint();
-			Reproject r = new Reproject(l.offset,this);
-			ArrayList<Extrusion3D> path = r.Proj(p);
-			if(path.size()==0) System.out.println(p);
-			g.addLayer(path);			
+			doLayer(n,g,last);
 		}
 		g.writeFromFile("end.gcode");
 		g.close();
+	}
+	private void doLayer(int n, GcodeExport g, Point2D last){
+		Layer l = new Layer(this,n);
+		System.out.println("Offset: "+l.offset);
+		shape.setOffset(l.offset);
+		ArrayList<Extrusion2D> p = l.getPath(last);
+		if(p==null||p.size()==0) return;
+		last = p.get(p.size()-1).lastPoint();
+		Reproject r = new Reproject(l.offset,this);
+		ArrayList<Extrusion3D> path = r.Proj(p);
+		if(path.size()==0) System.out.println(p);
+		g.addLayer(path);	
+	}
+	public void debug(String fileLoc){
+		PositionShape();
+		shape.move(new Vector3D(0,0,zMin));
+		int lc = layerCount();
+		IntersectTest t = new IntersectTest(fileLoc);
+		for(int n=0;n<lc;n++){
+			Layer l = new Layer(this,n);
+			shape.setOffset(l.offset);
+			t.export(shape.overlap(part));
+		}
+		t.close();
 	}
 }

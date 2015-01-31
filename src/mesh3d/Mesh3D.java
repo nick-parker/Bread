@@ -41,11 +41,18 @@ abstract class Mesh3D implements Shape3D{
 	 */
 	public Point3D getMax(Vector3D v){
 		Point3D max = Constants.origin;
-		double maxD = -1e99;
+		double maxD = 0;
+		boolean first = true;
 		for(Tri3D t:tris){
 			Point3D m = t.getMax(v);
 			double d = Vector3D.dotProduct(v, new Vector3D(Constants.origin,m));
 			if(d>maxD){
+				maxD=d;
+				max=m;
+				continue;
+			}
+			if(first){
+				first=false;
 				maxD=d;
 				max=m;
 			}

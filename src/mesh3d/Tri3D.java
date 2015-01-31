@@ -12,9 +12,10 @@ public class Tri3D{
 	private LineSegment3D[] es;
 	private Vector3D[] vs;	//Vectors describing u,v coordinate system of triangle.
 	private double uv;
-	private double denom;
+	private double denom; //Denominatoor of contains equations, baked in because it's a property of the triangle.
 	private double originDot; //baked in value for testing which side of the plane a point is on.
 	public final double radius;	//Distance from p0 to the furthest point on this triangle.
+	public final double xyradius; //XY distance from p0 to the furthest point on this triangle.
 	public final double zradius;
 	private Plane3D pl;
 	/**
@@ -34,6 +35,8 @@ public class Tri3D{
 		this.es = new LineSegment3D[]{e0,e1,e2};
 		this.originDot = PointDot(pl.normal(), pl.origin());
 		this.radius = Math.max(length(e0),length(e2));
+		this.xyradius= Math.sqrt(Math.max(Math.pow(p1.getX()-p0.getX(), 2)+Math.pow(p1.getY()-p0.getY(), 2),
+				Math.pow(p2.getX()-p0.getX(), 2)+Math.pow(p2.getY()-p0.getY(), 2)));
 		this.zradius = Math.max(Math.abs(p0.getZ()-p1.getZ()), Math.abs(p0.getZ()-p2.getZ()));
 	}
 	public Tri3D move(Vector3D v) {
@@ -54,7 +57,8 @@ public class Tri3D{
 	 */
 	public Point3D lineIntersection(StraightLine3D l){
 		Point3D p = pl.lineIntersection(l);
-		return this.contains(p) ? p : null;
+//		System.out.println(PointToStr(p));
+		return this.TolContains(p,1e-3) ? p : null;
 	}
 	/**
 	 * @param l Line segment to intersect with tri.
@@ -70,14 +74,24 @@ public class Tri3D{
 	 * @return Whether this contains point p, edges are included.
 	 */
 	public boolean contains(Point3D p){
+		return TolContains(p,Constants.tol);
+		//TODO Figure out if adding tolerances here hurts us.
+	}
+	/**
+	 * Contains with a tolerance.
+	 * @param p
+	 * @param tol Tolerance to account for floating point issues.
+	 * @return
+	 */
+	private boolean TolContains(Point3D p, double tol) {
 		if(p==null) return false;
 		if(!pl.contains(p)) return false;
 		//http://geomalgorithms.com/a06-_intersect-2.html
 		Vector3D v = new Vector3D(ps[0],p);
 		double[] p2d = new double[]{(uv*Vector3D.dotProduct(v,vs[0])-vs[1].normSq()*Vector3D.dotProduct(v, vs[0]))/denom,
 				(uv*Vector3D.dotProduct(v,vs[0])-vs[0].normSq()*Vector3D.dotProduct(v, vs[1]))/denom};
-		return p2d[0]>=-1*Constants.tol&&p2d[1]>=-1*Constants.tol&&p2d[0]<=1+Constants.tol&&p2d[1]<=1+Constants.tol&&p2d[0]+p2d[1]<=1+Constants.tol;
-		//TODO Figure out if adding tolerances here hurts us.
+		return p2d[0]>=-1*tol&&p2d[1]>=-1*tol&&p2d[0]<=1+tol&&p2d[1]<=1+tol&&p2d[0]+p2d[1]<=1+tol;
+//		return p2d[0]>=0&&p2d[1]>=0&&p2d[0]<=1&&p2d[1]<=1&&p2d[0]+p2d[1]<=1;
 	}
 	public Point3D getMax(Vector3D v) {
 		double d1 = Vector3D.dotProduct(vs[0], v);
