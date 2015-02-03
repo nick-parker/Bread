@@ -46,6 +46,7 @@ public class Slicer {
 	public boolean FirmwareRetract = false;
 	//Inputs below are optional, above are mandatory.
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
+	public double minInfillLength = 0.25;
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
 			double lift, double retraction, double retractSpeed, double retractThreshold) throws IOException{
@@ -163,22 +164,23 @@ public class Slicer {
 		g.setTempAndWait(this.printTemp);
 		Point2D last = new Point2D(0,0);
 		for(int n=0;n<lc;n++){
-			doLayer(n,g,last);
+			last = doLayer(n,g,last);
 		}
 		g.writeFromFile("end.gcode");
 		g.close();
 	}
-	private void doLayer(int n, GcodeExport g, Point2D last){
+	private Point2D doLayer(int n, GcodeExport g, Point2D last){
 		Layer l = new Layer(this,n);
 		System.out.println("Offset: "+l.offset);
 		shape.setOffset(l.offset);
 		ArrayList<Extrusion2D> p = l.getPath(last);
-		if(p==null||p.size()==0) return;
+		if(p==null||p.size()==0) return last;
 		last = p.get(p.size()-1).lastPoint();
 		Reproject r = new Reproject(l.offset,this);
 		ArrayList<Extrusion3D> path = r.Proj(p);
 		if(path.size()==0) System.out.println(p);
 		g.addLayer(path);	
+		return last;
 	}
 	public void debug(String fileLoc){
 		PositionShape();

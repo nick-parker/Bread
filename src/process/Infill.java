@@ -38,28 +38,37 @@ public class Infill {
 		if(regionPs==null) return null;
 		MultiPolygon2D region = NativeInset.GetRegion(regionPs);	//Convert to a multipolygon for some convenience.
 		Collection<LineSegment2D> edges = region.edges();	//Get the edges of the multipolygon
+		
 		//Calculate the CW angle from +x to run infill on this layer.
 		double a = (s.infillDir+layerNumber*s.infillAngle);	//CW angle infill lines make with x axis. %(2*Math.PI)
+		
 		//Calculate a perpendicular vector to the infill.
 		Vector2D move = Utils2D.AngleVector(a+Math.PI/2);	//Direction perpendicular to infill to move intersection line.
 		Vector2D dir = Utils2D.AngleVector(a);				//Direction parallel to infill.
+		
 		//Get the point furthest in the -move direction from the set of rings of points.
 		Point2D firstP = getExtreme(move,regionPs,false);
 		StraightLine2D l = new StraightLine2D(firstP, dir);
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Box2D b = region.boundingBox();
+		
 		//Calculate the worst case scenario number of lines necessary, because calculating width in a given vector direction 
 		//is implemented wrong.
 		int lineCount = (int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/s.infillWidth);
+		
 		//Iterate through lines without checking that they actually intersect. getEdges returns an empty list for nonintersection,
 		//so addAll and iterating through it both do nothing.
 		for(int i=0;i<lineCount;i++){
 			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,ET.infill);
-			if(i%2==0) output.addAll(es);
+			if(i%2==0){
+				for(Extrusion2D e : es){
+					if(e.length()>s.minInfillLength) output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),ET.infill));
+				}
+			}
 			else{	//Add them flipped and in reverse order. This way the lines form a zig zag pattern across part.
 				for(int q=es.size()-1;q>=0;q--){
 					Extrusion2D e = es.get(q);
-					output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),ET.infill));
+					if(e.length()>s.minInfillLength) output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),ET.infill));
 				}
 			}
 			//Move the line to the right.
