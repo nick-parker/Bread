@@ -2,10 +2,13 @@ package process;
 
 import java.util.ArrayList;
 
-import process.Extrusion2D.ET;
+import main.Slicer;
 import math.geom2d.Point2D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
+import structs.Extrusion2D;
+import structs.Extrusion3D;
+import structs.Extrusion2D.ET;
 import utils2D.Utils2D;
 
 /**

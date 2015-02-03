@@ -9,11 +9,8 @@ import java.util.InputMismatchException;
 import math.geom3d.Point3D;
 
 public class Stli {
-	private static Tri3D[] importMesh(String fileName,boolean ascii) throws IOException{
+	private static Tri3D[] importMesh(String fileName) throws IOException{
 		try{
-			if(!ascii){
-				throw new InputMismatchException("Please input ASCII .stl files only");
-			}
 			BufferedReader f = new BufferedReader(new FileReader(fileName));
 			ArrayList<Tri3D> tris = new ArrayList<Tri3D>();
 			Point3D[] ps = new Point3D[]{Constants.origin,Constants.origin,Constants.origin};
@@ -56,10 +53,20 @@ public class Stli {
 			return null;
 		}
 	}
+	/**
+	 * Import a binary .stl file
+	 * @param fileName File to import
+	 * @return An array of Tri3D objects representing the .stl
+	 */
+	private static Tri3D[] importBinMesh(String fileName){
+		throw new UnsupportedOperationException();
+	}
 	public static Model3D importModel(String fileName, boolean ascii) throws IOException{
-		return new Model3D(importMesh(fileName,ascii));
+		if(ascii) return new Model3D(importMesh(fileName));
+		return new Model3D(importBinMesh(fileName));
 	}
 	public static Surface3D importSurface(String fileName, boolean ascii) throws IOException{
-		return new Surface3D(importMesh(fileName,ascii));
+		if(ascii) return new Surface3D(importMesh(fileName));
+		return new Surface3D(importBinMesh(fileName));
 	}
 }

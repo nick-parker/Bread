@@ -9,12 +9,11 @@ import mesh3d.Model3D;
 import mesh3d.SimplePlane;
 import mesh3d.Stli;
 import mesh3d.Surface3D;
-import process.Loop;
 import process.NativeInset;
-import process.Slicer;
 import representation.ClipperJNA;
+import structs.Loop;
 
-public class NoView {
+public class Run {
 
 	public static void main(String[] args) {
 		Model3D part = null;
@@ -39,6 +38,6 @@ public class NoView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("2015-1-31-2240.gcode");
+		s.slice("2015-2-3-1638.gcode");
 	}
 }

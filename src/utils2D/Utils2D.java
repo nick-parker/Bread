@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import process.Extrusion2D;
-import process.Extrusion2D.ET;
+import structs.Extrusion2D;
+import structs.Extrusion2D.ET;
 import math.geom2d.Point2D;
 import math.geom2d.Vector2D;
 import math.geom2d.line.LineSegment2D;

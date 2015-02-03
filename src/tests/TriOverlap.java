@@ -19,8 +19,8 @@ import mesh3d.Tri3D;
 import org.junit.Test;
 
 import process.Flatten;
-import process.Loop;
 import process.Order;
+import structs.Loop;
 
 public class TriOverlap {
 

@@ -1,4 +1,4 @@
-package process;
+package structs;
 
 import java.util.ArrayList;
 

@@ -1,10 +1,15 @@
-package process;
+package main;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import process.GcodeExport;
+import process.Reproject;
+import structs.Extrusion2D;
+import structs.Extrusion3D;
+import structs.Layer;
 import tests.IntersectTest;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;

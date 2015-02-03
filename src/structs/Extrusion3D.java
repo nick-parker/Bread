@@ -1,6 +1,6 @@
-package process;
+package structs;
 
-import process.Extrusion2D.ET;
+import structs.Extrusion2D.ET;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
 import mesh3d.Tri3D;

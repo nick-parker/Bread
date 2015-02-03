@@ -1,9 +1,14 @@
-package process;
+package structs;
 
 import java.util.ArrayList;
 
-import process.Extrusion2D.ET;
+import process.Flatten;
+import process.Infill;
+import process.NativeInset;
+import process.Order;
+import structs.Extrusion2D.ET;
 import utils2D.Utils2D;
+import main.Slicer;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 
@@ -52,6 +57,7 @@ public class Layer {
 			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,ET.shell);
 			if(shells==null) continue;
 			for(ArrayList<Extrusion2D> shell : shells){
+				System.out.println(shell);
 				output.addAll(shell);
 			}
 		}

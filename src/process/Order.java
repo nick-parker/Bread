@@ -3,6 +3,7 @@ package process;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import structs.Loop;
 import math.geom2d.line.LineSegment2D;
 
 public class Order {

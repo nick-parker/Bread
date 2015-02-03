@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import javax.sound.midi.Track;
 import javax.swing.plaf.basic.BasicTreeUI.TreeTraverseAction;
 
-import process.Extrusion2D.ET;
+import structs.Extrusion3D;
+import structs.Extrusion2D.ET;
+import main.Slicer;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;

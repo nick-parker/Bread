@@ -3,8 +3,11 @@ package process;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import process.Extrusion2D.ET;
+import structs.Extrusion2D;
+import structs.Loop;
+import structs.Extrusion2D.ET;
 import utils2D.Utils2D;
+import main.Slicer;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
 import math.geom2d.Vector2D;

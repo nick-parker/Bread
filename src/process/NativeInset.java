@@ -2,10 +2,12 @@ package process;
 
 import java.util.ArrayList;
 
-import process.Extrusion2D.ET;
 import representation.ClipperJNA;
 import representation.Domain;
 import representation.IntPoint;
+import structs.Extrusion2D;
+import structs.Loop;
+import structs.Extrusion2D.ET;
 import math.geom2d.Point2D;
 import math.geom2d.polygon.LinearRing2D;
 import math.geom2d.polygon.MultiPolygon2D;
