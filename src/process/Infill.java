@@ -25,6 +25,7 @@ public class Infill {
 	 * @return A list of infill extrusions, ordered in a zig zag pattern across the part.
 	 */
 	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber){
+		double offset = (layerNumber<s.botLayers || layerNumber>=s.topLayerStart) ? s.extrusionWidth*1.09 : s.infillWidth;
 		if(loops.size()==0) return null;
 		ArrayList<ArrayList<Point2D>> regionPs;
 //		System.out.println(ToPoints(loops));
@@ -54,8 +55,7 @@ public class Infill {
 		
 		//Calculate the worst case scenario number of lines necessary, because calculating width in a given vector direction 
 		//is implemented wrong.
-		int lineCount = (int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/s.infillWidth);
-		
+		int lineCount = (int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/offset);
 		//Iterate through lines without checking that they actually intersect. getEdges returns an empty list for nonintersection,
 		//so addAll and iterating through it both do nothing.
 		for(int i=0;i<lineCount;i++){
@@ -72,7 +72,7 @@ public class Infill {
 				}
 			}
 			//Move the line to the right.
-			l = l.parallel(s.infillWidth);
+			l = l.parallel(offset);
 		}
 		return output;
 	}

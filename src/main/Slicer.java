@@ -44,12 +44,15 @@ public class Slicer {
 	public double retractThreshold;
 	public double zMin = 0.25;
 	public boolean FirmwareRetract = false;
+	public int topLayerStart;
+	public int botLayers;
+	public int layerCount;
 	//Inputs below are optional, above are mandatory.
-	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell
+	public double infillInsetMultiple = -0.25;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
 	public double minInfillLength = 0.25;
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
-			double lift, double retraction, double retractSpeed, double retractThreshold) throws IOException{
+			double lift, double retraction, double retractSpeed, double retractThreshold, int topLayers, int botLayers) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
 		this.extrusionWidth = extrusionWidth;
@@ -68,6 +71,9 @@ public class Slicer {
 		this.retraction = retraction;
 		this.retractSpeed = retractSpeed;
 		this.retractThreshold = retractThreshold;
+		this.layerCount = layerCount();
+		this.topLayerStart = layerCount-topLayers;
+		this.botLayers = botLayers;
 		//Cross sectional area of the extrusion is the ratio of plastic volume/XYZ distance, units mm^2
 		//volume rate * filament distance/unit volume = filament rate. filament distance/unit volume is cx area of filament.
 		this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
@@ -130,10 +136,16 @@ public class Slicer {
 				case "retractThreshold":
 					this.retractThreshold = Double.parseDouble(line[1]);
 					break;
+				case "topLayers":
+					this.topLayerStart = Integer.parseInt(line[1]);
+				case "botLayers":
+					this.botLayers = Integer.parseInt(line[1]);
 				}
 			}
 			this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
 			this.topo = shape.topology();
+			this.layerCount = layerCount();
+			this.topLayerStart = layerCount-topLayerStart;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -158,12 +170,11 @@ public class Slicer {
 	public void slice(String fileLoc){
 		PositionShape();
 		shape.move(new Vector3D(0,0,zMin));
-		int lc = layerCount();
 		GcodeExport g = new GcodeExport(fileLoc, this);
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
 		Point2D last = new Point2D(0,0);
-		for(int n=0;n<lc;n++){
+		for(int n=0;n<layerCount;n++){
 			last = doLayer(n,g,last);
 		}
 		g.writeFromFile("end.gcode");
@@ -185,7 +196,7 @@ public class Slicer {
 	public void debug(String fileLoc){
 		PositionShape();
 		shape.move(new Vector3D(0,0,zMin));
-		int lc = layerCount();
+		int lc = layerCount;
 		IntersectTest t = new IntersectTest(fileLoc);
 		for(int n=0;n<lc;n++){
 			Layer l = new Layer(this,n);

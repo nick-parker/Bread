@@ -25,10 +25,10 @@ public class Run {
 //			m1 = Stli.importModel("ASTM D638-10-1.stl", true);
 			part = Stli.importModel("ASTM D638-10-1.stl", true);
 //			m1.move(new Vector3D(0,0,0.25));
-			surface = Stli.importSurface("20deg.stl", true);
-//			m2 = SimplePlane.MakePlane(-200, -200, 200, 200, 4);
+//			surface = Stli.importSurface("20deg.stl", true);
+			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
 			part.move(new Vector3D(20,0,0));
-			surface.move(new Vector3D(20,0,0));
+//			surface.move(new Vector3D(20,0,0));
 			//(Model3D part, Surface3D shape, layerHeight, filD, nozzleD, 
 			//extrusionWidth, PrintTemp, xySpeed, zSpeed, numShells, infillWidth, 
 			//infillDir, infillAngle, lift, retraction)
@@ -40,7 +40,7 @@ public class Run {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("2015-2-4-1155.gcode");
+		s.slice("planeLayers.gcode");
 //		surface.setOffset(5.7);
 //		Point2D p = new Point2D(6.487060546875, 0.27490234375);
 //		Point3D p3 = surface.project(p);

@@ -63,7 +63,7 @@ public class Layer {
 		return output;
 	}
 	public ArrayList<Extrusion2D> getPath(Point2D lastPoint){
-		double infillDistance = (0.25+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
+		double infillDistance = (0.5+s.numShells+s.infillInsetMultiple)*s.extrusionWidth;
 		ArrayList<Extrusion2D> infill = s.infillWidth==0 ? null : getInfill(infillDistance); //TODO Something smarter here
 		ArrayList<Extrusion2D> shells = getShells();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
