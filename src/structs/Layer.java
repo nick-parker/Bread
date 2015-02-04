@@ -57,7 +57,6 @@ public class Layer {
 			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,ET.shell);
 			if(shells==null) continue;
 			for(ArrayList<Extrusion2D> shell : shells){
-				System.out.println(shell);
 				output.addAll(shell);
 			}
 		}

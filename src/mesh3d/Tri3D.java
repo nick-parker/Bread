@@ -10,8 +10,9 @@ import math.geom3d.plane.Plane3D;
 public class Tri3D{
 	private Point3D[] ps;
 	private LineSegment3D[] es;
-	private Vector3D[] vs;	//Vectors describing u,v coordinate system of triangle.
-	private double uv;
+	private Vector3D u;
+	private Vector3D v;
+	private double udotv;
 	private double denom; //Denominatoor of contains equations, baked in because it's a property of the triangle.
 	private double originDot; //baked in value for testing which side of the plane a point is on.
 	public final double radius;	//Distance from p0 to the furthest point on this triangle.
@@ -25,10 +26,11 @@ public class Tri3D{
 		this.ps = new Point3D[]{p0,p1,p2};
 		Vector3D v1 = new Vector3D(p0,p1);
 		Vector3D v2 = new Vector3D(p0,p2);
-		this.vs = new Vector3D[]{v1,v2};
-		this.uv = Vector3D.dotProduct(v1, v2);
-		this.denom = Math.pow(Vector3D.dotProduct(vs[0],vs[1]),2)-vs[0].normSq()*vs[1].normSq();
-		this.pl = new Plane3D(p0,v1,v2);
+		this.u = v1;
+		this.v = v2;
+		this.udotv = Vector3D.dotProduct(u,v);
+		this.denom = Math.pow(Vector3D.dotProduct(u,v),2)-u.normSq()*v.normSq();
+		this.pl = new Plane3D(p0,u,v);
 		LineSegment3D e0 = new LineSegment3D(p0, p1);
 		LineSegment3D e1 = new LineSegment3D(p1, p2);
 		LineSegment3D e2 = new LineSegment3D(p2, p0);
@@ -87,17 +89,16 @@ public class Tri3D{
 		if(p==null) return false;
 		if(!pl.contains(p)) return false;
 		//http://geomalgorithms.com/a06-_intersect-2.html
-		Vector3D v = new Vector3D(ps[0],p);
-		double[] p2d = new double[]{(uv*Vector3D.dotProduct(v,vs[0])-vs[1].normSq()*Vector3D.dotProduct(v, vs[0]))/denom,
-				(uv*Vector3D.dotProduct(v,vs[0])-vs[0].normSq()*Vector3D.dotProduct(v, vs[1]))/denom};
+		Vector3D w = new Vector3D(ps[0],p);
+		double[] p2d = new double[]{(udotv*Vector3D.dotProduct(w,v)-v.normSq()*Vector3D.dotProduct(w, u))/denom,
+				(udotv*Vector3D.dotProduct(w,u)-u.normSq()*Vector3D.dotProduct(w, v))/denom};
 		return p2d[0]>=-1*tol&&p2d[1]>=-1*tol&&p2d[0]<=1+tol&&p2d[1]<=1+tol&&p2d[0]+p2d[1]<=1+tol;
 //		return p2d[0]>=0&&p2d[1]>=0&&p2d[0]<=1&&p2d[1]<=1&&p2d[0]+p2d[1]<=1;
 	}
-	public Point3D getMax(Vector3D v) {
-		double d1 = Vector3D.dotProduct(vs[0], v);
-		double d2 = Vector3D.dotProduct(vs[1], v);
-		double d3 = Vector3D.dotProduct(vs[0].opposite(), v);
-		if(d3>d1 &&d3>d2) return Mesh3D.copyPoint(ps[0]);
+	public Point3D getMax(Vector3D vec) {
+		double d1 = Vector3D.dotProduct(u, vec);
+		double d2 = Vector3D.dotProduct(v, vec);
+		if(d1<0&&d1<d2) return Mesh3D.copyPoint(ps[0]);
 		if(d1>d2) return Mesh3D.copyPoint(ps[1]);
 		return Mesh3D.copyPoint(ps[2]);
 	}
