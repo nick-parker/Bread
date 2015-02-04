@@ -40,7 +40,7 @@ public class Run {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("planeLayers.gcode");
+		s.slice("debug.gcode");
 //		surface.setOffset(5.7);
 //		Point2D p = new Point2D(6.487060546875, 0.27490234375);
 //		Point3D p3 = surface.project(p);

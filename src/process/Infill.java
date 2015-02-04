@@ -62,7 +62,7 @@ public class Infill {
 			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,ET.infill);
 			if(i%2==0){
 				for(Extrusion2D e : es){
-					if(e.length()>s.minInfillLength) output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),ET.infill));
+					if(e.length()>s.minInfillLength) output.add(e);
 				}
 			}
 			else{	//Add them flipped and in reverse order. This way the lines form a zig zag pattern across part.
