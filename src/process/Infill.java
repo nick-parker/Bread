@@ -15,6 +15,8 @@ import math.geom2d.line.LineSegment2D;
 import math.geom2d.line.StraightLine2D;
 import math.geom2d.polygon.MultiPolygon2D;
 
+//TODO Change infill so that the grid doesn't move on layer changes. This will make infill much stronger, and keep it from getting droopy.
+
 public class Infill {
 	/**
 	 * 
@@ -48,7 +50,7 @@ public class Infill {
 		Vector2D dir = Utils2D.AngleVector(a);				//Direction parallel to infill.
 		
 		//Get the point furthest in the -move direction from the set of rings of points.
-		Point2D firstP = getExtreme(move,regionPs,false);
+		Point2D firstP = getStart(move,regionPs,false,offset);
 		StraightLine2D l = new StraightLine2D(firstP, dir);
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Box2D b = region.boundingBox();
@@ -84,7 +86,22 @@ public class Infill {
 		return output;
 	}
 	/**
-	 * 
+	 * Generates a grid of lines perpendicular to perp, offset apart, with the first
+	 * line passing through 0,0. Then finds the point furthest in the given direction
+	 * along v in set ps, and returns a point on the line nearest that point.
+	 * @param v Direction perpendicular to lines.
+	 * @param ps Set of points to search for the extreme.
+	 * @param max Find the point in +v or -v
+	 * @param offset Distance between lines in the grid
+	 * @return
+	 */
+	public static Point2D getStart(Vector2D v, ArrayList<ArrayList<Point2D>> ps, boolean max, double offset){
+		Point2D p = getExtreme(v, ps, max);
+		Vector2D vec = new Vector2D(p);
+		double d = Vector2D.dot(vec, v.normalize());
+		return p.plus(v.times(-(d%offset)));
+	}
+	/**
 	 * @param v
 	 * @param ps
 	 * @return The point in ps farthest in the given direction.

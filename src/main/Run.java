@@ -22,28 +22,19 @@ public class Run {
 		Surface3D surface = null;		
 		Slicer s = null;
 		try {
-//			m1 = Stli.importModel("ASTM D638-10-1.stl", true);
-			part = Stli.importModel("ASTM D638-10-1.stl", true);
-//			m1.move(new Vector3D(0,0,0.25));
-//			surface = Stli.importSurface("20deg.stl", true);
-			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
-			part.move(new Vector3D(20,0,0));
+//			part = Stli.importModel("ASTM D638-10-1.stl", true);
+			part = Stli.importModel("jagged.stl", true);
+			surface = Stli.importSurface("v2.stl", true);
+//			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
+//			part.move(new Vector3D(20,0,0));
 //			surface.move(new Vector3D(20,0,0));
-			//(Model3D part, Surface3D shape, layerHeight, filD, nozzleD, 
-			//extrusionWidth, PrintTemp, xySpeed, zSpeed, numShells, infillWidth, 
-			//infillDir, infillAngle, lift, retraction)
 			s = new Slicer(part, surface, "config1.txt");
-//			s = new Slicer(m1, m2, 0.3, 1.75, 0.4, .55, 200, 40, 40, 0, 0.6, 0, Math.PI/4, 0.15, 0, 50);
 		} catch (FileNotFoundException e){
 			System.out.println(e.getMessage());
 			return;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("debug.gcode");
-//		surface.setOffset(5.7);
-//		Point2D p = new Point2D(6.487060546875, 0.27490234375);
-//		Point3D p3 = surface.project(p);
-//		System.out.println(p3);
+		s.slice("dragon.gcode");
 	}
 }
