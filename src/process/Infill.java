@@ -26,8 +26,9 @@ public class Infill {
 	 * @param layerNumber The number of this layer, for infill orientation.
 	 * @return A list of infill extrusions, ordered in a zig zag pattern across the part.
 	 */
-	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber){
+	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber, int angle){
 		double offset = (layerNumber<s.botLayers || layerNumber>=s.topLayerStart) ? s.extrusionWidth*1.09 : s.infillWidth;
+		offset *= s.infillFlowMultiple;
 		if(loops.size()==0) return null;
 		ArrayList<ArrayList<Point2D>> regionPs;
 //		System.out.println(ToPoints(loops));
@@ -46,11 +47,11 @@ public class Infill {
 		double a = (s.infillDir+layerNumber*s.infillAngle);	//CW angle infill lines make with x axis. %(2*Math.PI)
 		
 		//Calculate a perpendicular vector to the infill.
-		Vector2D move = Utils2D.AngleVector(a+Math.PI/2);	//Direction perpendicular to infill to move intersection line.
-		Vector2D dir = Utils2D.AngleVector(a);				//Direction parallel to infill.
+		Vector2D move = Utils2D.AngleVector(a+Math.PI/2+angle*Math.PI/180);	//Direction perpendicular to infill to move intersection line.
+		Vector2D dir = Utils2D.AngleVector(a+angle*Math.PI/180);				//Direction parallel to infill.
 		
 		//Get the point furthest in the -move direction from the set of rings of points.
-		Point2D firstP = getStart(move,regionPs,false,offset);
+		Point2D firstP = getStart(move,regionPs,offset);
 		StraightLine2D l = new StraightLine2D(firstP, dir);
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Box2D b = region.boundingBox();
@@ -95,8 +96,8 @@ public class Infill {
 	 * @param offset Distance between lines in the grid
 	 * @return
 	 */
-	public static Point2D getStart(Vector2D v, ArrayList<ArrayList<Point2D>> ps, boolean max, double offset){
-		Point2D p = getExtreme(v, ps, max);
+	public static Point2D getStart(Vector2D v, ArrayList<ArrayList<Point2D>> ps, double offset){
+		Point2D p = getExtreme(v, ps, false);
 		Vector2D vec = new Vector2D(p);
 		double d = Vector2D.dot(vec, v.normalize());
 		return p.plus(v.times(-(d%offset)));

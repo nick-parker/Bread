@@ -41,7 +41,12 @@ public class Layer {
 	 */
 	public ArrayList<Extrusion2D> getInfill(double distance){
 		if(!loopsMade) makeLoops();
-		return Infill.getInfill(s, loops, distance, layerNo);
+		if(!s.cross) return Infill.getInfill(s, loops, distance, layerNo,0);
+		else{
+			ArrayList<Extrusion2D> output = Infill.getInfill(s,loops,distance, layerNo, 0);
+			if(output!=null) output.addAll(Infill.getInfill(s,loops,distance,layerNo,90));
+			return output;
+		}
 	}
 	/**
 	 * Generate a set of line segments representing the shells for this layer.
@@ -56,6 +61,9 @@ public class Layer {
 			double dist = (i+0.5)*s.extrusionWidth;
 			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,ET.shell);
 			if(shells==null) continue;
+			if(shells.size()>1){
+				System.out.println("breakpoint");
+			}
 			for(ArrayList<Extrusion2D> shell : shells){
 				output.addAll(shell);
 			}

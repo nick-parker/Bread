@@ -61,8 +61,8 @@ public class GcodeExport {
 	 * Convert the final Extrusion3D path of a layer object to gcode, and append it to the output file.
 	 * @param path Layer path to convert
 	 */
-	public void addLayer(ArrayList<Extrusion3D> path){
-		w.println(";layer");
+	public void addLayer(ArrayList<Extrusion3D> path, int layerNo){
+		w.println(";layer "+layerNo);
 		Extrusion3D prev = path.get(0);
 		last = prev.firstPoint();
 		zeroE();
@@ -73,14 +73,20 @@ public class GcodeExport {
 				System.out.println("Jump from "+Tri3D.PointToStr(last)+" to "+Tri3D.PointToStr(e.firstPoint()));
 			}
 			if(e.ExtrusionType!=ET.travel&&prev.ExtrusionType==ET.travel){
+				w.println(";retract");
 				retract(false);
+				w.println(";travel");
 			}
 			if(e.ExtrusionType==ET.travel&&prev.ExtrusionType!=ET.travel){
+				w.println(";retract");
 				retract(true);
+				w.println(";travel");
 			}
 			else if(e.ExtrusionType==ET.infill||e.ExtrusionType==ET.shell){
 				//Infill or shell.
 				currE +=s.EperL*Tri3D.length(e);
+				if(e.ExtrusionType==ET.infill) w.println(";infill");
+				else w.println(";shell");
 			}
 			G1(e.lastPoint());
 			prev = e;

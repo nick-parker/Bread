@@ -23,10 +23,10 @@ public class Run {
 		Slicer s = null;
 		try {
 //			part = Stli.importModel("ASTM D638-10-1.stl", true);
-			part = Stli.importModel("jagged.stl", true);
-			surface = Stli.importSurface("v2.stl", true);
+			part = Stli.importModel("squarering.stl", true);
+			surface = Stli.importSurface("v.stl", true);
 //			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
-//			part.move(new Vector3D(20,0,0));
+			part.move(new Vector3D(0,0.1,0));
 //			surface.move(new Vector3D(20,0,0));
 			s = new Slicer(part, surface, "config1.txt");
 		} catch (FileNotFoundException e){
@@ -35,6 +35,6 @@ public class Run {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("dragon.gcode");
+		s.slice("dragon.g");
 	}
 }

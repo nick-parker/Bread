@@ -1,13 +1,13 @@
 //Configure accordingly for your machine.
-layerHeight 0.3 mm
+layerHeight 0.31 mm
 filD 1.75 mm		//filament diameter
 nozzleD 0.4 mm		//nozzle diameter
 extrusionWidth .55 mm
 printTemp 200 C	
 xySpeed 20 mm/s	//Max speed on XY, i just set this low for the first prints.
 zSpeed 3 mm/s	//Maximum speed on your z axis. I might be using the wrong units here because my mendel90 tops out at 4.
-numShells 2 		//Can't be nonzero right now. Somebody wanna port clipper to java for me?
-infillWidth 4 mm		//Distance between lines of infill
+numShells 4 		//Can't be nonzero right now. Somebody wanna port clipper to java for me?
+infillWidth 2.5 mm		//Distance between lines of infill
 infillDir 45 degrees		//Infill direction on layer 0, CW from +X axis
 infillAngle 90 degrees	//Infill direction change on each subsequent layer
 lift 0 mm		//Z lift for travels, should be half the layer height or slightly less.

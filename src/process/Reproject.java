@@ -105,10 +105,15 @@ public class Reproject {
 		double ModelTop = s.part.boundingBox().getMaxZ()+s.lift;
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		Extrusion3D first = projectExtrusion(travels.get(0));
-		Vector3D rise = new Vector3D(0,0,s.lift);
-		Extrusion3D lift = new Extrusion3D(first.firstPoint(),first.firstPoint().plus(rise),ET.nonretracting);	//liftE handled by one applied to first.
-		output.add(lift);
-		double z = lift.lastPoint().getZ();
+		double z = first.lastPoint().getZ();
+		if(s.lift!=0){
+			Vector3D rise = new Vector3D(0,0,s.lift);
+			Extrusion3D lift = new Extrusion3D(first.firstPoint(),first.firstPoint().plus(rise),ET.nonretracting);	//liftE handled by one applied to first.
+			output.add(lift);
+			z = lift.lastPoint().getZ();
+			output.add(liftE(first));
+		}
+		else output.add(first);
 		for(Extrusion2D e : travels){
 			//Nothing happens here if first was the only edge.
 			Extrusion3D proj = projectExtrusion(e);

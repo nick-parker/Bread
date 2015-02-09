@@ -48,6 +48,8 @@ public class Slicer {
 	public int botLayers;
 	public int layerCount;
 	//Inputs below are optional, above are mandatory.
+	public boolean cross = true;
+	public double infillFlowMultiple = 1;
 	public double infillInsetMultiple = -0.25;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
 	public double minInfillLength = 0.25;
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
@@ -190,7 +192,7 @@ public class Slicer {
 		Reproject r = new Reproject(l.offset,this);
 		ArrayList<Extrusion3D> path = r.Proj(p);
 		if(path.size()==0) System.out.println(p);
-		g.addLayer(path);	
+		g.addLayer(path,n);	
 		return last;
 	}
 	public void debug(String fileLoc){
