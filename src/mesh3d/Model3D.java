@@ -1,5 +1,6 @@
 package mesh3d;
 
+import main.Constants;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
 

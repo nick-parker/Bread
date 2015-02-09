@@ -1,4 +1,4 @@
-package process;
+package io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,11 +13,11 @@ import javax.swing.plaf.basic.BasicTreeUI.TreeTraverseAction;
 
 import structs.Extrusion3D;
 import structs.Extrusion2D.ET;
+import main.Constants;
 import main.Slicer;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
-import mesh3d.Constants;
 import mesh3d.Tri3D;
 /**
  * A Gcode Export function for use with absolute coordinate modes. The most recent position in XYZE coordinates is stored as

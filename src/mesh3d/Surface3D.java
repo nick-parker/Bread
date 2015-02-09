@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 import utils2D.Utils2D;
+import main.Constants;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom3d.Box3D;

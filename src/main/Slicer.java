@@ -1,11 +1,12 @@
 package main;
 
+import io.GcodeExport;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import process.GcodeExport;
 import process.Reproject;
 import structs.Extrusion2D;
 import structs.Extrusion3D;

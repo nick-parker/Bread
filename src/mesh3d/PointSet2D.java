@@ -6,6 +6,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import math.geom2d.Point2D;
 
+/**
+ * Sort points wrt their x coordinates. Currently unused, was planned for part of the reprojection process.
+ * Radius checking seems quick enough for now though.
+ * @author Nick
+ *
+ */
 public class PointSet2D {
 	private ArrayList<Point2D> ps;
 	private PointCmp c = new PointCmp();

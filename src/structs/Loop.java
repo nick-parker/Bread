@@ -3,9 +3,9 @@ package structs;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import main.Constants;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
-import mesh3d.Constants;
 /**
  * A loop of LineSegment2D objects which will hopefully be closed when finished, but is not guaranteed to be.
  * Used in the Order function.

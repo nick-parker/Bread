@@ -5,9 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import main.Constants;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
-import mesh3d.Constants;
 
 /**
  * A simple gcode exporter to look at 3D paths.

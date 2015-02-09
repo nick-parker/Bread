@@ -1,4 +1,4 @@
-package mesh3d;
+package main;
 
 import java.text.DecimalFormat;
 

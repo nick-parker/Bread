@@ -3,9 +3,9 @@ package structs;
 import java.util.ArrayList;
 
 import utils2D.Utils2D;
+import main.Constants;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
-import mesh3d.Constants;
 
 /**
  * ExtrusionType marks the type of extrusion this line represents.

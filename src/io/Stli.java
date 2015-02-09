@@ -1,4 +1,4 @@
-package mesh3d;
+package io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -6,7 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 
+import main.Constants;
 import math.geom3d.Point3D;
+import mesh3d.Model3D;
+import mesh3d.Surface3D;
+import mesh3d.Tri3D;
 
 public class Stli {
 	private static Tri3D[] importMesh(String fileName) throws IOException{

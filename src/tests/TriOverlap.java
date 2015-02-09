@@ -1,18 +1,18 @@
 package tests;
 
 import static org.junit.Assert.*;
+import io.Stli;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import main.Constants;
 import math.geom2d.line.LineSegment2D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
-import mesh3d.Constants;
 import mesh3d.Model3D;
 import mesh3d.SimplePlane;
-import mesh3d.Stli;
 import mesh3d.Surface3D;
 import mesh3d.Tri3D;
 

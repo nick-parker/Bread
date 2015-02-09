@@ -1,5 +1,7 @@
 package main;
 
+import io.Stli;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
@@ -8,7 +10,6 @@ import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import mesh3d.Model3D;
 import mesh3d.SimplePlane;
-import mesh3d.Stli;
 import mesh3d.Surface3D;
 import process.NativeInset;
 import representation.ClipperJNA;

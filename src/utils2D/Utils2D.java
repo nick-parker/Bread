@@ -6,11 +6,11 @@ import java.util.Collections;
 
 import structs.Extrusion2D;
 import structs.Extrusion2D.ET;
+import main.Constants;
 import math.geom2d.Point2D;
 import math.geom2d.Vector2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom3d.Point3D;
-import mesh3d.Constants;
 
 public class Utils2D {
 	public static double PointDot(Vector2D v, Point2D p){

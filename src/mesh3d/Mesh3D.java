@@ -2,6 +2,7 @@ package mesh3d;
 
 import java.util.Arrays;
 
+import main.Constants;
 import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.Shape3D;
