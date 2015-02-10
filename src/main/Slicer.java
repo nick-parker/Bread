@@ -11,6 +11,7 @@ import process.Reproject;
 import structs.Extrusion2D;
 import structs.Extrusion3D;
 import structs.Layer;
+import structs.SmartLayer;
 import tests.IntersectTest;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
@@ -184,7 +185,8 @@ public class Slicer {
 		g.close();
 	}
 	private Point2D doLayer(int n, GcodeExport g, Point2D last){
-		Layer l = new Layer(this,n);
+		SmartLayer l = new SmartLayer(this,n);
+		l.makeChunks();
 		System.out.println("Offset: "+l.offset);
 		shape.setOffset(l.offset);
 		ArrayList<Extrusion2D> p = l.getPath(last);

@@ -20,14 +20,14 @@ public class Layer {
 	int layerNo;
 	public double offset;
 	ArrayList<Loop> loops;
-	private boolean loopsMade = false;
+	protected boolean loopsMade = false;
 	
 	public Layer(Slicer s, int layerNo){
 		this.s=s;
 		this.layerNo=layerNo;
 		this.offset = layerNo*s.layerHeight;
 	}
-	private void makeLoops(){
+	protected void makeLoops(){
 		s.shape.setOffset(offset);
 		LineSegment2D[] ls = Flatten.FlattenZ(s.shape.overlap(s.part));
 		this.loops = Order.ListOrder(ls);
