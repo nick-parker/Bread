@@ -44,7 +44,7 @@ public class Slicer {
 	public double retraction;
 	public double retractSpeed;
 	public double retractThreshold;
-	public double zMin = 0.25;
+	public double zMin = 0;
 	public boolean FirmwareRetract = false;
 	public int topLayerStart;
 	public int botLayers;
@@ -185,8 +185,9 @@ public class Slicer {
 		g.close();
 	}
 	private Point2D doLayer(int n, GcodeExport g, Point2D last){
-		SmartLayer l = new SmartLayer(this,n);
-		l.makeChunks();
+//		SmartLayer l = new SmartLayer(this,n);
+//		l.makeChunks();
+		Layer l = new Layer(this,n);
 		System.out.println("Offset: "+l.offset);
 		shape.setOffset(l.offset);
 		ArrayList<Extrusion2D> p = l.getPath(last);

@@ -51,8 +51,7 @@ public class GcodeExport {
 		Point3D l = path.get(0).firstPoint();
 		for(LineSegment3D e: path){
 			if(!Tri3D.equiv(l,e.firstPoint())){
-				System.out.println("Discontinuous path! Something's probably wrong!");
-				System.out.println("Jump from "+Tri3D.PointToStr(l)+" to "+Tri3D.PointToStr(e.firstPoint()));
+				System.out.println("Discontinuous path! Jump from "+Tri3D.PointToStr(l)+" to "+Tri3D.PointToStr(e.firstPoint()));
 			}
 			l = e.lastPoint();
 		}
@@ -69,20 +68,18 @@ public class GcodeExport {
 		G1(last);
 		for(Extrusion3D e: path){
 			if(!Tri3D.equiv(last,e.firstPoint())){
-				System.out.println("Discontinuous path! Something's probably wrong!");
-				System.out.println("Jump from "+Tri3D.PointToStr(last)+" to "+Tri3D.PointToStr(e.firstPoint()));
-			}
-			if(e.ExtrusionType!=ET.travel&&prev.ExtrusionType==ET.travel){
-				w.println(";retract");
-				retract(false);
-				w.println(";travel");
+				System.out.println("Discontinuous path! Jump from "+Tri3D.PointToStr(last)+" to "+Tri3D.PointToStr(e.firstPoint()));
 			}
 			if(e.ExtrusionType==ET.travel&&prev.ExtrusionType!=ET.travel){
 				w.println(";retract");
-				retract(true);
+				retract(true); //pull back
 				w.println(";travel");
 			}
-			else if(e.ExtrusionType==ET.infill||e.ExtrusionType==ET.shell){
+			if(e.ExtrusionType!=ET.travel&&prev.ExtrusionType==ET.travel){
+				w.println(";unretract");
+				retract(false); //push out
+			}
+			if(e.ExtrusionType==ET.infill||e.ExtrusionType==ET.shell){
 				//Infill or shell.
 				currE +=s.EperL*Tri3D.length(e);
 				if(e.ExtrusionType==ET.infill) w.println(";infill");

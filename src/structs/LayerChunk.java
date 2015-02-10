@@ -15,7 +15,7 @@ public class LayerChunk extends Layer{
 	}
 	@Override
 	protected void makeLoops(){
-		if(!loopsMade) System.out.println("Chunk lacks loops, things are about to break.");
+//		if(!loopsMade) System.out.println("Chunk lacks loops, things are about to break.");
 	}
 	public void addLoop(Loop l){
 		if(l.hole()) loops.add(l);

@@ -61,9 +61,6 @@ public class Layer {
 			double dist = (i+0.5)*s.extrusionWidth;
 			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,ET.shell);
 			if(shells==null) continue;
-			if(shells.size()>1){
-				System.out.println("breakpoint");
-			}
 			for(ArrayList<Extrusion2D> shell : shells){
 				output.addAll(shell);
 			}
@@ -88,12 +85,6 @@ public class Layer {
 				last = e.lastPoint();
 			}
 		}
-//		if(shells!=null){
-//			for(Extrusion2D e: shells){
-//				ConnectSplitAppend(last,e,output);
-//				last = e.lastPoint();
-//			}
-//		}
 		if(output.size()==0) return null;
 		return output;
 	}

@@ -102,32 +102,30 @@ public class Reproject {
 	 * @return
 	 */
 	private ArrayList<Extrusion3D> projectTravel(ArrayList<Extrusion2D> travels, Point2D end){
-		double ModelTop = s.part.boundingBox().getMaxZ()+s.lift;
+		double ModelTop = s.part.boundingBox().getMaxZ()+s.lift+s.layerHeight; //Extra margin of 1 layer height.
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		Extrusion3D first = projectExtrusion(travels.get(0));
-		double z = first.lastPoint().getZ();
+		Point3D last = liftP(first.firstPoint(),s.lift);
+		double z = last.getZ();
 		if(s.lift!=0){
-			Vector3D rise = new Vector3D(0,0,s.lift);
-			Extrusion3D lift = new Extrusion3D(first.firstPoint(),first.firstPoint().plus(rise),ET.nonretracting);	//liftE handled by one applied to first.
+			Extrusion3D lift = new Extrusion3D(first.firstPoint(),last,first.ExtrusionType);	//liftE handled by one applied to first.
 			output.add(lift);
 			z = lift.lastPoint().getZ();
-			output.add(liftE(first));
 		}
-		else output.add(first);
 		for(Extrusion2D e : travels){
-			//Nothing happens here if first was the only edge.
 			Extrusion3D proj = projectExtrusion(e);
 			double newZ = proj.lastPoint().getZ()+s.lift;
-			if(newZ>z&&newZ<ModelTop){	//Don't move up past the top of the part, it's needless.
-				//Need to keep sloping up on this one.
-				Point3D last = output.get(output.size()-1).lastPoint();
-				output.add(new Extrusion3D(last,liftP(proj.lastPoint(),s.lift),e.ExtrusionType));
-				z = proj.lastPoint().getZ()+s.lift;
+			//Move up, but not past the top of the part.
+			if(newZ>z&&newZ<ModelTop){ //If we need to keep sloping up on this one.
+				Extrusion3D add = new Extrusion3D(last,liftP(proj.lastPoint(),s.lift),e.ExtrusionType);
+				output.add(add);
+				z = add.lastPoint().getZ();
 			}
 			else output.add(setZ(e,z));
+			last = output.get(output.size()-1).lastPoint();
 		}
-		Extrusion3D last = output.get(output.size()-1);
-		Extrusion3D lower = new Extrusion3D(last.lastPoint(),liftP(s.shape.project(end),to()),travels.get(travels.size()-1).ExtrusionType);
+		Extrusion3D lastE = output.get(output.size()-1);
+		Extrusion3D lower = new Extrusion3D(lastE.lastPoint(),liftP(s.shape.project(end),to()),travels.get(travels.size()-1).ExtrusionType);
 		output.add(lower);
 		return output;
 	}
