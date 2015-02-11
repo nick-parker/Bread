@@ -17,6 +17,7 @@ import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom3d.Box3D;
 import math.geom3d.Vector3D;
+import math.geom3d.line.LineSegment3D;
 import mesh3d.Model3D;
 import mesh3d.Surface3D;
 
@@ -161,19 +162,44 @@ public class Slicer {
 	private void PositionShape(){
 		Box3D b1 = shape.boundingBox();
 		Box3D b2 = part.boundingBox();
-		Vector3D mv = new Vector3D(0,0,b2.getMinZ()-b1.getMaxZ()+layerHeight/2);
+		Vector3D mv = new Vector3D(0,0,b2.getMinZ()-b1.getMaxZ()+layerHeight);
 		shape.move(mv);
+		Vector3D layerUp = new Vector3D(0,0,layerHeight);
+		while(checkEmpty(0)){
+			shape.move(layerUp);
+		}
 	}
 	private int layerCount(){
+		PositionShape();
 		Box3D b1 = shape.boundingBox();
 		Box3D b2 = part.boundingBox();
 		//Distance between highest point on part and the lowest point on a properly positioned shape.
 		double distance = b1.getDepth()+b2.getDepth()-layerHeight/2;
-		return (int) Math.ceil(distance/layerHeight);
+		int max = 1+(int) Math.ceil(distance/layerHeight);
+		int min = 0;
+		while(!checkEmpty(min)&&checkEmpty(max)&&min<max-1){
+			int mid = (min+max)/2;
+			if(checkEmpty(mid)) max=mid;
+			else min=mid;
+		}
+		shape.setOffset(0);
+		return max;
+		
+		
+	}
+	/**
+	 * Check if a layer with the given number would be empty.
+	 * @param layerNum
+	 * @return
+	 */
+	private boolean checkEmpty(int layerNum){
+		shape.setOffset(layerNum*layerHeight);
+//		LineSegment3D[] overlap = shape.overlap(part);
+		return !shape.intersect(part);
 	}
 	public void slice(String fileLoc){
 		PositionShape();
-		shape.move(new Vector3D(0,0,zMin));
+		part.move(new Vector3D(0,0,zMin));
 		GcodeExport g = new GcodeExport(fileLoc, this);
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
@@ -201,7 +227,7 @@ public class Slicer {
 	}
 	public void debug(String fileLoc){
 		PositionShape();
-		shape.move(new Vector3D(0,0,zMin));
+		part.move(new Vector3D(0,0,zMin));
 		int lc = layerCount;
 		IntersectTest t = new IntersectTest(fileLoc);
 		for(int n=0;n<lc;n++){

@@ -27,7 +27,8 @@ public class Infill {
 	 * @return A list of infill extrusions, ordered in a zig zag pattern across the part.
 	 */
 	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber, int angle){
-		double offset = (layerNumber<s.botLayers || layerNumber>=s.topLayerStart) ? s.extrusionWidth*1.09 : s.infillWidth;
+		boolean solid = (layerNumber<s.botLayers || layerNumber>=s.topLayerStart);
+		double offset = solid ? s.extrusionWidth*1.09 : s.infillWidth;
 		offset *= s.infillFlowMultiple;
 		if(loops.size()==0) return null;
 		ArrayList<ArrayList<Point2D>> regionPs;
@@ -58,7 +59,7 @@ public class Infill {
 		
 		//Calculate the worst case scenario number of lines necessary, because calculating width in a given vector direction 
 		//is implemented wrong.
-		int lineCount = (int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/offset);
+		int lineCount = 2+(int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/offset);
 		//Iterate through lines without checking that they actually intersect. getEdges returns an empty list for nonintersection,
 		//so addAll and iterating through it both do nothing.
 		for(int i=0;i<lineCount;i++){
@@ -158,17 +159,25 @@ public class Infill {
 				ps.add(hit);				
 			}
 		}
-		ArrayList<Point2D> truePs = ps;
 		//Check that there's an even number of intersections.
-		if(truePs.size()%2!=0){
+		if(ps.size()%2!=0){
 			System.out.println("Odd number of intersections.");
 			return output;
 		}
 		//Sort the intersections along l
-		ArrayList<Point2D> sorted = Utils2D.orderPoints(v, truePs);
-		for(int k=0;k<sorted.size()-1;k+=2){
+		ArrayList<Point2D> sorted = Utils2D.orderPoints(v, ps);
+		boolean used = false; //Checks whether k has been used.
+		//connect points (0,1), (2,3) etc unless a pair is 0 length, then step over it and connect its end with the point following it.
+		for(int k=0;k<sorted.size()-1;k+=1){
+			if(used){
+				used = false;
+				continue;
+			}
 			if(Utils2D.equiv(sorted.get(k), sorted.get(k+1))) continue;	//Don't make 0 length edges.
-			output.add(new Extrusion2D(sorted.get(k),sorted.get(k+1),type));
+			else{
+				used = true;
+				output.add(new Extrusion2D(sorted.get(k),sorted.get(k+1),type));
+			}
 		}
 		return output;
 	}

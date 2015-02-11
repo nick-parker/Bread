@@ -74,6 +74,18 @@ abstract class Mesh3D implements Shape3D{
 	 */
 	public int triCount(){return tris.length;}
 	
+	public boolean intersect(Mesh3D m){
+		for(Tri3D tS : tris){
+			for(Tri3D tM : m.tris){
+				if(Math.abs(tS.getPoint3D(0).getZ()-tM.getPoint3D(0).getZ())>tS.zradius+tM.zradius) continue;
+				if(tS.getPoint(0).distance(tM.getPoint(0))>tS.radius+tM.radius) continue;
+				Point3D[] overlap = tS.overlap(tM);
+				if(overlap!=null&&overlap.length>0) return true;
+			}
+		}
+		return false;
+	}
+	
 	//Static methods below this point.
 	/**
 	 * @param p Point to duplicate
