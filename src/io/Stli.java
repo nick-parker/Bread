@@ -1,10 +1,15 @@
 package io;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 
 import main.Constants;
 import math.geom3d.Point3D;
@@ -63,7 +68,39 @@ public class Stli {
 	 * @return An array of Tri3D objects representing the .stl
 	 */
 	private static Tri3D[] importBinMesh(String fileName){
-		throw new UnsupportedOperationException();
+		try{
+			InputStream is = new FileInputStream(fileName);
+			is.skip(84); //toss the header
+			ArrayList<Tri3D> ts = new ArrayList<Tri3D>();
+			boolean done=false;
+			while(true){
+				is.skip(12);
+				double[] ps = new double[9];
+				for(int j=0;j<9;j++){
+					byte[] bytes = new byte[4];
+					if(is.read(bytes)<=0){
+						done = true;
+						break;
+					};
+					double d = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN ).getFloat();
+					ps[j]=d;
+				}
+				ts.add(t3d(ps));
+				is.skip(2);
+				if(done) break;
+			}
+			return ts.toArray(new Tri3D[ts.size()]);
+		} catch(IOException e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	private static Tri3D t3d(double[] coords){
+		return new Tri3D(
+				new Point3D(coords[0],coords[1],coords[2]),
+				new Point3D(coords[3],coords[4],coords[5]),
+				new Point3D(coords[6],coords[7],coords[8])
+				);
 	}
 	public static Model3D importModel(String fileName, boolean ascii) throws IOException{
 		if(ascii) return new Model3D(importMesh(fileName));

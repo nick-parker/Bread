@@ -11,6 +11,7 @@ import math.geom3d.Vector3D;
 import mesh3d.Model3D;
 import mesh3d.SimplePlane;
 import mesh3d.Surface3D;
+import mesh3d.Tri3D;
 import process.NativeInset;
 import representation.ClipperJNA;
 import structs.Layer;
@@ -23,12 +24,12 @@ public class Run {
 		Surface3D surface = null;		
 		Slicer s = null;
 		try {
-			part = Stli.importModel("ASTM D638-10-1.stl", true);
-//			part = Stli.importModel("vtop.stl", true);
+//			part = Stli.importModel("ASTM D638-10-1.stl", true);
+			part = Stli.importModel("5mm.stl", false);
 //			surface = Stli.importSurface("v2.stl", true);
 			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
-			part.move(new Vector3D(20,0,0));
-			surface.move(new Vector3D(1.5,0,0));
+//			part.move(new Vector3D(20,0,0));
+//			surface.move(new Vector3D(1.5,0,0));
 			s = new Slicer(part, surface, "config1.txt");
 		} catch (FileNotFoundException e){
 			System.out.println(e.getMessage());
@@ -36,6 +37,6 @@ public class Run {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("test2.g");
+		s.slice("cube.g");
 	}
 }
