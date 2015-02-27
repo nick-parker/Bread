@@ -31,7 +31,7 @@ public class Brim {
 		loops.add(l);
 		ArrayList<ArrayList<Extrusion2D>> ls = new ArrayList<ArrayList<Extrusion2D>>();
 		for(int i=0;i<count;i++){
-			ls.addAll(NativeInset.insetLines(loops, -(i+0.5)*s.extrusionWidth, ET.shell));
+			ls.addAll(NativeInset.insetLines(loops, -(i+0.25)*s.extrusionWidth, ET.shell));
 		}
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		Point3D last = new Point3D(lst.getX(),lst.getY(),z);

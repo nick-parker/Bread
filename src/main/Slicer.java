@@ -54,7 +54,7 @@ public class Slicer {
 	public int layerCount;
 	//Inputs below are optional, above are mandatory.
 	public boolean cross = true;
-	public boolean allSolid = true;
+	public boolean allSolid = false;
 	public int brimCount = 8;
 	public double TipRadius = 0.25; //Radius of the flat tip of the nozzle, NOT the hole itself. 
 	public double infillFlowMultiple = 1;
@@ -169,8 +169,17 @@ public class Slicer {
 		Box3D b2 = part.boundingBox();
 		Vector3D mv = new Vector3D(0,0,b2.getMinZ()-b1.getMaxZ()+layerHeight);
 		shape.move(mv);
+		b1 = shape.boundingBox();
+		System.out.println("New max Z: " + b1.getMaxZ());
 		Vector3D layerUp = new Vector3D(0,0,layerHeight);
+		Vector3D layerDown = new Vector3D(0,0,-layerHeight);
+		//TODO Figure out why the hell this is necessary... Bounding Box implementation is probably broken junk?
+		while(!checkEmpty(0)){
+			System.out.println("Moving Down");
+			shape.move(layerDown);
+		}
 		while(checkEmpty(0)){
+			System.out.println("Moving up");
 			shape.move(layerUp);
 		}
 	}
@@ -203,7 +212,7 @@ public class Slicer {
 		return !shape.intersect(part);
 	}
 	public void slice(String fileLoc){
-		PositionShape();
+//		PositionShape();
 		part.move(new Vector3D(0,0,zMin));
 		GcodeExport g = new GcodeExport(fileLoc, this);
 		g.writeFromFile("start.gcode");

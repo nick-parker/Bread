@@ -50,6 +50,12 @@ public class NozzleOffset {
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		Point3D last = es.get(0).firstPoint();
 		for(Extrusion3D e : es){
+			//Don't compensate travels, who cares? Also, causes weird pausy movements.
+			if(e.ExtrusionType==ET.travel||e.ExtrusionType==ET.nonretracting){
+				output.add(new Extrusion3D(last,e.firstPoint(),e.ExtrusionType));
+				output.add(e);
+				last = e.lastPoint();
+			}
 			Extrusion3D off = offset(e,rad);
 			output.add(new Extrusion3D(last,off.firstPoint(),ET.nonretracting));
 			output.add(off);
