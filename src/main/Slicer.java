@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import process.Brim;
 import process.Reproject;
 import structs.Extrusion2D;
 import structs.Extrusion3D;
@@ -52,6 +53,8 @@ public class Slicer {
 	public int layerCount;
 	//Inputs below are optional, above are mandatory.
 	public boolean cross = true;
+	public boolean allSolid = true;
+	public int brimCount = 8;
 	public double infillFlowMultiple = 1;
 	public double infillInsetMultiple = -0.25;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
 	public double minInfillLength = 0.25;
@@ -204,6 +207,9 @@ public class Slicer {
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
 		Point2D last = new Point2D(0,0);
+		ArrayList<Extrusion3D> br = Brim.Brim(this, brimCount, last);
+		if(brimCount!=0) g.addLayer(br, -1);
+		last = new Point2D(br.get(br.size()-1).lastPoint().getX(),br.get(br.size()-1).lastPoint().getY());
 		for(int n=0;n<layerCount;n++){
 			last = doLayer(n,g,last);
 		}

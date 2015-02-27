@@ -3,16 +3,16 @@ layerHeight 0.3 mm
 filD 1.75 mm		//filament diameter
 nozzleD 0.4 mm		//nozzle diameter
 extrusionWidth .55 mm
-printTemp 200 C	
+printTemp 180 C	
 xySpeed 20 mm/s	//Max speed on XY, i just set this low for the first prints.
-zSpeed 3 mm/s	//Maximum speed on your z axis. I might be using the wrong units here because my mendel90 tops out at 4.
-numShells 2 	
-infillWidth 2.5 mm		//Distance between lines of infill
+zSpeed 7 mm/s	//Maximum speed on your z axis. I might be using the wrong units here because my mendel90 tops out at 4.
+numShells 1 	
+infillWidth 4.5 mm		//Distance between lines of infill
 infillDir 45 degrees		//Infill direction on layer 0, CW from +X axis
 infillAngle 90 degrees	//Infill direction change on each subsequent layer
 lift 0 mm		//Z lift for travels, should be half the layer height or slightly less.
 retraction 1.2 mm		//retraction
 retractSpeed 50 mm/s
 retractThreshold 6 mm	//Minimum travel distance to trigger retraction.
-topLayers 0
+topLayers 3
 botLayers 0

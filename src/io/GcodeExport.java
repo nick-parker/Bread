@@ -64,8 +64,8 @@ public class GcodeExport {
 		w.println(";layer "+layerNo);
 		Extrusion3D prev = path.get(0);
 		last = prev.firstPoint();
-		zeroE();
-		G1(last);
+		zeroE();	//Zero E
+		G1(last);	//Travel to the first point directly from wherever it is now.
 		for(Extrusion3D e: path){
 			if(!Tri3D.equiv(last,e.firstPoint())){
 				System.out.println("Discontinuous path! Jump from "+Tri3D.PointToStr(last)+" to "+Tri3D.PointToStr(e.firstPoint()));
@@ -89,7 +89,7 @@ public class GcodeExport {
 			prev = e;
 			last = e.lastPoint();
 		}
-		lift(s.layerHeight);
+		lift(s.layerHeight); //Lift by one layer height.
 	}
 	/**
 	 * Encapsulates retraction functionality.

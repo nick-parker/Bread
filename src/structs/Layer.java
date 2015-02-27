@@ -41,7 +41,7 @@ public class Layer {
 	 */
 	public ArrayList<Extrusion2D> getInfill(double distance){
 		if(!loopsMade) makeLoops();
-		boolean solid = (layerNo<s.botLayers || layerNo>=s.topLayerStart);
+		boolean solid = s.allSolid||(layerNo<s.botLayers || layerNo>=s.topLayerStart);
 		if(!s.cross||solid) return Infill.getInfill(s, loops, distance, layerNo,0);
 		else{
 			ArrayList<Extrusion2D> output = Infill.getInfill(s,loops,distance, layerNo, 0);

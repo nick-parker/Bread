@@ -27,7 +27,7 @@ public class Infill {
 	 * @return A list of infill extrusions, ordered in a zig zag pattern across the part.
 	 */
 	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber, int angle){
-		boolean solid = (layerNumber<s.botLayers || layerNumber>=s.topLayerStart);
+		boolean solid = s.allSolid||(layerNumber<s.botLayers || layerNumber>=s.topLayerStart);
 		double offset = solid ? s.extrusionWidth*1.09 : s.infillWidth;
 		offset *= s.infillFlowMultiple;
 		if(loops.size()==0) return null;

@@ -24,11 +24,13 @@ public class Run {
 		Surface3D surface = null;		
 		Slicer s = null;
 		try {
-//			part = Stli.importModel("ASTM D638-10-1.stl", true);
-			part = Stli.importModel("5mm.stl", false);
-//			surface = Stli.importSurface("v2.stl", true);
-			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
+			part = Stli.importModel("ASTM D638-10-1.stl", false);
+			surface = Stli.importSurface("vastm.stl", false);
 //			part.move(new Vector3D(20,0,0));
+//			part = Stli.importModel("20mmCube.stl", false);
+//			surface = Stli.importSurface("steep v.stl", false);
+//			surface = Stli.importSurface("v2.stl", true);
+//			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
 //			surface.move(new Vector3D(1.5,0,0));
 			s = new Slicer(part, surface, "config1.txt");
 		} catch (FileNotFoundException e){
@@ -37,6 +39,6 @@ public class Run {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("cube.g");
+		s.slice("astm.g");
 	}
 }

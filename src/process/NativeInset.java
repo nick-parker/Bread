@@ -12,10 +12,7 @@ import math.geom2d.Point2D;
 import math.geom2d.polygon.LinearRing2D;
 import math.geom2d.polygon.MultiPolygon2D;
 /**
- * Semifunctional wrapper for the CampSkeleton library. CampSkeleton performs straight skeleton based
- * polygon offsetting operations, but doesn't have support for certain skeleton features necessary to represent some
- * very common shapes (rectangular regions), and therefore isn't usable in this project. In the future NativeInset should be
- * replaced with a JNI interface to the Clipper library's C++ implementation.
+ * Wrapper for the C++ library Clipper, which I've packaged into ClipperLib2.dll with a pretty ugly little string interface.
  * @author Nick
  *
  */
