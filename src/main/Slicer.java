@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import process.Brim;
+import process.NozzleOffset;
 import process.Reproject;
 import structs.Extrusion2D;
 import structs.Extrusion3D;
@@ -55,8 +56,9 @@ public class Slicer {
 	public boolean cross = true;
 	public boolean allSolid = true;
 	public int brimCount = 8;
+	public double TipRadius = 0.25; //Radius of the flat tip of the nozzle, NOT the hole itself. 
 	public double infillFlowMultiple = 1;
-	public double infillInsetMultiple = -0.25;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
+	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
 	public double minInfillLength = 0.25;
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
@@ -217,17 +219,16 @@ public class Slicer {
 		g.close();
 	}
 	private Point2D doLayer(int n, GcodeExport g, Point2D last){
-//		SmartLayer l = new SmartLayer(this,n);
-//		l.makeChunks();
-		Layer l = new Layer(this,n);
+		SmartLayer l = new SmartLayer(this,n);
+		l.makeChunks();
+//		Layer l = new Layer(this,n);
 		System.out.println("Offset: "+l.offset);
 		shape.setOffset(l.offset);
 		ArrayList<Extrusion2D> p = l.getPath(last);
 		if(p==null||p.size()==0) return last;
 		last = p.get(p.size()-1).lastPoint();
 		Reproject r = new Reproject(l.offset,this);
-		ArrayList<Extrusion3D> path = r.Proj(p);
-		if(path.size()==0) System.out.println(p);
+		ArrayList<Extrusion3D> path = NozzleOffset.offset(r.Proj(p),TipRadius);
 		g.addLayer(path,n);	
 		return last;
 	}

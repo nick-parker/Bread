@@ -25,9 +25,14 @@ public class Extrusion3D extends LineSegment3D {
 	public Extrusion3D reverse() {
 		return new Extrusion3D(this.lastPoint(),this.firstPoint(),ExtrusionType);
 	}
+	public Extrusion3D move(double x, double y, double z){
+		return new Extrusion3D(
+				new Point3D(x1+x,y1+y,z1+z),
+				new Point3D(this.x2+x,y2+y,z2+z),
+				this.ExtrusionType);
+	}
 	@Override
 	public String toString(){
 		return "E3D("+Tri3D.PointToStr(this.firstPoint())+", "+Tri3D.PointToStr(this.lastPoint())+" "+this.ExtrusionType+")";
 	}
-	
 }
