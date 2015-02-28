@@ -1,6 +1,7 @@
 package structs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import process.Flatten;
 import process.Infill;
@@ -63,7 +64,16 @@ public class Layer {
 			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,ET.shell);
 			if(shells==null) continue;
 			for(ArrayList<Extrusion2D> shell : shells){
-				output.addAll(shell);
+				if(layerNo%2==0){
+					output.addAll(shell);
+//					System.out.println("Forward");
+				}
+				else{
+//					System.out.println("Reverse");
+					for(int j=shell.size()-1;j>=0;j--){
+						output.add(shell.get(j).reverseE());
+					}
+				}
 			}
 		}
 		return output;

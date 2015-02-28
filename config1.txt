@@ -6,7 +6,7 @@ extrusionWidth .55 mm
 printTemp 180 C	
 xySpeed 20 mm/s	//Max speed on XY, i just set this low for the first prints.
 zSpeed 7 mm/s	//Maximum speed on your z axis. I might be using the wrong units here because my mendel90 tops out at 4.
-numShells 0 	
+numShells 2
 infillWidth 4.5 mm		//Distance between lines of infill
 infillDir 45 degrees		//Infill direction on layer 0, CW from +X axis
 infillAngle 90 degrees	//Infill direction change on each subsequent layer

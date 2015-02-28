@@ -29,8 +29,8 @@ public class Run {
 //			part.move(new Vector3D(20,0,0));
 			part = Stli.importModel("20mmCube.stl", false);
 //			surface = Stli.importSurface("steep v.stl", false);
-			surface = Stli.importSurface("slant.stl", false);
-//			surface = Stli.importSurface("v2.stl", true);
+//			surface = Stli.importSurface("slant.stl", false);
+			surface = Stli.importSurface("v2.stl", true);
 //			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
 //			surface.move(new Vector3D(1.5,0,0));
 			s = new Slicer(part, surface, "config1.txt");

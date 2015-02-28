@@ -50,4 +50,7 @@ public class Extrusion2D extends LineSegment2D{
 	public String toString(){
 		return "E2D[("+Constants.xyz.format(this.x0)+", "+Constants.xyz.format(this.y0)+")-("+Constants.xyz.format(x0+dx)+", "+Constants.xyz.format(y0+dy)+") "+ExtrusionType+"]";
 	}
+	public Extrusion2D reverseE(){
+		return new Extrusion2D(lastPoint(),firstPoint(),ExtrusionType);
+	}
 }
