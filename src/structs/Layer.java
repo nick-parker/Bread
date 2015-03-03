@@ -1,8 +1,6 @@
 package structs;
 
 import java.util.ArrayList;
-import java.util.Collections;
-
 import process.Flatten;
 import process.Infill;
 import process.NativeInset;
@@ -83,7 +81,7 @@ public class Layer {
 		ArrayList<Extrusion2D> infill = s.infillWidth==0 ? null : getInfill(infillDistance); //TODO Something smarter here
 		ArrayList<Extrusion2D> shells = getShells();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
-		Point2D last = lastPoint;	//Last segment added to output.
+		Point2D last = lastPoint;	//End of last segment added to output.
 		if(shells!=null){
 			for(Extrusion2D e: shells){
 				ConnectSplitAppend(last,e,output);

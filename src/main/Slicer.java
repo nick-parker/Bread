@@ -19,7 +19,6 @@ import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom3d.Box3D;
 import math.geom3d.Vector3D;
-import math.geom3d.line.LineSegment3D;
 import mesh3d.Model3D;
 import mesh3d.Surface3D;
 
@@ -56,10 +55,10 @@ public class Slicer {
 	public boolean cross = true;
 	public boolean allSolid = false;
 	public int brimCount = 8;
-	public double TipRadius = 0.25; //Radius of the flat tip of the nozzle, NOT the hole itself. 
+	public double TipRadius = 0.1; //Radius of the flat tip of the nozzle, NOT the hole itself. 
 	public double infillFlowMultiple = 1;
-	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
-	public double minInfillLength = 0.25;
+	public double infillInsetMultiple = 0.05;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
+	public double minInfillLength = 1.25;
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
 			double lift, double retraction, double retractSpeed, double retractThreshold, int topLayers, int botLayers) throws IOException{
@@ -218,7 +217,7 @@ public class Slicer {
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
 		Point2D last = new Point2D(0,0);
-		ArrayList<Extrusion3D> br = Brim.Brim(this, brimCount, last);
+		ArrayList<Extrusion3D> br = Brim.brim(this, brimCount, last);
 		if(brimCount!=0) g.addLayer(br, -1);
 		last = new Point2D(br.get(br.size()-1).lastPoint().getX(),br.get(br.size()-1).lastPoint().getY());
 		for(int n=0;n<layerCount;n++){
@@ -238,6 +237,7 @@ public class Slicer {
 		last = p.get(p.size()-1).lastPoint();
 		Reproject r = new Reproject(l.offset,this);
 		ArrayList<Extrusion3D> path = NozzleOffset.offset(r.Proj(p),TipRadius);
+//		ArrayList<Extrusion3D> path =  r.Proj(p);
 		g.addLayer(path,n);	
 		return last;
 	}

@@ -15,14 +15,13 @@ import structs.Loop;
 //TODO Make this use a planar slice not a simple box.
 
 public class Brim {
-	public static ArrayList<Extrusion3D> Brim(Slicer s, int count, Point2D lst){
+	public static ArrayList<Extrusion3D> brim(Slicer s, int count, Point2D lst){
 		double z = s.layerHeight;
 		Box3D b = s.part.boundingBox();
 		Point2D p0 = new Point2D(b.getMinX(),b.getMinY());
 		Point2D p1 = new Point2D(b.getMaxX(),b.getMinY());
 		Point2D p2 = new Point2D(b.getMaxX(),b.getMaxY());
 		Point2D p3 = new Point2D(b.getMinX(),b.getMaxY());
-		ArrayList<Extrusion3D> loop = new ArrayList<Extrusion3D>();
 		Loop l = new Loop(new LineSegment2D(p0, p1));
 		l.AttemptAdd(new LineSegment2D(p1,p2));
 		l.AttemptAdd(new LineSegment2D(p2,p3));

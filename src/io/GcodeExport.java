@@ -5,11 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-
-import javax.sound.midi.Track;
-import javax.swing.plaf.basic.BasicTreeUI.TreeTraverseAction;
 
 import structs.Extrusion3D;
 import structs.Extrusion2D.ET;
@@ -29,6 +25,7 @@ import mesh3d.Tri3D;
 public class GcodeExport {
 	private Point3D last;
 	private double currE;
+	private double CurrSpeed = 0;
 	//Formatting just matches the conventions set by other slicers for precision in various axes.
 	//Cura is compatible with all the popular firmwares, so its conventions are a safe bet.
 	PrintWriter w;
@@ -63,14 +60,17 @@ public class GcodeExport {
 	public void addLayer(ArrayList<Extrusion3D> path, int layerNo){
 		w.println(";layer "+layerNo);
 		Extrusion3D prev = path.get(0);
-		last = prev.firstPoint();
+//		System.out.println(Tri3D.PointToStr(last));
+//		last = prev.firstPoint();
+//		System.out.println(Tri3D.PointToStr(last));
 		zeroE();	//Zero E
-		G1(last);	//Travel to the first point directly from wherever it is now.
+//		G1(last);	//Travel to the first point directly from wherever it is now.
 		for(Extrusion3D e: path){
+			if(Tri3D.length(e)<Constants.tol) continue;
 			if(!Tri3D.equiv(last,e.firstPoint())){
 				System.out.println("Discontinuous path! Jump from "+Tri3D.PointToStr(last)+" to "+Tri3D.PointToStr(e.firstPoint()));
 			}
-			if(e.ExtrusionType==ET.travel&&prev.ExtrusionType!=ET.travel){
+			if(e.ExtrusionType==ET.travel&&prev.ExtrusionType!=ET.travel||e.equals(prev)){
 				w.println(";retract");
 				retract(true); //pull back
 				w.println(";travel");
@@ -82,13 +82,15 @@ public class GcodeExport {
 			if(e.ExtrusionType==ET.infill||e.ExtrusionType==ET.shell){
 				//Infill or shell.
 				currE +=s.EperL*Tri3D.length(e);
-				if(e.ExtrusionType==ET.infill) w.println(";infill");
-				else w.println(";shell");
+				if(e.ExtrusionType==ET.infill&&prev.ExtrusionType!=ET.infill) w.println(";infill");
+				else if(prev.ExtrusionType!=ET.shell) w.println(";shell");
 			}
 			G1(e.lastPoint());
 			prev = e;
 			last = e.lastPoint();
 		}
+		w.println(";retract");
+		retract(true);
 		lift(s.layerHeight); //Lift by one layer height.
 	}
 	/**
@@ -174,8 +176,10 @@ public class GcodeExport {
 	 * @param d Speed in mm/s
 	 */
 	public void SetSpeed(double d) {
-		w.println("G1 F"+Constants.xyz.format(d*60));
-		
+		if(CurrSpeed!=d){
+			CurrSpeed = d;
+			w.println("G1 F"+Constants.xyz.format(d*60));
+		}		
 	}
 	/**
 	 * Set the temperature and wait until the temperature is reached before executing more

@@ -3,19 +3,9 @@ package main;
 import io.Stli;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-
-import math.geom2d.Point2D;
-import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import mesh3d.Model3D;
-import mesh3d.SimplePlane;
 import mesh3d.Surface3D;
-import mesh3d.Tri3D;
-import process.NativeInset;
-import representation.ClipperJNA;
-import structs.Layer;
-import structs.Loop;
 
 public class Run {
 
@@ -28,6 +18,7 @@ public class Run {
 //			surface = Stli.importSurface("vastm.stl", false);
 //			part.move(new Vector3D(20,0,0));
 			part = Stli.importModel("20mmCube.stl", false);
+			part.move(new Vector3D(1,0,0));
 //			surface = Stli.importSurface("steep v.stl", false);
 //			surface = Stli.importSurface("slant.stl", false);
 			surface = Stli.importSurface("v2.stl", true);

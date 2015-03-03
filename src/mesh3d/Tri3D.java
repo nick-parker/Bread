@@ -207,7 +207,7 @@ public class Tri3D{
 		return "Tri3D: "+PointToStr(ps[0])+" " + PointToStr(ps[1]) + " " + PointToStr(ps[2]);
 	}
 	public static String PointToStr(Point3D p){
-		return "["+ p.getX() + " " + p.getY() + " " +p.getZ() +"]";
+		return "["+ Constants.xyz.format(p.getX()) + " " + Constants.xyz.format(p.getY()) + " " +Constants.xyz.format(p.getZ()) +"]";
 	}
 	public static String VectorToStr(Vector3D v){
 		return "{"+ v.getX() + " " + v.getY() + " " +v.getZ() +"}";

@@ -71,5 +71,10 @@ public class SmartLayer {
 	 * @author Nick
 	 *
 	 */
-	public class MalformedLayerException extends Exception{};
+	public class MalformedLayerException extends Exception{
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 4736224455681249906L;};
 }

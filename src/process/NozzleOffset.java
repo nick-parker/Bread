@@ -7,6 +7,7 @@ import structs.Extrusion2D.ET;
 import main.Constants;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
+import mesh3d.Tri3D;
 
 /**
  * A method to compensate for the difference between uphill and downhill printing.
@@ -43,7 +44,7 @@ public class NozzleOffset {
 	 * @return A new Extrusion3D instance appropriately shifted.
 	 */
 	public static Extrusion3D offset(Extrusion3D e, double rad){
-		if(Math.sqrt(Math.pow(del(e,0),2)+Math.pow(del(e,1),2))<Constants.tol) return e;
+		if(Math.sqrt(Math.pow(del(e,0),2)+Math.pow(del(e,1),2))<Constants.tol) return e; //Ignore verticals
 		return e.move(0, 0, -rad*getTan(e));
 	}
 	public static ArrayList<Extrusion3D> offset(ArrayList<Extrusion3D> es, double rad){
@@ -52,12 +53,15 @@ public class NozzleOffset {
 		for(Extrusion3D e : es){
 			//Don't compensate travels, who cares? Also, causes weird pausy movements.
 			if(e.ExtrusionType==ET.travel||e.ExtrusionType==ET.nonretracting){
-				output.add(new Extrusion3D(last,e.firstPoint(),e.ExtrusionType));
+				if(!Tri3D.equiv(last, e.firstPoint())){
+					output.add(new Extrusion3D(last,e.firstPoint(),e.ExtrusionType));
+				}
 				output.add(e);
 				last = e.lastPoint();
+				continue;
 			}
 			Extrusion3D off = offset(e,rad);
-			output.add(new Extrusion3D(last,off.firstPoint(),ET.nonretracting));
+			if(!Tri3D.equiv(last, off.firstPoint())) output.add(new Extrusion3D(last,off.firstPoint(),ET.nonretracting));
 			output.add(off);
 			last = off.lastPoint();
 		}

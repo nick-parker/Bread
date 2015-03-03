@@ -1,8 +1,6 @@
 package io;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -89,6 +87,7 @@ public class Stli {
 				is.skip(2);
 				if(done) break;
 			}
+			is.close();
 			return ts.toArray(new Tri3D[ts.size()]);
 		} catch(IOException e){
 			e.printStackTrace();
