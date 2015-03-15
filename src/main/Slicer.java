@@ -53,12 +53,12 @@ public class Slicer {
 	public int layerCount;
 	//Inputs below are optional, above are mandatory.
 	public boolean cross = true;
-	public boolean allSolid = false;
-	public int brimCount = 8;
+	public boolean allSolid = true;
+	public int brimCount = 15;
 	public double TipRadius = 0.1; //Radius of the flat tip of the nozzle, NOT the hole itself. 
 	public double infillFlowMultiple = 1;
-	public double infillInsetMultiple = 0.05;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
-	public double minInfillLength = 1.25;
+	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
+	public double minInfillLength = 0.5;
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
 			double lift, double retraction, double retractSpeed, double retractThreshold, int topLayers, int botLayers) throws IOException{

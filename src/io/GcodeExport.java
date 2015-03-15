@@ -83,14 +83,12 @@ public class GcodeExport {
 				//Infill or shell.
 				currE +=s.EperL*Tri3D.length(e);
 				if(e.ExtrusionType==ET.infill&&prev.ExtrusionType!=ET.infill) w.println(";infill");
-				else if(prev.ExtrusionType!=ET.shell) w.println(";shell");
+				else if(e.ExtrusionType==ET.shell&&prev.ExtrusionType!=ET.shell) w.println(";shell");
 			}
 			G1(e.lastPoint());
 			prev = e;
 			last = e.lastPoint();
 		}
-		w.println(";retract");
-		retract(true);
 		lift(s.layerHeight); //Lift by one layer height.
 	}
 	/**

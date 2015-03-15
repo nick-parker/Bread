@@ -16,12 +16,11 @@ public class Run {
 		try {
 //			part = Stli.importModel("ASTM D638-10-1.stl", false);
 //			surface = Stli.importSurface("vastm.stl", false);
-//			part.move(new Vector3D(20,0,0));
-			part = Stli.importModel("20mmCube.stl", false);
-			part.move(new Vector3D(1,0,0));
-//			surface = Stli.importSurface("steep v.stl", false);
+			part = Stli.importModel("./Prints/DBZ.stl", false);
+//			part.move(new Vector3D(1,0,0));
+			surface = Stli.importSurface("./Prints/DBS.stl", false);
 //			surface = Stli.importSurface("slant.stl", false);
-			surface = Stli.importSurface("v2.stl", true);
+//			surface = Stli.importSurface("v2.stl", true);
 //			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
 //			surface.move(new Vector3D(1.5,0,0));
 			s = new Slicer(part, surface, "config1.txt");
@@ -31,6 +30,6 @@ public class Run {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("cube.g");
+		s.slice("DBZ.g");
 	}
 }

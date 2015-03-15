@@ -29,7 +29,7 @@ public class Brim {
 		ArrayList<Loop> loops = new ArrayList<Loop>();
 		loops.add(l);
 		ArrayList<ArrayList<Extrusion2D>> ls = new ArrayList<ArrayList<Extrusion2D>>();
-		for(int i=0;i<count;i++){
+		for(int i=count-1;i>=0;i--){
 			ls.addAll(NativeInset.insetLines(loops, -(i+0.25)*s.extrusionWidth, ET.shell));
 		}
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
