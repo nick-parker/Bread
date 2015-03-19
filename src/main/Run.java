@@ -3,8 +3,10 @@ package main;
 import io.Stli;
 
 import java.io.FileNotFoundException;
+
 import math.geom3d.Vector3D;
 import mesh3d.Model3D;
+import mesh3d.SimplePlane;
 import mesh3d.Surface3D;
 
 public class Run {
@@ -16,9 +18,11 @@ public class Run {
 		try {
 //			part = Stli.importModel("ASTM D638-10-1.stl", false);
 //			surface = Stli.importSurface("vastm.stl", false);
-			part = Stli.importModel("./Prints/DBZ.stl", false);
-//			part.move(new Vector3D(1,0,0));
-			surface = Stli.importSurface("./Prints/DBS.stl", false);
+			part = Stli.importModel("./Prints/DBY.stl", false);
+//			surface = Stli.importSurface("./Prints/DBS.stl", false);
+			surface = SimplePlane.MakePlane(-10, -10, 90, 90, 0);
+//			part = Stli.importModel("./Prints/vtop.stl", true);
+//			surface = Stli.importSurface("./Prints/v.stl", true);
 //			surface = Stli.importSurface("slant.stl", false);
 //			surface = Stli.importSurface("v2.stl", true);
 //			surface = SimplePlane.MakePlane(-5, -5, 50, 50, 0);
@@ -30,6 +34,6 @@ public class Run {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("DBZ.g");
+		s.slice("DBYF.g");
 	}
 }
