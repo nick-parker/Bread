@@ -19,4 +19,5 @@ public class Constants {
 	static public final double tol = 1e-4;
 	static public DecimalFormat ext = new DecimalFormat("#.#####");	//Extrusion
 	static public DecimalFormat xyz = new DecimalFormat("#.###");		//Position
+	static public Vector3D zero =  new Vector3D(0,0,0);
 }

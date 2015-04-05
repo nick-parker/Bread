@@ -33,13 +33,13 @@ public class Slicer {
 	public double filD;
 	public double nozzleD;
 	public double extrusionWidth;
-	public int printTemp;
-	public int xySpeed;
-	public int zSpeed;
-	public int numShells;
-	public double infillWidth;
-	public double infillDir;	//Direction of infill on layer 0;
-	public double infillAngle;	//Amount to change infill direction each layer, radians CW.
+	public int printTemp = 200;
+	public int xySpeed = 20;
+	public int zSpeed = 5;
+	public int numShells = 1;
+	public double infillWidth = 3;
+	public double infillDir = 45*Math.PI/180.0;	//Direction of infill on layer 0;
+	public double infillAngle = 90*Math.PI/180.0;	//Amount to change infill direction each layer, radians CW.
 	public double lift;	//Amount to lift for travel moves.
 	public LineSegment2D[] topo;
 	public double EperL;	//E increase per unit L increase.
@@ -53,8 +53,8 @@ public class Slicer {
 	public int layerCount;
 	//Inputs below are optional, above are mandatory.
 	public boolean cross = true;
-	public boolean allSolid = true;
-	public int brimCount = 15;
+	public boolean allSolid = false;
+	public int brimCount = 0;
 	public double TipRadius = 0.1; //Radius of the flat tip of the nozzle, NOT the hole itself. 
 	public double infillFlowMultiple = 1;
 	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
@@ -147,8 +147,19 @@ public class Slicer {
 					break;
 				case "topLayers":
 					this.topLayerStart = Integer.parseInt(line[1]);
-				case "botLayers":
-					this.botLayers = Integer.parseInt(line[1]);
+					break;
+				case "AllSolid":
+					this.allSolid = Boolean.parseBoolean(line[1]);
+					break;
+				case "FirmwareRetract":
+					this.FirmwareRetract = Boolean.parseBoolean(line[1]);
+					break;
+				case "TipRadius":
+					this.TipRadius = Double.parseDouble(line[1]);
+					break;
+				case "brimCount":
+					this.brimCount = Integer.parseInt(line[1]);
+					break;
 				}
 			}
 			this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
@@ -218,8 +229,10 @@ public class Slicer {
 		g.setTempAndWait(this.printTemp);
 		Point2D last = new Point2D(0,0);
 		ArrayList<Extrusion3D> br = Brim.brim(this, brimCount, last);
-		if(brimCount!=0) g.addLayer(br, -1);
-		last = new Point2D(br.get(br.size()-1).lastPoint().getX(),br.get(br.size()-1).lastPoint().getY());
+		if(brimCount!=0){
+			g.addLayer(br, -1);
+			last = new Point2D(br.get(br.size()-1).lastPoint().getX(),br.get(br.size()-1).lastPoint().getY());
+		}
 		for(int n=0;n<layerCount;n++){
 			last = doLayer(n,g,last);
 		}

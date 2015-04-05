@@ -1,4 +1,4 @@
-package utils2D;
+package utils;
 
 import java.util.ArrayList;
 import java.util.Collection;

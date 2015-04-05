@@ -9,15 +9,14 @@ Extrude the layer shapes along the Z axis for the interval of Z values which the
 
 For each extruded shape, calculate which other ones it intersects with at all.
 
-Store the extruded shapes in an interval tree for added speed.
-
-For each layer shape, for each of it's Z offset values, fetch the set of potentially intersecting shapes from the interval tree, then
-eliminate all those which don't intersect this layer shape's extrusion, and all those with lower priority than this one.
-
-Intersect the remaining shapes with the layer shape, using the layer shape's edges as mentioned before, to get the domain of the layer
-shape mesh outside of the shapes which cut holes in it.
+For each layer shape, for each of it's Z offset values, Intersect the potentially intersecting shapes with the layer shape,
+ using the layer shape's edges as mentioned before to get the domain of the layer shape mesh outside of the shapes which cut 
+ holes in it. Ignore any shapes with lower priority than the layer.
 
 Finally, intersect the layer shape mesh with the part and perform a boolean intersection in Clipper between the domain from the previous
 section and this domain. Path the intersection as in normal nonplanar slicing.
 
-Ordering the layers for printing: This is still unsolved, and introduces a lot of collision detection shittiness re: the hotend.
+Ordering the layers for printing:
+
+Whole layer shapes regions should be printed at once for now. There aren't many scenarios where having two layer shapes interwoven is more beneficial than
+just merging them into a single layer shape.

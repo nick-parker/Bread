@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import main.Slicer;
 import math.geom2d.Point2D;
-import math.geom2d.line.LineSegment2D;
 import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
@@ -15,23 +14,10 @@ import structs.Extrusion3D;
 import structs.Extrusion2D.ET;
 import structs.Loop;
 
-//TODO Make this use a planar slice not a simple box.
-
 public class Brim {
 	public static ArrayList<Extrusion3D> brim(Slicer s, int count, Point2D lst){
+		if(count==0) return new ArrayList<Extrusion3D>();
 		double z = s.layerHeight*.75;
-		Box3D b = s.part.boundingBox();
-//		Point2D p0 = new Point2D(b.getMinX(),b.getMinY());
-//		Point2D p1 = new Point2D(b.getMaxX(),b.getMinY());
-//		Point2D p2 = new Point2D(b.getMaxX(),b.getMaxY());
-//		Point2D p3 = new Point2D(b.getMinX(),b.getMaxY());
-//		Loop l = new Loop(new LineSegment2D(p0, p1));
-//		l.AttemptAdd(new LineSegment2D(p1,p2));
-//		l.AttemptAdd(new LineSegment2D(p2,p3));
-//		l.AttemptAdd(new LineSegment2D(p3,p0));
-//		ArrayList<Loop> loops = new ArrayList<Loop>();
-//		loops.add(l);
-//		Surface3D plane = SimplePlane.MakePlane(b.getMinX()-1, b.getMinY()-1, b.getMaxX()+1, b.getMaxY()+1, z);
 		Surface3D plane = SimplePlane.MakePlane(-100, -100, 100, 100, z);
 		LineSegment3D[] overlap = plane.overlap(s.part);
 		ArrayList<Loop> loops = Order.ListOrder(Flatten.FlattenZ(overlap));

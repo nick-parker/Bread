@@ -18,9 +18,9 @@ public class Run {
 		try {
 //			part = Stli.importModel("ASTM D638-10-1.stl", false);
 //			surface = Stli.importSurface("vastm.stl", false);
-			part = Stli.importModel("./Prints/DBY.stl", false);
-//			surface = Stli.importSurface("./Prints/DBS.stl", false);
-			surface = SimplePlane.MakePlane(-10, -10, 90, 90, 0);
+			part = Stli.importModel("./Prints/wave.stl", false);
+			surface = Stli.importSurface("./Prints/wavesurface.stl", false);
+//			surface = SimplePlane.MakePlane(-10, -10, 30, 30, 0);
 //			part = Stli.importModel("./Prints/vtop.stl", true);
 //			surface = Stli.importSurface("./Prints/v.stl", true);
 //			surface = Stli.importSurface("slant.stl", false);
@@ -34,6 +34,6 @@ public class Run {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		s.slice("DBYF.g");
+		s.slice("wave.g");
 	}
 }

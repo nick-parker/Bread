@@ -9,12 +9,12 @@ import java.util.ArrayList;
 
 import structs.Extrusion3D;
 import structs.Extrusion2D.ET;
+import utils.Utils3D;
 import main.Constants;
 import main.Slicer;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
-import mesh3d.Tri3D;
 /**
  * A Gcode Export function for use with absolute coordinate modes. The most recent position in XYZE coordinates is stored as
  * state in each instance of the exporter, as well as the location to write the .gcode file and the slicer object which
@@ -47,8 +47,8 @@ public class GcodeExport {
 	public static void CheckContinuity(ArrayList<? extends LineSegment3D> path){
 		Point3D l = path.get(0).firstPoint();
 		for(LineSegment3D e: path){
-			if(!Tri3D.equiv(l,e.firstPoint())){
-				System.out.println("Discontinuous path! Jump from "+Tri3D.PointToStr(l)+" to "+Tri3D.PointToStr(e.firstPoint()));
+			if(!Utils3D.equiv(l,e.firstPoint())){
+				System.out.println("Discontinuous path! Jump from "+Utils3D.PointToStr(l)+" to "+Utils3D.PointToStr(e.firstPoint()));
 			}
 			l = e.lastPoint();
 		}
@@ -66,9 +66,9 @@ public class GcodeExport {
 		zeroE();	//Zero E
 //		G1(last);	//Travel to the first point directly from wherever it is now.
 		for(Extrusion3D e: path){
-			if(Tri3D.length(e)<Constants.tol) continue;
-			if(!Tri3D.equiv(last,e.firstPoint())){
-				System.out.println("Discontinuous path! Jump from "+Tri3D.PointToStr(last)+" to "+Tri3D.PointToStr(e.firstPoint()));
+			if(Utils3D.length(e)<Constants.tol) continue;
+			if(!Utils3D.equiv(last,e.firstPoint())){
+				System.out.println("Discontinuous path! Jump from "+Utils3D.PointToStr(last)+" to "+Utils3D.PointToStr(e.firstPoint()));
 			}
 			if(e.ExtrusionType==ET.travel&&prev.ExtrusionType!=ET.travel||e.equals(prev)){
 				w.println(";retract");
@@ -81,7 +81,7 @@ public class GcodeExport {
 			}
 			if(e.ExtrusionType==ET.infill||e.ExtrusionType==ET.shell){
 				//Infill or shell.
-				currE +=s.EperL*Tri3D.length(e);
+				currE +=s.EperL*Utils3D.length(e);
 				if(e.ExtrusionType==ET.infill&&prev.ExtrusionType!=ET.infill) w.println(";infill");
 				else if(e.ExtrusionType==ET.shell&&prev.ExtrusionType!=ET.shell) w.println(";shell");
 			}

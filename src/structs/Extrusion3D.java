@@ -1,9 +1,9 @@
 package structs;
 
 import structs.Extrusion2D.ET;
+import utils.Utils3D;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
-import mesh3d.Tri3D;
 
 /**
  * ExtrusionType marks the type of extrusion this line represents.
@@ -33,7 +33,7 @@ public class Extrusion3D extends LineSegment3D {
 	}
 	@Override
 	public String toString(){
-		return "E3D("+Tri3D.PointToStr(this.firstPoint())+", "+Tri3D.PointToStr(this.lastPoint())+" "+this.ExtrusionType+")";
+		return "E3D("+Utils3D.PointToStr(this.firstPoint())+", "+Utils3D.PointToStr(this.lastPoint())+" "+this.ExtrusionType+")";
 	}
 	public Extrusion3D reverseE(){
 		return new Extrusion3D(lastPoint(),firstPoint(),ExtrusionType);

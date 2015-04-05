@@ -7,12 +7,14 @@ printTemp 200 C
 xySpeed 20 mm/s	//Max speed on XY, i just set this low for the first prints.
 zSpeed 7 mm/s	//Maximum speed on your z axis. I might be using the wrong units here because my mendel90 tops out at 4.
 numShells 3
-infillWidth 4.5 mm		//Distance between lines of infill
-infillDir 45 degrees		//Infill direction on layer 0, CW from +X axis
-infillAngle 90 degrees	//Infill direction change on each subsequent layer
+infillWidth 4.5 mm		//Distance between lines of infill on non-solid layers.
 lift 0 mm		//Z lift for travels, should be half the layer height or slightly less.
 retraction 1.2 mm		//retraction
 retractSpeed 70 mm/s
-retractThreshold 10 mm	//Minimum travel distance to trigger retraction.
-topLayers 5
-botLayers 12
+retractThreshold 10 mm	//Minimum XY travel distance to trigger retraction.
+topLayers 5 	//Solid layers on the top and bottom.
+botLayers 5
+allSolid false	//Print all layers as solid.
+brimCount 0
+TipRadius 0	 //Used for nozzle compensation, set to 0 to disable.
+FirmwareRetract = false 

@@ -9,7 +9,8 @@ import math.geom3d.Vector3D;
 import structs.Extrusion2D;
 import structs.Extrusion3D;
 import structs.Extrusion2D.ET;
-import utils2D.Utils2D;
+import utils.Utils2D;
+import utils.Utils3D;
 
 /**
  *  
@@ -102,16 +103,15 @@ public class Reproject {
 	 * @return
 	 */
 	private ArrayList<Extrusion3D> projectTravel(ArrayList<Extrusion2D> travels, Point2D end){
+		boolean SlopeDown = projectPoint(travels.get(0).firstPoint()).getZ()>projectPoint(end).getZ(); //Checks whether this path needs to be sloped down at the end.
 		double ModelTop = s.part.boundingBox().getMaxZ()+s.lift+s.layerHeight; //Extra margin of 1 layer height.
 		ArrayList<Extrusion3D> output = new ArrayList<Extrusion3D>();
 		Extrusion3D first = projectExtrusion(travels.get(0));
-		
 		Point3D last = first.firstPoint();
 		double z = last.getZ();
 		if(s.lift!=0){
 			//If lift is nonzero, add a movement from the actual start of the travel series to +lift above it.
-			Extrusion3D lift = new Extrusion3D(first.firstPoint(),liftP(last,s.lift),first.ExtrusionType);
-			output.add(lift);
+			//Add the movement at the end so indexing matches up between travels and output for the slope down loop.
 			z+=s.lift;
 		}
 		for(Extrusion2D e : travels){
@@ -121,17 +121,54 @@ public class Reproject {
 			if(newZ>z){ //If we need to keep sloping up on this one.
 				Point3D next = newZ<=ModelTop ? liftP(proj.lastPoint(),s.lift) : new Point3D(proj.lastPoint().getX(),proj.lastPoint().getY(),ModelTop);
 				Extrusion3D add = new Extrusion3D(last,next,e.ExtrusionType);
+				if(Utils3D.slope(add)<0) SlopeDown=true;
 				output.add(add);
 				z = next.getZ();
 				last = next;
 				continue;
 			}
-			output.add(setZ(e,z)); //TODO modify this to make travels slope back down instead of dropping vertically.
+			output.add(setZ(e,z));
 			last = output.get(output.size()-1).lastPoint();
 		}
-		Extrusion3D lastE = output.get(output.size()-1);
-		Extrusion3D lower = new Extrusion3D(lastE.lastPoint(),liftP(s.shape.project(end),to()),lastE.ExtrusionType);
-		output.add(lower);
+		if(SlopeDown){
+			//Slope down the end.
+			z=-1e10;
+			for(int i=output.size()-1;i>=0;i--){
+				Extrusion3D curr = output.get(i);
+				Extrusion3D proj = projectExtrusion(travels.get(i));
+				double newZ = proj.lastPoint().getZ()+s.lift;
+				if(newZ<curr.lastPoint().getZ()){ //If we are still below the path
+					//Either slope up or go flat.
+					double slope = Utils3D.slope(proj);
+					if(newZ>z&&slope>0){
+						Point3D newEnd = liftP(proj.lastPoint(),s.lift);
+						Point3D newStart = liftP(proj.firstPoint(),s.lift);
+						Extrusion3D newE = new Extrusion3D(newStart,newEnd,curr.ExtrusionType);
+						slope = (newE.firstPoint().getZ()-newE.lastPoint().getZ())/Utils3D.length(newE);
+						output.set(i,new Extrusion3D(newStart,newEnd,curr.ExtrusionType));
+						z=newStart.getZ();
+					}
+					else{
+						Point3D lp = proj.lastPoint();
+						Point3D newEnd = new Point3D(lp.getX(),lp.getY(),Math.max(lp.getZ(),z));
+						Point3D fp = proj.firstPoint();
+						Point3D newStart = new Point3D(fp.getX(),fp.getY(),Math.max(fp.getZ(),z));
+						output.set(i,new Extrusion3D(newStart,newEnd,curr.ExtrusionType));
+						z=newStart.getZ();
+					}
+				}
+				else break;
+			}
+		}
+		if(s.lift!=0){
+			//If lift is nonzero, add a movement from the actual start of the travel series to +lift above it.
+			Extrusion3D lift = new Extrusion3D(first.firstPoint(),liftP(last,s.lift),first.ExtrusionType);
+			output.add(0,lift);
+			z+=s.lift;
+		}
+		//		Extrusion3D lastE = output.get(output.size()-1);
+		//		Extrusion3D lower = new Extrusion3D(lastE.lastPoint(),liftP(s.shape.project(end),to()),lastE.ExtrusionType);
+		//		output.add(lower);
 		return output;
 	}
 	/**

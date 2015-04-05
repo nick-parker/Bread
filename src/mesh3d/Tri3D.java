@@ -1,5 +1,6 @@
 package mesh3d;
 
+import utils.Utils3D;
 import main.Constants;
 import math.geom2d.Point2D;
 import math.geom3d.Point3D;
@@ -10,7 +11,7 @@ import math.geom3d.plane.Plane3D;
 
 public class Tri3D{
 	private Point3D[] ps;
-	private LineSegment3D[] es;
+	public final LineSegment3D[] es;
 	private Vector3D u;
 	private Vector3D v;
 	private double udotv;
@@ -36,8 +37,8 @@ public class Tri3D{
 		LineSegment3D e1 = new LineSegment3D(p1, p2);
 		LineSegment3D e2 = new LineSegment3D(p2, p0);
 		this.es = new LineSegment3D[]{e0,e1,e2};
-		this.originDot = PointDot(pl.normal(), pl.origin());
-		this.radius = Math.max(length(e0),length(e2));
+		this.originDot = Utils3D.PointDot(pl.normal(), pl.origin());
+		this.radius = Math.max(Utils3D.length(e0),Utils3D.length(e2));
 		this.xyradius= Math.sqrt(Math.max(Math.pow(p1.getX()-p0.getX(), 2)+Math.pow(p1.getY()-p0.getY(), 2),
 				Math.pow(p2.getX()-p0.getX(), 2)+Math.pow(p2.getY()-p0.getY(), 2)));
 		this.zradius = Math.max(Math.abs(p0.getZ()-p1.getZ()), Math.abs(p0.getZ()-p2.getZ()));
@@ -52,7 +53,7 @@ public class Tri3D{
 	 * @return a new Triangle with opposite normal to this triangle.
 	 */
 	public Tri3D flip(){
-		return new Tri3D(Mesh3D.copyPoint(ps[0]),Mesh3D.copyPoint(ps[2]),Mesh3D.copyPoint(ps[1]));
+		return new Tri3D(Utils3D.copyPoint(ps[0]),Utils3D.copyPoint(ps[2]),Utils3D.copyPoint(ps[1]));
 	}
 	/**
 	 * @param l Line to intersect with tri.
@@ -99,9 +100,9 @@ public class Tri3D{
 	public Point3D getMax(Vector3D vec) {
 		double d1 = Vector3D.dotProduct(u, vec);
 		double d2 = Vector3D.dotProduct(v, vec);
-		if(d1<0&&d1<d2) return Mesh3D.copyPoint(ps[0]);
-		if(d1>d2) return Mesh3D.copyPoint(ps[1]);
-		return Mesh3D.copyPoint(ps[2]);
+		if(d1<0&&d1<d2) return Utils3D.copyPoint(ps[0]);
+		if(d1>d2) return Utils3D.copyPoint(ps[1]);
+		return Utils3D.copyPoint(ps[2]);
 	}
 	/**
 	 * Find the line segment representing the intersection of this triangle with t.
@@ -114,13 +115,13 @@ public class Tri3D{
 //		2. Reject as trivial if all points of triangle 1 are on same side.
 		//Dot them all with the normal and test against the origin of the plane
 		Vector3D n2 = t.normal();
-		double[] dots1 = new double[]{PointDot(n2,ps[0]),PointDot(n2,ps[1]),PointDot(n2,ps[2])};
+		double[] dots1 = new double[]{Utils3D.PointDot(n2,ps[0]),Utils3D.PointDot(n2,ps[1]),Utils3D.PointDot(n2,ps[2])};
 		if(allSameSide(dots1,t.originDot)) return null;	//This triangle doesn't intersect the other's plane.
 //		3. Compute plane equation of triangle 1.
 		//Baked in this triangle
 //		4. Reject as trivial if all points of triangle 2 are on same side.
 		Vector3D n = normal();
-		double[] dots2 = new double[]{PointDot(n,t.ps[0]),PointDot(n,t.ps[1]),PointDot(n,t.ps[2])};
+		double[] dots2 = new double[]{Utils3D.PointDot(n,t.ps[0]),Utils3D.PointDot(n,t.ps[1]),Utils3D.PointDot(n,t.ps[2])};
 		if(allSameSide(dots2,originDot)) return null; //The other doesn't intersect this triangle's plane.
 		//Check they aren't coplanar
 		if(Vector3D.isColinear(n,n2)) return null;
@@ -137,9 +138,9 @@ public class Tri3D{
 		if(hitsA==null||hitsB==null) return null;
 //		6. Dot the intersections with normalized n1 x n2 to get their positions along the intersection line
 		Vector3D dir = Vector3D.crossProduct(n, n2).normalize();
-		double[] dotsA = new double[]{PointDot(dir,hitsA[0]), PointDot(dir,hitsA[1])};
+		double[] dotsA = new double[]{Utils3D.PointDot(dir,hitsA[0]), Utils3D.PointDot(dir,hitsA[1])};
 		double lineOrigin = dotsA[0];
-		double[] dotsB = new double[]{PointDot(dir,hitsB[0]), PointDot(dir,hitsB[1])};
+		double[] dotsB = new double[]{Utils3D.PointDot(dir,hitsB[0]), Utils3D.PointDot(dir,hitsB[1])};
 		if(dotsA[0]>dotsA[1]) flipVals(dotsA,0,1);
 		if(dotsB[0]>dotsB[1]) flipVals(dotsB,0,1);
 //		7. Find the overlap between the two intervals on the intersection line
@@ -204,30 +205,12 @@ public class Tri3D{
 	}
 	@Override
 	public String toString(){
-		return "Tri3D: "+PointToStr(ps[0])+" " + PointToStr(ps[1]) + " " + PointToStr(ps[2]);
+		return "Tri3D: "+Utils3D.PointToStr(ps[0])+" " + Utils3D.PointToStr(ps[1]) + " " + Utils3D.PointToStr(ps[2]);
 	}
-	public static String PointToStr(Point3D p){
-		return "["+ Constants.xyz.format(p.getX()) + " " + Constants.xyz.format(p.getY()) + " " +Constants.xyz.format(p.getZ()) +"]";
-	}
-	public static String VectorToStr(Vector3D v){
-		return "{"+ v.getX() + " " + v.getY() + " " +v.getZ() +"}";
-	}
-	public static <T> void flipVals(T[] arr, int a, int b){
-		T tmp = arr[a];
-		arr[a]=arr[b];
-		arr[b]=tmp;
-	}
-	public static void flipVals(double[] arr, int a, int b){
+	private static void flipVals(double[] arr, int a, int b){
 		double tmp = arr[a];
 		arr[a]=arr[b];
 		arr[b]=tmp;
-	}
-	public static double PointDot(Vector3D v, Point3D p){
-		Vector3D v2 = new Vector3D(p);
-		return Vector3D.dotProduct(v, v2);
-	}
-	public static double length(LineSegment3D l){
-		return l.firstPoint().distance(l.lastPoint());
 	}
 	/**
 	 * Check that either all values of a are > than v or all
@@ -251,6 +234,5 @@ public class Tri3D{
 	public Plane3D plane() {
 		return pl;
 	}
-	static public boolean equiv(Point3D a, Point3D b){return a.distance(b)<Constants.tol;}
 	
 }

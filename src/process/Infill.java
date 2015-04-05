@@ -6,7 +6,7 @@ import java.util.Collection;
 import structs.Extrusion2D;
 import structs.Loop;
 import structs.Extrusion2D.ET;
-import utils2D.Utils2D;
+import utils.Utils2D;
 import main.Slicer;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
@@ -14,9 +14,6 @@ import math.geom2d.Vector2D;
 import math.geom2d.line.LineSegment2D;
 import math.geom2d.line.StraightLine2D;
 import math.geom2d.polygon.MultiPolygon2D;
-
-//TODO Change infill so that the grid doesn't move on layer changes. This will make infill much stronger, and keep it from getting droopy.
-
 public class Infill {
 	/**
 	 * 

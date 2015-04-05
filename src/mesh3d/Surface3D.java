@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 
-import utils2D.Utils2D;
+import utils.Utils2D;
+import utils.Utils3D;
 import main.Constants;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;
@@ -19,7 +20,13 @@ public class Surface3D extends Mesh3D{
 	private Hashtable<Point2D,Tri3D> TriMap;
 	private ArrayList<Point2D> ps;
 	private double MaxRad;	//Length of the longest edge in this mesh, useful for reprojection.
+	private boolean PerimsMade = false;
+	private ArrayList<LineSegment3D> Perims;
 	public Surface3D(Tri3D[] ts) {
+		//TODO Figure out why most triangles trigger this check. Layer shape has normals pointing down?
+//		for(Tri3D t : ts){
+//			if(t.normal().getZ()<=0) System.out.println("Invalid Layer Shape! Triangle oriented sideways or downward.");
+//		}
 		this.tris = ts;
 		offset = 0;
 		makeMaps();
@@ -149,5 +156,32 @@ public class Surface3D extends Mesh3D{
 	}
 	public double getOffset() {
 		return offset;
+	}
+	/**
+	 * Fetch the open perimeters of this surface.
+	 */
+	public ArrayList<LineSegment3D> getPerimeters(){
+		if(PerimsMade) return Perims;
+		ArrayList<LineSegment3D> output = new ArrayList<LineSegment3D>();
+		/*
+		 * Strictly speaking, this will return any edge which has
+		 * an even number of duplicates, but stuff's very broken
+		 * if there's more than 2 copies of an edge.
+		 */
+		for(Tri3D t: tris){
+			for(LineSegment3D e : t.es){
+				boolean add = true;
+				for(int i=0;i<output.size()-1;i++){
+					LineSegment3D l = output.get(i);
+					if(Utils3D.equiv(l, e)){
+						add = false;
+						output.remove(l);
+						break;
+					}
+				}
+				if(add) output.add(e);
+			}
+		}
+		return output;
 	}
 }

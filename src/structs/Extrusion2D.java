@@ -2,7 +2,7 @@ package structs;
 
 import java.util.ArrayList;
 
-import utils2D.Utils2D;
+import utils.Utils2D;
 import main.Constants;
 import math.geom2d.Point2D;
 import math.geom2d.line.LineSegment2D;

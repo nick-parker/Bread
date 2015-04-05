@@ -1,4 +1,4 @@
-package utils2D;
+package utils;
 
 import math.geom2d.Point2D;
 import math.geom2d.Vector2D;

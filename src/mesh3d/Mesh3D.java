@@ -85,15 +85,7 @@ abstract class Mesh3D implements Shape3D{
 		}
 		return false;
 	}
-	
-	//Static methods below this point.
-	/**
-	 * @param p Point to duplicate
-	 * @return Return a duplicate of point p.
-	 */
-	static public Point3D copyPoint(Point3D p){return new Point3D(p.getX(),p.getY(),p.getZ());}
-	//Unimplemented inherited methods below this point.	
-	
+	//Unimplemented inherited methods below this point.
 	/**
 	 * Not Implemented.
 	 */

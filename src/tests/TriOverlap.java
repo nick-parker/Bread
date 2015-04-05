@@ -21,6 +21,7 @@ import org.junit.Test;
 import process.Flatten;
 import process.Order;
 import structs.Loop;
+import utils.Utils3D;
 
 public class TriOverlap {
 
@@ -88,7 +89,7 @@ public class TriOverlap {
 		LineSegment3D[] over = m2.overlap(m1);
 		double sum = 0;
 		for(LineSegment3D l:over){
-			sum += Tri3D.length(l);
+			sum += Utils3D.length(l);
 		}
 		System.out.println(sum);
 		assertTrue(Math.abs(sum-60)<Constants.tol);

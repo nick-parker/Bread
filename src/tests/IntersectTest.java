@@ -19,7 +19,6 @@ public class IntersectTest {
 		try {
 			this.w = new PrintWriter(new FileWriter(fileName));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
