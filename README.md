@@ -21,3 +21,7 @@ To simply use this Slicer:
 Contributing
 ==========
 While people are free to jump on this now, I'll be doing some pretty significant restructuring over the Summer. If you're eager to make a lasting contribution, the best way to do so is to optimize or improve some of the core components. For example, an octree implementation of Mesh3D.overlap could be dramatically faster than the current radix check, but I haven't gotten around to writing one. Surface3D.project(Point2D p) could benefit from similar optimizations.
+
+License
+=========
+This project is licensed under GPL v3. For more information, see https://www.gnu.org/copyleft/gpl.html
