@@ -3,7 +3,6 @@ package structs;
 import java.util.ArrayList;
 
 import utils.Utils3D;
-import main.Constants;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
 import mesh3d.CollisionMesh;

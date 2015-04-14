@@ -3,8 +3,12 @@ package main;
 import io.GcodeExport;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 
 import process.Brim;
@@ -24,7 +28,7 @@ import mesh3d.Surface3D;
 
 /**
  * Stores info on a slice job and the layers which make it up. Eventually this class should have every
- * parameter set by its constructor, but for now non-final values are set manually in source code for testing. TODO
+ * parameter set by its constructor, but for now non-final values are set manually in source code for testing.
  */
 public class Slicer {
 	public Model3D part;
@@ -54,6 +58,7 @@ public class Slicer {
 	//Inputs below are optional, above are mandatory.
 	public boolean cross = true;
 	public boolean allSolid = false;
+	public boolean OuterFirst = false;
 	public int brimCount = 0;
 	public double TipRadius = 0.1; //Radius of the flat tip of the nozzle, NOT the hole itself. 
 	public double infillFlowMultiple = 1;
@@ -94,11 +99,24 @@ public class Slicer {
 	public Slicer(Model3D part, Surface3D shape, String config){
 		this.part = part;
 		this.shape = shape;
+		try {
+			configure(new FileReader(config));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	public Slicer(Model3D part, Surface3D shape, Reader r){
+		this.part = part;
+		this.shape = shape;
+		configure(r);
+	}
+	private void configure(Reader r){
 		BufferedReader f;
 		try {
-			f = new BufferedReader(new FileReader(config));
-			while(f.ready()){
-				String[] line = f.readLine().split(" ");
+			f = new BufferedReader(r);
+			String lineRead;
+			while((lineRead = f.readLine())!=null){
+				String[] line = lineRead.split("[ \t]");
 				switch(line[0]){
 				case "layerHeight":
 					this.layerHeight = Double.parseDouble(line[1]);
@@ -160,6 +178,9 @@ public class Slicer {
 				case "brimCount":
 					this.brimCount = Integer.parseInt(line[1]);
 					break;
+				case "OuterFirst":
+					this.OuterFirst = Boolean.parseBoolean(line[1]);
+					break;
 				}
 			}
 			this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
@@ -169,7 +190,6 @@ public class Slicer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	/**
 	 * Position shape so that its highest point is layerHeight/2 above the part's lowest point.
@@ -221,12 +241,13 @@ public class Slicer {
 //		LineSegment3D[] overlap = shape.overlap(part);
 		return !shape.intersect(part);
 	}
-	public void slice(String fileLoc){
+	public void slice(Writer w){
 //		PositionShape();
 		part.move(new Vector3D(0,0,zMin));
-		GcodeExport g = new GcodeExport(fileLoc, this);
+		GcodeExport g = new GcodeExport(w, this);
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
+//		Point2D last = new Point2D(shape.boundingBox().getMinX(),shape.boundingBox().getMinY());
 		Point2D last = new Point2D(0,0);
 		ArrayList<Extrusion3D> br = Brim.brim(this, brimCount, last);
 		if(brimCount!=0){
@@ -238,6 +259,13 @@ public class Slicer {
 		}
 		g.writeFromFile("end.gcode");
 		g.close();
+	}
+	public void slice(String fileLoc){
+		try {
+			slice(new FileWriter(fileLoc));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	private Point2D doLayer(int n, GcodeExport g, Point2D last){
 		SmartLayer l = new SmartLayer(this,n);

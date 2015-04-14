@@ -1,10 +1,12 @@
 package io;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -16,15 +18,19 @@ import mesh3d.Surface3D;
 import mesh3d.Tri3D;
 
 public class Stli {
-	private static Tri3D[] importMesh(String fileName) throws IOException{
+	private static Tri3D[] importMesh(String fileLoc) throws IOException{
+		return importMesh(new FileReader(fileLoc));
+	}
+	private static Tri3D[] importMesh(Reader r) throws IOException{
 		try{
-			BufferedReader f = new BufferedReader(new FileReader(fileName));
+			BufferedReader f = new BufferedReader(r);
 			ArrayList<Tri3D> tris = new ArrayList<Tri3D>();
 			Point3D[] ps = new Point3D[]{Constants.origin,Constants.origin,Constants.origin};
 			int i=0;
 			boolean inFace = false;
-			while(f.ready()){
-				String[] lineArray = f.readLine().trim().split(" ");
+			String line;
+			while((line = f.readLine()) != null){
+				String[] lineArray = line.trim().split(" ");
 				switch(lineArray[0]){
 				case "facet":
 					if(inFace){
@@ -65,9 +71,17 @@ public class Stli {
 	 * @param fileName File to import
 	 * @return An array of Tri3D objects representing the .stl
 	 */
-	private static Tri3D[] importBinMesh(String fileName){
+	private static Tri3D[] importBinMesh(String fileLoc){
 		try{
-			InputStream is = new FileInputStream(fileName);
+			InputStream is = new FileInputStream(fileLoc);
+			return importBinMesh(is);
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
+	}
+	private static Tri3D[] importBinMesh(InputStream is){
+		try{
 			is.skip(84); //toss the header
 			ArrayList<Tri3D> ts = new ArrayList<Tri3D>();
 			boolean done=false;
@@ -108,5 +122,33 @@ public class Stli {
 	public static Surface3D importSurface(String fileName, boolean ascii) throws IOException{
 		if(ascii) return new Surface3D(importMesh(fileName));
 		return new Surface3D(importBinMesh(fileName));
+	}
+	/**
+	 * Only supports ASCII right now.
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static Model3D importModel(Reader file) throws IOException{
+		return new Model3D(importMesh(file));
+	}
+	/**
+	 * Only supports ASCII right now.
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static Surface3D importSurface(Reader file) throws IOException{
+		return new Surface3D(importMesh(file));
+		
+	}
+	public static Model3D importModel(byte[] stl){
+		InputStream is = new ByteArrayInputStream(stl);
+		return new Model3D(importBinMesh(is));
+	}
+	public static Surface3D importSurface(byte[] stl){
+		InputStream is = new ByteArrayInputStream(stl);
+		return new Surface3D(importBinMesh(is));
+		
 	}
 }

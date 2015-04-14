@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 
 import structs.Extrusion3D;
@@ -39,6 +40,11 @@ public class GcodeExport {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	public GcodeExport(Writer w, Slicer s){
+		this.s = s;
+		this.last = new Point3D(0,0,0);
+		this.w = new PrintWriter(w);
 	}
 	/**
 	 * Debugging function to check that a series of LineSegment3D objects is continuous.

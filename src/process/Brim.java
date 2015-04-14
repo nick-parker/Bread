@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import main.Slicer;
 import math.geom2d.Point2D;
-import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
 import mesh3d.SimplePlane;

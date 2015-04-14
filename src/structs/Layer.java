@@ -58,7 +58,9 @@ public class Layer {
 	public ArrayList<Extrusion2D> getShells(){
 		if(!loopsMade) makeLoops();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
-		for(int i=0;i<s.numShells;i++){
+		for(int i= s.OuterFirst ? 0 : s.numShells-1;
+		i<s.numShells&&s.OuterFirst || i>=0&&!s.OuterFirst;
+		i+= s.OuterFirst ? 1 : -1){
 			double dist = (i+0.5)*s.extrusionWidth;
 			ArrayList<ArrayList<Extrusion2D>> shells = NativeInset.insetLines(loops, dist,ET.shell);
 			if(shells==null) continue;
