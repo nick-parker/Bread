@@ -1,0 +1,21 @@
+//Configure accordingly for your machine.
+layerHeight 0.3 mm
+filD 1.75 mm		//filament diameter
+nozzleD 0.4 mm		//nozzle diameter
+extrusionWidth .55 mm
+printTemp 200 C	
+xySpeed 20 mm/s	//Max speed on XY, i just set this low for the first prints.
+zSpeed 7 mm/s	//Maximum speed on your z axis. I might be using the wrong units here because my mendel90 tops out at 4.
+numShells 3
+infillWidth 4.5 mm		//Distance between lines of infill on non-solid layers.
+lift 0 mm		//Z lift for travels, should be half the layer height or slightly less.
+retraction 1.2 mm		//retraction
+retractSpeed 70 mm/s
+retractThreshold 10 mm	//Minimum XY travel distance to trigger retraction.
+topLayers 5  //Solid layers on the top and bottom.
+botLayers 5
+AllSolid true  //Print all layers as solid.
+brimCount 11
+TipRadius 0.2	 //Used for nozzle compensation, set to 0 to disable.
+FirmwareRetract false
+OuterFirst true 
