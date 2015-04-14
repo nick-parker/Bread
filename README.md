@@ -24,7 +24,7 @@ To simply use this Slicer:
 
 1. Make sure you're running a 32 bit installation of Java.
 
-2. Place Bread.jar, ClipperLib2.dll, config.txt, start.gcode, and end.gcode in a directory of your choice.
+2. Place Bread.jar, config.txt, start.gcode, and end.gcode in a directory of your choice.
 
 3. Change the relevant settings in config.txt for your machine, and configure start.gcode and end.gcode to your liking. Set very conservative values for speeds on your first print. 
 
