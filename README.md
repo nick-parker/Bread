@@ -18,6 +18,13 @@ To simply use this Slicer:
 
 4. In command line or shell, navigate to your chosen directory and execute Bread.jar [path to part.stl] [path to surface.stl] [path to config.txt] [path to write to]
 
+Some important notes on making it play nice:
+Your layer shape needs to cover everywhere the head is going to go in X and Y, sort of like a height function over the plane. I think there's a little hack which makes it OK for travels to go outside the layer shape, but you should really avoid that. This includes the initial travel from (0,0), so if possible get the origin inside your layer shape too.
+
+I haven't really characterized the effects of NozzleOffset. It essentially tries to make up for the fact that parts of the code treat the disk-like nozzle as if it's a point. You can enable or disable it by simply setting TipRadius to 0, or your nozzle radius respectively. Enabling it will cause a lot of stress on your Z axis, but may improve surface finish.
+
+You may notice that with steep layer shapes the surface finish gets awful very quickly. This is caused by the leading edge of your nozzle colliding with the previous layer. In general, don't angle your surface up above the XY plane by more than arctan(layer height / nozzle diameter). If you aren't using a NozzleOffset (TipRadius set to 0), this angle limit is lower.
+
 Why 3D Layers?
 ==========
 In short, why not? We have these machines that can move in 3 dimensions, we should probably make them move in 3 dimensions. In terms of actual tangible benefits, adjusting your layer shape can:
