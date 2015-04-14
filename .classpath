@@ -4,11 +4,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="javaGeom-0.11.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/CampSkeletonInsetter.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/vecmath-1.3.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/gpcj-2.2.0-full.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/Insetter/Jama-1.0.3.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/TreeSlicer/ClipperJNA.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/ClipperJNA/jna-4.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/TreeSlicer/lib/vecmath-1.3.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/TreeSlicer/lib/gpcj-2.2.0-full.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/TreeSlicer/lib/Jama-1.0.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/TreeSlicer/lib/ClipperJNA.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/TreeSlicer/lib/jna-4.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

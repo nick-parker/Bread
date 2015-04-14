@@ -2,55 +2,32 @@ package main;
 
 import io.Stli;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-
 import mesh3d.Model3D;
 import mesh3d.Surface3D;
 
 /**
- * The main class of TreeSlicer. Slice is probably the method you want to call.
+ * The main class of TreeSlicer. Execute is probably the method you want to call.
  * @author Nick
  *
  */
 public class Run {
 
 	public static void main(String[] args) throws IOException {
-		execute("./Prints/DBZ.stl","./Prints/DBS.stl", "DBZNew");
-//		BufferedReader brp = new BufferedReader(new FileReader(args[0]));
-//		BufferedReader brs = new BufferedReader(new FileReader(args[1]));
-//		BufferedReader brc = new BufferedReader(new FileReader(args[2]));
-//		String part = "", config = "", surface = "";
-//		String line;
-//		while((line=brp.readLine())!=null){
-//			part = part + line+'\n';
-//		}
-//		while((line=brs.readLine())!=null){
-//			surface = surface + line+'\n';
-//		}
-//		while((line=brc.readLine())!=null){
-//			config = config+line+'\n';
-//		}
-//		brp.close();
-//		brs.close();
-//		brc.close();
-//		slice(part, surface, config,"output");
+		execute(args[0], args[1], args[2],"output");
 	}
-	private static void execute(String partStr, String surfaceStr, String output){
+	private static void execute(String partStr, String surfaceStr, String configStr, String output){
 		Model3D part = null;
 		Surface3D surface = null;		
 		Slicer s = null;
 		try {
 			part = Stli.importModel(partStr, false);
 			surface = Stli.importSurface(surfaceStr, false);
-			s = new Slicer(part, surface, "config1.txt");
+			s = new Slicer(part, surface, configStr);
 		} catch (FileNotFoundException e){
 			System.out.println(e.getMessage());
 			return;
