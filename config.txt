@@ -1,11 +1,11 @@
 //Configure accordingly for your machine.
 layerHeight 0.3 mm
-filD 1.75 mm		//filament diameter
-nozzleD 0.4 mm		//nozzle diameter
-extrusionWidth .55 mm
-printTemp 200 C	
+filD 1.75 mm		//filament diameter, set your own.
+nozzleD 0.4 mm		//nozzle diameter, set your own.
+extrusionWidth .55 mm //Set to about 11/8 nozzleD. Subject to change.
+printTemp 200 C		//Set for your plastic.
 xySpeed 20 mm/s	//Max speed on XY, i just set this low for the first prints.
-zSpeed 7 mm/s	//Maximum speed on your z axis. I might be using the wrong units here because my mendel90 tops out at 4.
+zSpeed 7 mm/s	//Maximum speed on your z axis. Set this low at first, they're easy to stall...
 numShells 3
 infillWidth 4.5 mm		//Distance between lines of infill on non-solid layers.
 lift 0 mm		//Z lift for travels, should be half the layer height or slightly less.
@@ -18,4 +18,4 @@ AllSolid true  //Print all layers as solid.
 brimCount 11
 TipRadius 0.2	 //Used for nozzle compensation, set to 0 to disable.
 FirmwareRetract false
-OuterFirst true 
+OuterFirst true 	//Print shells outside first or inside first. In general, try to print lower ones first.
