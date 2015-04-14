@@ -1,4 +1,4 @@
-TreeSlicer
+Bread
 ==========
 
 This is an experimental slicer which allows users to print with 3D layers on conventional FDM machines.
