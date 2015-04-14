@@ -18,6 +18,18 @@ To simply use this Slicer:
 
 4. In command line or shell, navigate to your chosen directory and execute Bread.jar [path to part.stl] [path to surface.stl] [path to config.txt] [path to write to]
 
+Why 3D Layers?
+==========
+In short, why not? We have these machines that can move in 3 dimensions, we should probably make them move in 3 dimensions. In terms of actual tangible benefits, adjusting your layer shape can:
+
+-Eliminate the stairstep pattern typically seen on angled surfaces
+
+-Reduce and manipulate the directional weakness caused by layer-layer bonds
+
+-Print steeper overhangs without support material
+
+-Manipulate which parts get printed first to reduce the number of material switches in multimaterial printing (future feature)
+
 Contributing
 ==========
 While people are free to jump on this now, I'll be doing some pretty significant restructuring over the Summer. If you're eager to make a lasting contribution, the best way to do so is to optimize or improve some of the core components. For example, an octree implementation of Mesh3D.overlap could be dramatically faster than the current radix check, but I haven't gotten around to writing one. Surface3D.project(Point2D p) could benefit from similar optimizations.
