@@ -18,7 +18,7 @@ import mesh3d.Surface3D;
 public class Run {
 
 	public static void main(String[] args) throws IOException {
-		execute(args[0], args[1], args[2],"output");
+		execute(args[0], args[1], args[2],args[3]);
 	}
 	private static void execute(String partStr, String surfaceStr, String configStr, String output){
 		Model3D part = null;
