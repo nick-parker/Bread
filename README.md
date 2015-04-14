@@ -3,6 +3,18 @@ Bread
 
 This is an experimental slicer which allows users to print with 3D layers on conventional FDM machines.
 
+Why 3D Layers?
+==========
+In short, why not? We have these machines that can move in 3 dimensions, we should probably make them move in 3 dimensions. In terms of actual tangible benefits, adjusting your layer shape can:
+
+-Eliminate the stairstep pattern typically seen on angled surfaces
+
+-Reduce and manipulate the directional weakness caused by layer-layer bonds
+
+-Print steeper overhangs without support material
+
+-Manipulate which parts get printed first to reduce the number of material switches in multimaterial printing (future feature)
+
 Getting Started
 ==========
 At this time, I can make absolutely no guarantees about the behavior of this Slicer. Most hardware was not designed with constant rapid Z motion in mind. There are definitely still bugs in this code, some of which may cause bed crashes, jerky movement that causes skipped steps, etc. No Guarantees.
@@ -24,18 +36,6 @@ Your layer shape needs to cover everywhere the head is going to go in X and Y, s
 I haven't really characterized the effects of NozzleOffset. It essentially tries to make up for the fact that parts of the code treat the disk-like nozzle as if it's a point. You can enable or disable it by simply setting TipRadius to 0, or your nozzle radius respectively. Enabling it will cause a lot of stress on your Z axis, but may improve surface finish.
 
 You may notice that with steep layer shapes the surface finish gets awful very quickly. This is caused by the leading edge of your nozzle colliding with the previous layer. In general, don't angle your surface up above the XY plane by more than arctan(layer height / nozzle diameter). If you aren't using a NozzleOffset (TipRadius set to 0), this angle limit is lower.
-
-Why 3D Layers?
-==========
-In short, why not? We have these machines that can move in 3 dimensions, we should probably make them move in 3 dimensions. In terms of actual tangible benefits, adjusting your layer shape can:
-
--Eliminate the stairstep pattern typically seen on angled surfaces
-
--Reduce and manipulate the directional weakness caused by layer-layer bonds
-
--Print steeper overhangs without support material
-
--Manipulate which parts get printed first to reduce the number of material switches in multimaterial printing (future feature)
 
 Contributing
 ==========
