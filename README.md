@@ -15,6 +15,9 @@ In short, why not? We have these machines that can move in 3 dimensions, we shou
 
 -Manipulate which parts get printed first to reduce the number of material switches in multimaterial printing (future feature)
 
+Here's an example print:
+![Wavy.](/Pictures/wave.jpg?raw=true)
+
 Getting Started
 ==========
 At this time, I can make absolutely no guarantees about the behavior of this Slicer. Most hardware was not designed with constant rapid Z motion in mind. There are definitely still bugs in this code, some of which may cause bed crashes, jerky movement that causes skipped steps, etc. No Guarantees.
