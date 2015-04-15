@@ -15,7 +15,7 @@ retractThreshold 10 mm	//Minimum XY travel distance to trigger retraction.
 topLayers 5  //Solid layers on the top and bottom.
 botLayers 5
 AllSolid true  //Print all layers as solid.
-brimCount 11
+brimCount 0
 TipRadius 0.2	 //Used for nozzle compensation, set to 0 to disable.
 FirmwareRetract false
 OuterFirst true 	//Print shells outside first or inside first. In general, try to print lower ones first.

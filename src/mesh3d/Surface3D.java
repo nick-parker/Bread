@@ -136,6 +136,8 @@ public class Surface3D extends Mesh3D{
 			}
 			//Otherwise the associated triangle can't possibly reach this point.
 		}
+
+        // If we got here, that means the point is trying to be projected outside of the bounding box.
 		Box3D b = this.boundingBox();
 		System.out.println("Point " + p.getX()+" "+p.getY() + " Failed to project.");
 		System.out.println("X bounds: "+ b.getMinX()+" : "+b.getMaxX()+" Y bounds: "+b.getMinY()+" : "+b.getMaxY());

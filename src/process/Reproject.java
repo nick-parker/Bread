@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import main.Slicer;
 import math.geom2d.Point2D;
+import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import structs.Extrusion2D;
@@ -80,6 +81,16 @@ public class Reproject {
 	 */
 	private Point3D projectPoint(Point2D p){
 		Point3D hit = s.shape.project(p);
+
+        if(hit == null) {
+            Box3D bb = s.shape.boundingBox();
+
+            // IF WE GOT HERE IT'S BAD. IT MEANS A POINT WAS PROJECTED OUTSIDE OF THE BOUNDING BOX
+            // I feel bad.
+            // Sorry for yelling.
+            hit = s.shape.project(new Point2D(bb.getMinX(), bb.getMinY()));
+        }
+
 		if(hit.getZ()+to()<s.zMin){	//TODO reimplement this check in a way that doesn't cause discontinuities.
 			return new Point3D(hit.getX(),hit.getY(),s.zMin);
 		}
