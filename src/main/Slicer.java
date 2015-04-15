@@ -50,7 +50,12 @@ public class Slicer {
 	public double retraction;
 	public double retractSpeed;
 	public double retractThreshold;
-	public double zMin = 0;
+    public double xMax = 0;
+    public double yMax = 0;
+    public double zMax = 0;
+    public double xMin = 0;
+    public double yMin = 0;
+    public double zMin = 0;
 	public boolean FirmwareRetract = false;
 	public int topLayerStart;
 	public int botLayers;
@@ -66,7 +71,8 @@ public class Slicer {
 	public double minInfillLength = 0.5;
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
-			double lift, double retraction, double retractSpeed, double retractThreshold, int topLayers, int botLayers) throws IOException{
+			double lift, double retraction, double retractSpeed, double retractThreshold, int topLayers, int botLayers,
+            double xMax, double yMax, double zMax, double xMin, double yMin, double zMin) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
 		this.extrusionWidth = extrusionWidth;
@@ -88,6 +94,13 @@ public class Slicer {
 		this.layerCount = layerCount();
 		this.topLayerStart = layerCount-topLayers;
 		this.botLayers = botLayers;
+        this.xMax = xMax;
+        this.yMax = yMax;
+        this.zMax = zMax;
+        this.xMin = xMin;
+        this.yMin = yMin;
+        this.zMin = zMin;
+
 		//Cross sectional area of the extrusion is the ratio of plastic volume/XYZ distance, units mm^2
 		//volume rate * filament distance/unit volume = filament rate. filament distance/unit volume is cx area of filament.
 		this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
@@ -181,6 +194,24 @@ public class Slicer {
 				case "OuterFirst":
 					this.OuterFirst = Boolean.parseBoolean(line[1]);
 					break;
+                case "XMax":
+                    this.xMax = Double.parseDouble(line[1]);
+                    break;
+                case "YMax":
+                    this.yMax = Double.parseDouble(line[1]);
+                    break;
+                case "ZMax":
+                    this.zMax = Double.parseDouble(line[1]);
+                    break;
+                case "XMin":
+                    this.xMin = Double.parseDouble(line[1]);
+                    break;
+                case "YMin":
+                    this.yMin = Double.parseDouble(line[1]);
+                    break;
+                case "ZMin":
+                    this.zMin = Double.parseDouble(line[1]);
+                    break;
 				}
 			}
 			this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
