@@ -45,7 +45,6 @@ public class Slicer {
 	public double infillDir = 45*Math.PI/180.0;	//Direction of infill on layer 0;
 	public double infillAngle = 90*Math.PI/180.0;	//Amount to change infill direction each layer, radians CW.
 	public double lift;	//Amount to lift for travel moves.
-	public LineSegment2D[] topo;
 	public double EperL;	//E increase per unit L increase.
 	public double retraction;
 	public double retractSpeed;
@@ -90,7 +89,7 @@ public class Slicer {
 		this.infillAngle = infillAngle*Math.PI/180.0;
 		this.part = part;
 		this.shape = shape;
-		this.topo = shape.topology();
+		shape.generateTopology();
 		this.lift = lift;
 		this.retraction = retraction;
 		this.retractSpeed = retractSpeed;
@@ -219,7 +218,7 @@ public class Slicer {
             this.setBedDimensions(new Vector3D(xMin, yMin, zMin), new Vector3D(xMax, yMax, zMax));
 
 			this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
-			this.topo = shape.topology();
+			shape.generateTopology();
 			this.layerCount = layerCount();
 			this.topLayerStart = layerCount-topLayerStart;
 

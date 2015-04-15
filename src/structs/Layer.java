@@ -115,8 +115,8 @@ public class Layer {
 					lp,
 					np,
 					lp.distance(np)>s.retractThreshold ? ET.travel : ET.nonretracting)	//Retract is 0, nonretracting is 3.
-					).splitExtrusion(s.topo));
+					).splitExtrusion(s.shape.topo));
 		}
-		output.addAll(e.splitExtrusion(s.topo));
+		output.addAll(e.splitExtrusion(s.shape.topo));
 	}
 }

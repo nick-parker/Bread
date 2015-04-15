@@ -26,15 +26,14 @@ abstract class Mesh3D implements Shape3D{
 	 * This should probably be changed to return a new Mesh to match the functionality of Tri3D.move, and to make multithreading
 	 * step 1 easy/possible.
 	 */
-	public void move(Vector3D v){{
+	public void move(Vector3D v){
 		Tri3D[] newTris = new Tri3D[tris.length];
 		int i=0;
 		for(Tri3D t:tris){
 			newTris[i]=t.move(v);
 			i++;
-			}
+        }
 		tris=newTris;
-		};
 	}
 	/**
 	 * @param v Direction to search
