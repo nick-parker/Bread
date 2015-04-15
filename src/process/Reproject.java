@@ -83,11 +83,7 @@ public class Reproject {
 		Point3D hit = s.shape.project(p);
 
         if(hit == null) {
-            Box3D bb = s.shape.boundingBox();
-
-            // IF WE GOT HERE IT'S BAD. IT MEANS A POINT WAS PROJECTED OUTSIDE OF THE BOUNDING BOX
-            // I feel bad.
-            // Sorry for yelling.
+            // If we failed to project the point, just project the 2d point in to 3d space by directly converting a 2d point in to a 3d point, using a calculated z height.
             hit = new Point3D(p.getX(), p.getY(), to());
         }
 
