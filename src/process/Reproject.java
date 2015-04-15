@@ -88,7 +88,7 @@ public class Reproject {
             // IF WE GOT HERE IT'S BAD. IT MEANS A POINT WAS PROJECTED OUTSIDE OF THE BOUNDING BOX
             // I feel bad.
             // Sorry for yelling.
-            hit = s.shape.project(new Point2D(bb.getMinX(), bb.getMinY()));
+            hit = new Point3D(p.getX(), p.getY(), to());
         }
 
 		if(hit.getZ()+to()<s.zMin){	//TODO reimplement this check in a way that doesn't cause discontinuities.
