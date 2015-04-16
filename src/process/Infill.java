@@ -2,11 +2,13 @@ package process;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import structs.Extrusion2D;
 import structs.Loop;
 import structs.Extrusion2D.ET;
 import utils.Utils2D;
+import main.Constants;
 import main.Slicer;
 import math.geom2d.Box2D;
 import math.geom2d.Point2D;
@@ -38,9 +40,10 @@ public class Infill {
 			regionPs = ToPoints(loops);
 		}
 		if(regionPs==null) return null;
+		//Convert to a set of edges for intersecting with.
 		MultiPolygon2D region = NativeInset.GetRegion(regionPs);	//Convert to a multipolygon for some convenience.
 		Collection<LineSegment2D> edges = region.edges();	//Get the edges of the multipolygon
-		
+		edges.removeIf(new Tiny()); //Fix degenerateLines that seem to only turn up here.
 		//Calculate the CW angle from +x to run infill on this layer.
 		double a = (s.infillDir+layerNumber*s.infillAngle);	//CW angle infill lines make with x axis. %(2*Math.PI)
 		
@@ -76,6 +79,14 @@ public class Infill {
 			l = l.parallel(offset);
 		}
 		return output;
+	}
+	private static class Tiny implements Predicate<LineSegment2D>{
+
+		@Override
+		public boolean test(LineSegment2D t) {
+			return t.length()<=Constants.tol;
+		}
+		
 	}
 	private static ArrayList<ArrayList<Point2D>> ToPoints(ArrayList<Loop> loops) {
 		ArrayList<ArrayList<Point2D>> output = new ArrayList<ArrayList<Point2D>>();

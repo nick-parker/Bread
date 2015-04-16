@@ -31,7 +31,6 @@ import com.vividsolutions.jts.operation.buffer.BufferOp;
  */
 public class NativeInset {
 	private static GeometryFactory gf = new GeometryFactory();
-//	static boolean UseClipperLib = false;
 	/**
 	 * Inset the provided paths by the given distance d.
 	 * @param loops An ArrayList of Loop objects passed out of the Order function
@@ -39,16 +38,6 @@ public class NativeInset {
 	 * @return A new set of loops represented as an arraylist of arraylists of points.
 	 */
 	public static ArrayList<ArrayList<Point2D>> inset(ArrayList<Loop> loops, double d){
-//		if(UseClipperLib){
-//			ArrayList<ArrayList<Point2D>> points = new ArrayList<ArrayList<Point2D>>();
-//			for(Loop l:loops){
-//				if(!l.checkClosure()) System.out.println("Unclosed loop in NativeInset");
-//				points.add(l.getPointLoop());
-//			}
-//			ArrayList<ArrayList<Point2D>> output = inset(d,points);
-//			System.out.println(output);
-//			return output;
-//		}
 		return jtsInset(-d,loops);
 	}
 	public static ArrayList<ArrayList<Point2D>> inset(double d, ArrayList<ArrayList<Point2D>> ps){
@@ -62,7 +51,6 @@ public class NativeInset {
 		BufferOp bf = new BufferOp(mp);
 		bf.setQuadrantSegments(5);
 		Geometry g = bf.getResultGeometry(d);
-//		ArrayList<Polygon> polies = new ArrayList<Polygon>();
 		@SuppressWarnings("unchecked")
 		List<Polygon> polies = (List<Polygon>)PolygonExtracter.getPolygons(g);
 		ArrayList<ArrayList<Point2D>> output = new  ArrayList<ArrayList<Point2D>>();
