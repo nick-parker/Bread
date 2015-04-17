@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import main.Slicer;
 import math.geom2d.Point2D;
+import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.line.LineSegment3D;
 import mesh3d.SimplePlane;
@@ -17,7 +18,8 @@ public class Brim {
 	public static ArrayList<Extrusion3D> brim(Slicer s, int count, Point2D lst){
 		if(count==0) return new ArrayList<Extrusion3D>();
 		double z = s.layerHeight*.75;
-		Surface3D plane = SimplePlane.MakePlane(-100, -100, 100, 100, z);
+		Box3D bb = s.part.boundingBox();
+		Surface3D plane = SimplePlane.MakePlane(bb.getMinX()-5, bb.getMinY()-5, bb.getMaxX()+5, bb.getMaxY()+5, z);
 		LineSegment3D[] overlap = plane.overlap(s.part);
 		ArrayList<Loop> loops = Order.ListOrder(Flatten.FlattenZ(overlap));
 		ArrayList<ArrayList<Extrusion2D>> ls = new ArrayList<ArrayList<Extrusion2D>>();

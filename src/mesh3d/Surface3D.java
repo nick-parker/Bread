@@ -17,7 +17,9 @@ import math.geom3d.line.StraightLine3D;
 
 public class Surface3D extends Mesh3D{
 	double offset;	//Z offset applied to this surface.
-	private Hashtable<Point2D,Tri3D> TriMap;
+
+    public LineSegment2D[] topo;
+    private Hashtable<Point2D,Tri3D> TriMap;
 	private ArrayList<Point2D> ps;
 	private double MaxRad;	//Length of the longest edge in this mesh, useful for reprojection.
 	private boolean PerimsMade = false;
@@ -53,7 +55,7 @@ public class Surface3D extends Mesh3D{
 
 	@Override
 	public boolean closed(){return false;};
-	
+
 	public LineSegment3D[] overlap(Mesh3D m){
 		LineSegment3D[] output = new LineSegment3D[m.triCount()*this.triCount()];
 		int j=0;
@@ -82,7 +84,7 @@ public class Surface3D extends Mesh3D{
 	 * the output of this function is a set of 2D line segments.
 	 * @return A 2d projection of this Surface's topology.
 	 */
-	public LineSegment2D[] topology(){
+	public LineSegment2D[] generateTopology(){
 		ArrayList<LineSegment2D> output = new ArrayList<LineSegment2D>();;
 		for(Tri3D t:tris){
 			Point2D[] ps = t.getPoints2D();
@@ -105,7 +107,8 @@ public class Surface3D extends Mesh3D{
 				if(checks[i])output.add(ls[i]);
 			}
 		}
-		return output.toArray(new LineSegment2D[output.size()]);
+        this.topo = output.toArray(new LineSegment2D[output.size()]);
+		return this.topo;
 	}
 	/**
 	 * Set the amount by which this surface is offset from its "true" position in the Z axis.
@@ -136,6 +139,8 @@ public class Surface3D extends Mesh3D{
 			}
 			//Otherwise the associated triangle can't possibly reach this point.
 		}
+
+        // If we got here, that means the point is trying to be projected outside of the bounding box.
 		Box3D b = this.boundingBox();
 		System.out.println("Point " + p.getX()+" "+p.getY() + " Failed to project.");
 		System.out.println("X bounds: "+ b.getMinX()+" : "+b.getMaxX()+" Y bounds: "+b.getMinY()+" : "+b.getMaxY());
@@ -143,16 +148,10 @@ public class Surface3D extends Mesh3D{
 		return null;
 	}
 	@Override
-	public void move(Vector3D v){{
-		Tri3D[] newTris = new Tri3D[tris.length];
-		int i=0;
-		for(Tri3D t:tris){
-			newTris[i]=t.move(v);
-			i++;
-			}
-		tris=newTris;
-		};
+	public void move(Vector3D v) {
+        super.move(v);
 		makeMaps();
+        generateTopology();
 	}
 	public double getOffset() {
 		return offset;
