@@ -19,3 +19,9 @@ brimCount 11
 TipRadius 0.2	 //Used for nozzle compensation, set to 0 to disable.
 FirmwareRetract false
 OuterFirst false 	//Print shells outside first or inside first. In general, try to print lower ones first.
+XMax 200 mm
+YMax 200 mm
+ZMax 200 mm
+XMin 0 mm
+YMin 0 mm
+ZMin 0 mm

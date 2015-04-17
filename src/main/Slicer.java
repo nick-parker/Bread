@@ -31,8 +31,8 @@ import mesh3d.Surface3D;
  * parameter set by its constructor, but for now non-final values are set manually in source code for testing.
  */
 public class Slicer {
-	public Model3D part;
-	public Surface3D shape;
+	public Model3D part; // The mesh of the part being printed
+	public Surface3D shape; // A mesh representing the shape of the layers
 	public double layerHeight;
 	public double filD;
 	public double nozzleD;
@@ -45,12 +45,20 @@ public class Slicer {
 	public double infillDir = 45*Math.PI/180.0;	//Direction of infill on layer 0;
 	public double infillAngle = 90*Math.PI/180.0;	//Amount to change infill direction each layer, radians CW.
 	public double lift;	//Amount to lift for travel moves.
-	public LineSegment2D[] topo;
 	public double EperL;	//E increase per unit L increase.
 	public double retraction;
 	public double retractSpeed;
 	public double retractThreshold;
-	public double zMin = 0;
+    public double xMax = 0;
+    public double yMax = 0;
+    public double zMax = 0;
+    public double xMin = 0;
+    public double yMin = 0;
+    public double zMin = 0;
+    public Vector3D bedMin = new Vector3D(0,0,0);
+    public Vector3D bedMax = new Vector3D(0,0,0);
+    public Vector3D bedCenter = new Vector3D(0,0,0);
+
 	public boolean FirmwareRetract = false;
 	public int topLayerStart;
 	public int botLayers;
@@ -66,7 +74,8 @@ public class Slicer {
 	public double minInfillLength = 0.5;
 	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
 			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
-			double lift, double retraction, double retractSpeed, double retractThreshold, int topLayers, int botLayers) throws IOException{
+			double lift, double retraction, double retractSpeed, double retractThreshold, int topLayers, int botLayers,
+            double xMax, double yMax, double zMax, double xMin, double yMin, double zMin) throws IOException{
 		this.filD = filD;
 		this.nozzleD = nozzleD;
 		this.extrusionWidth = extrusionWidth;
@@ -80,7 +89,7 @@ public class Slicer {
 		this.infillAngle = infillAngle*Math.PI/180.0;
 		this.part = part;
 		this.shape = shape;
-		this.topo = shape.topology();
+		shape.generateTopology();
 		this.lift = lift;
 		this.retraction = retraction;
 		this.retractSpeed = retractSpeed;
@@ -88,10 +97,14 @@ public class Slicer {
 		this.layerCount = layerCount();
 		this.topLayerStart = layerCount-topLayers;
 		this.botLayers = botLayers;
+
+        this.setBedDimensions(new Vector3D(xMin, yMin, zMin), new Vector3D(xMax, yMax, zMax));
+
 		//Cross sectional area of the extrusion is the ratio of plastic volume/XYZ distance, units mm^2
 		//volume rate * filament distance/unit volume = filament rate. filament distance/unit volume is cx area of filament.
 		this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
 	}
+
 	/**
 	 * Load a slicer config for the given meshes.
 	 * @param config
@@ -105,12 +118,13 @@ public class Slicer {
 			e.printStackTrace();
 		}
 	}
-	public Slicer(Model3D part, Surface3D shape, Reader r){
+
+    public Slicer(Model3D part, Surface3D shape, Reader r){
 		this.part = part;
 		this.shape = shape;
 		configure(r);
 	}
-	private void configure(Reader r){
+    private void configure(Reader r){
 		BufferedReader f;
 		try {
 			f = new BufferedReader(r);
@@ -181,26 +195,53 @@ public class Slicer {
 				case "OuterFirst":
 					this.OuterFirst = Boolean.parseBoolean(line[1]);
 					break;
+                case "XMax":
+                    this.xMax = Double.parseDouble(line[1]);
+                    break;
+                case "YMax":
+                    this.yMax = Double.parseDouble(line[1]);
+                    break;
+                case "ZMax":
+                    this.zMax = Double.parseDouble(line[1]);
+                    break;
+                case "XMin":
+                    this.xMin = Double.parseDouble(line[1]);
+                    break;
+                case "YMin":
+                    this.yMin = Double.parseDouble(line[1]);
+                    break;
+                case "ZMin":
+                    this.zMin = Double.parseDouble(line[1]);
+                    break;
 				}
 			}
+            this.setBedDimensions(new Vector3D(xMin, yMin, zMin), new Vector3D(xMax, yMax, zMax));
+
 			this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
-			this.topo = shape.topology();
+			shape.generateTopology();
 			this.layerCount = layerCount();
 			this.topLayerStart = layerCount-topLayerStart;
-		} catch (Exception e) {
+
+
+        } catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	/**
+    /**
 	 * Position shape so that its highest point is layerHeight/2 above the part's lowest point.
 	 */
 	private void PositionShape(){
-		Box3D b1 = shape.boundingBox();
-		Box3D b2 = part.boundingBox();
-		Vector3D mv = new Vector3D(0,0,b2.getMinZ()-b1.getMaxZ()+layerHeight);
+		Box3D shapeBb = shape.boundingBox();
+		Box3D partBb = part.boundingBox();
+
+        double xOffset = bedCenter.getX() - ((partBb.getMaxX() - partBb.getMinX()) * 0.5);
+        double yOffset = bedCenter.getY() - ((partBb.getMaxY() - partBb.getMinY()) * 0.5);
+
+        Vector3D mv = new Vector3D(xOffset,yOffset,partBb.getMinZ()-shapeBb.getMaxZ()+layerHeight);
 		shape.move(mv);
-		b1 = shape.boundingBox();
-		System.out.println("New max Z: " + b1.getMaxZ());
+        part.move(new Vector3D(xOffset, yOffset,0));
+		shapeBb = shape.boundingBox();
+		System.out.println("New max Z: " + shapeBb.getMaxZ());
 		Vector3D layerUp = new Vector3D(0,0,layerHeight);
 		Vector3D layerDown = new Vector3D(0,0,-layerHeight);
 		//TODO Figure out why the hell this is necessary... Bounding Box implementation is probably broken junk?
@@ -213,7 +254,7 @@ public class Slicer {
 			shape.move(layerUp);
 		}
 	}
-	private int layerCount(){
+    private int layerCount(){
 		PositionShape();
 		Box3D b1 = shape.boundingBox();
 		Box3D b2 = part.boundingBox();
@@ -228,22 +269,22 @@ public class Slicer {
 		}
 		shape.setOffset(0);
 		return max;
-		
-		
+
+
 	}
-	/**
+    /**
 	 * Check if a layer with the given number would be empty.
 	 * @param layerNum
 	 * @return
 	 */
 	private boolean checkEmpty(int layerNum){
-		shape.setOffset(layerNum*layerHeight);
+		shape.setOffset(layerNum * layerHeight);
 //		LineSegment3D[] overlap = shape.overlap(part);
 		return !shape.intersect(part);
 	}
-	public void slice(Writer w){
+    public void slice(Writer w){
 //		PositionShape();
-		part.move(new Vector3D(0,0,zMin));
+		part.move(new Vector3D(0, 0, zMin));
 		GcodeExport g = new GcodeExport(w, this);
 		g.writeFromFile("start.gcode");
 		g.setTempAndWait(this.printTemp);
@@ -260,14 +301,14 @@ public class Slicer {
 		g.writeFromFile("end.gcode");
 		g.close();
 	}
-	public void slice(String fileLoc){
+    public void slice(String fileLoc){
 		try {
 			slice(new FileWriter(fileLoc));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	private Point2D doLayer(int n, GcodeExport g, Point2D last){
+    private Point2D doLayer(int n, GcodeExport g, Point2D last){
 		SmartLayer l = new SmartLayer(this,n);
 		l.makeChunks();
 //		Layer l = new Layer(this,n);
@@ -279,12 +320,12 @@ public class Slicer {
 		Reproject r = new Reproject(l.offset,this);
 		ArrayList<Extrusion3D> path = NozzleOffset.offset(r.Proj(p),TipRadius);
 //		ArrayList<Extrusion3D> path =  r.Proj(p);
-		g.addLayer(path,n);	
+		g.addLayer(path,n);
 		return last;
 	}
-	public void debug(String fileLoc){
+    public void debug(String fileLoc){
 		PositionShape();
-		part.move(new Vector3D(0,0,zMin));
+		part.move(new Vector3D(0, 0, zMin));
 		int lc = layerCount;
 		IntersectTest t = new IntersectTest(fileLoc);
 		for(int n=0;n<lc;n++){
@@ -294,4 +335,42 @@ public class Slicer {
 		}
 		t.close();
 	}
+    public void setBedDimensions(Vector3D min, Vector3D max) {
+        this.setBedMin(min);
+        this.setBedMax(max);
+        this.setBedCenter();
+    }
+
+    public void setBedMin(Vector3D vec){
+        this.xMin = vec.getX();
+        this.yMin = vec.getY();
+        this.zMin =vec.getZ();
+        this.bedMin = vec;
+    }
+
+    public void setBedMin(double x,double y,double z){
+        this.xMin = x;
+        this.yMin = y;
+        this.zMin = z;
+        this.bedMin = new Vector3D(x,y,z);
+    }
+
+
+    public void setBedMax(double x,double y,double z){
+        this.xMax = x;
+        this.yMax = y;
+        this.zMax = z;
+        this.bedMax = new Vector3D(x,y,z);
+    }
+
+    public void setBedMax(Vector3D vec){
+        this.xMax = vec.getX();
+        this.yMax = vec.getY();
+        this.zMax =vec.getZ();
+        this.bedMax = vec;
+    }
+
+    public void setBedCenter(){
+        this.bedCenter = bedMax.minus(bedMin).times(0.5);
+    }
 }

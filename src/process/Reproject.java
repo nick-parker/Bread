@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import main.Slicer;
 import math.geom2d.Point2D;
+import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import structs.Extrusion2D;
@@ -80,6 +81,12 @@ public class Reproject {
 	 */
 	private Point3D projectPoint(Point2D p){
 		Point3D hit = s.shape.project(p);
+
+        if(hit == null) {
+            // If we failed to project the point, just project the 2d point in to 3d space by directly converting a 2d point in to a 3d point, using a calculated z height.
+            hit = new Point3D(p.getX(), p.getY(), to());
+        }
+
 		if(hit.getZ()+to()<s.zMin){	//TODO reimplement this check in a way that doesn't cause discontinuities.
 			return new Point3D(hit.getX(),hit.getY(),s.zMin);
 		}
