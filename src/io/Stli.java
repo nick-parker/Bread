@@ -49,7 +49,8 @@ public class Stli {
 					if(!inFace||i!=3){
 						throw new IllegalArgumentException("Invalid .stl file.");
 					}
-					tris.add(new Tri3D(ps[0],ps[1],ps[2]));
+					Tri3D a = new Tri3D(ps[0],ps[1],ps[2]);
+					if(!a.degenerate())tris.add(a);
 					ps = new Point3D[]{Constants.origin,Constants.origin,Constants.origin};
 					i=0;
 					inFace = false;
@@ -97,7 +98,8 @@ public class Stli {
 					double d = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN ).getFloat();
 					ps[j]=d;
 				}
-				ts.add(t3d(ps));
+				Tri3D a = t3d(ps);
+				if(!a.degenerate())ts.add(a);
 				is.skip(2);
 				if(done) break;
 			}

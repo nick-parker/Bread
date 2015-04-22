@@ -31,6 +31,7 @@ public class Surface3D extends Mesh3D{
 //		}
 		this.tris = ts;
 		offset = 0;
+		initTree();
 		makeMaps();
 	}
 	/**

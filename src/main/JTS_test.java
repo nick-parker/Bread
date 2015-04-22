@@ -1,32 +1,24 @@
 package main;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.operation.buffer.BufferOp;
+import java.io.IOException;
+
+import math.geom3d.Point3D;
+import math.geom3d.Vector3D;
+import mesh3d.Model3D;
+import mesh3d.Tri3D;
+import io.Stli;
 
 public class JTS_test {
-	public static void main(String[] args){
-		Coordinate c0 = new Coordinate(0.0,0.0);
-		Coordinate c1 = new Coordinate(0.0,20.0);
-		Coordinate c2 = new Coordinate(20.0,20.0);
-		Coordinate c3 = new Coordinate(20.0,0.0);
-		Coordinate[] cs = new Coordinate[]{c0,c1,c2,c3,c0};
-		GeometryFactory gf = new GeometryFactory();
-		System.out.println(gf.getPrecisionModel());
-		LinearRing lr = gf.createLinearRing(cs);
-		Coordinate h0 = new Coordinate(4,4);
-		Coordinate h1 = new Coordinate(8,4);
-		Coordinate h2 = new Coordinate(8,8);
-		Coordinate h3 = new Coordinate(4,8);
-		Coordinate[] hs = new Coordinate[]{h0,h1,h2,h3,h0};
-		LinearRing[] holes = new LinearRing[]{gf.createLinearRing(hs)};
-		Polygon p = gf.createPolygon(lr, holes);
-		BufferOp bf = new BufferOp(p);
-		bf.setQuadrantSegments(1);
-		Geometry lr2 = bf.getResultGeometry(-1);
-		System.out.println(lr2);
+	public static void main(String[] args) throws IOException{
+		Model3D m = Stli.importModel("./Prints/wave.stl",false);
+		System.out.println("Imported.");
+		Point3D p0 = new Point3D(-5,-5,3);
+		Point3D p1 = new Point3D(0,1,3);
+		Point3D p2 = new Point3D(1,0,3);
+		Tri3D t = new Tri3D(p0,p1,p2);
+		System.out.println(t);
+		System.out.println(m.triTree.getIntersectible(t));
+		System.out.println(m.intersect(t));
+		
 	}
 }

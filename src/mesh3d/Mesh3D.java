@@ -2,6 +2,7 @@ package mesh3d;
 
 import java.util.Arrays;
 
+import structs.OctTree;
 import main.Constants;
 import math.geom3d.Box3D;
 import math.geom3d.Point3D;
@@ -11,6 +12,7 @@ import math.geom3d.transform.AffineTransform3D;
 
 abstract class Mesh3D implements Shape3D{
 	protected Tri3D[] tris;
+	public OctTree<Tri3D> triTree;
 	/**
 	 * Generate the smallest possible axis aligned box which contains this mesh.
 	 */
@@ -34,6 +36,8 @@ abstract class Mesh3D implements Shape3D{
 			i++;
         }
 		tris=newTris;
+		initTree();
+//		triTree.move(v);
 	}
 	/**
 	 * @param v Direction to search
@@ -74,15 +78,25 @@ abstract class Mesh3D implements Shape3D{
 	public int triCount(){return tris.length;}
 	
 	public boolean intersect(Mesh3D m){
-		for(Tri3D tS : tris){
-			for(Tri3D tM : m.tris){
-				if(Math.abs(tS.getPoint3D(0).getZ()-tM.getPoint3D(0).getZ())>tS.zradius+tM.zradius) continue;
-				if(tS.getPoint(0).distance(tM.getPoint(0))>tS.radius+tM.radius) continue;
-				Point3D[] overlap = tS.overlap(tM);
-				if(overlap!=null&&overlap.length>0) return true;
-			}
+		for(Tri3D tM : m.tris){
+			if(this.intersect(tM)) return true;
 		}
 		return false;
+	}
+	public boolean intersect(Tri3D t){
+//		for(Tri3D tM : this.triTree.getIntersectible(t)){
+		for(Tri3D tM : this.tris){
+			Point3D[] overlap = t.overlap(tM);
+			if(overlap!=null&&overlap.length>0) return true;
+		}
+		return false;
+	}
+	protected void initTree(){
+		Box3D bb = this.boundingBox();
+		Vector3D min = new Vector3D(bb.getMinX()-1,bb.getMinY()-1,bb.getMinZ()-1);
+		Vector3D max = new Vector3D(bb.getMaxX()+1,bb.getMaxY()+1,bb.getMaxZ()+1);
+		this.triTree = new OctTree<Tri3D>(min,max, new OctTree.TriLocator());
+		this.triTree.addAll(tris);
 	}
 	//Unimplemented inherited methods below this point.
 	/**

@@ -245,7 +245,7 @@ public class Slicer {
 		Vector3D layerUp = new Vector3D(0,0,layerHeight);
 		Vector3D layerDown = new Vector3D(0,0,-layerHeight);
 		//TODO Figure out why the hell this is necessary... Bounding Box implementation is probably broken junk?
-		while(!checkEmpty(0)){
+		while(!checkEmpty(-1)){
 			System.out.println("Moving Down");
 			shape.move(layerDown);
 		}
@@ -262,6 +262,7 @@ public class Slicer {
 		double distance = b1.getDepth()+b2.getDepth()-layerHeight/2;
 		int max = 1+(int) Math.ceil(distance/layerHeight);
 		int min = 0;
+		//binary search for the last layer.
 		while(!checkEmpty(min)&&checkEmpty(max)&&min<max-1){
 			int mid = (min+max)/2;
 			if(checkEmpty(mid)) max=mid;
@@ -274,6 +275,7 @@ public class Slicer {
 	}
     /**
 	 * Check if a layer with the given number would be empty.
+	 * Warning: Changes shape offset. Change back after call if necessary.
 	 * @param layerNum
 	 * @return
 	 */

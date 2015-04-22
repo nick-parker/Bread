@@ -234,5 +234,12 @@ public class Tri3D{
 	public Plane3D plane() {
 		return pl;
 	}
+	/**
+	 * 
+	 * @return If this is a degenerate Triangle, eg a line or point.
+	 */
+	public boolean degenerate(){
+		return Utils3D.equiv(ps[0], ps[1])||Utils3D.equiv(ps[1], ps[2])||Utils3D.equiv(ps[2], ps[0]);
+	}
 	
 }
