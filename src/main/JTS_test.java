@@ -17,7 +17,7 @@ public class JTS_test {
 		Point3D p2 = new Point3D(1,0,3);
 		Tri3D t = new Tri3D(p0,p1,p2);
 		System.out.println(t);
-		System.out.println(m.triTree.getIntersectible(t));
+//		System.out.println(m.triTree.getIntersectible(t));
 		System.out.println(m.intersect(t));
 		
 	}

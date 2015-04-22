@@ -60,8 +60,10 @@ public class Surface3D extends Mesh3D{
 	public LineSegment3D[] overlap(Mesh3D m){
 		LineSegment3D[] output = new LineSegment3D[m.triCount()*this.triCount()];
 		int j=0;
-		for(Tri3D tS:tris){
-			for(Tri3D tM:m.tris){
+		for(Tri3D tM:m.tris){
+			ArrayList<Tri3D> relevantTris = this.triTree.getIntersectible(tM);
+//			for(Tri3D tS:tris){
+			for(Tri3D tS:relevantTris){
 				//Skip any Tris that can't possibly reach each other.
 				if(Math.abs(tS.getPoint3D(0).getZ()-tM.getPoint3D(0).getZ())>tS.zradius+tM.zradius) continue;
 				if(tS.getPoint(0).distance(tM.getPoint(0))>tS.radius+tM.radius) continue;

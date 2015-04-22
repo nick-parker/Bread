@@ -1,5 +1,6 @@
 package mesh3d;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import structs.OctTree;
@@ -12,7 +13,7 @@ import math.geom3d.transform.AffineTransform3D;
 
 abstract class Mesh3D implements Shape3D{
 	protected Tri3D[] tris;
-	public OctTree<Tri3D> triTree;
+	protected OctTree<Tri3D> triTree;
 	/**
 	 * Generate the smallest possible axis aligned box which contains this mesh.
 	 */
@@ -85,7 +86,8 @@ abstract class Mesh3D implements Shape3D{
 	}
 	public boolean intersect(Tri3D t){
 //		for(Tri3D tM : this.triTree.getIntersectible(t)){
-		for(Tri3D tM : this.tris){
+		ArrayList<Tri3D> relevantTris = this.triTree.getIntersectible(t);
+		for(Tri3D tM : relevantTris){
 			Point3D[] overlap = t.overlap(tM);
 			if(overlap!=null&&overlap.length>0) return true;
 		}
