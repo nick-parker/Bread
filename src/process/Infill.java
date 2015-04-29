@@ -23,17 +23,18 @@ public class Infill {
 	 * @param loops The set of loops representing the layer domain in 2D.
 	 * @param distance Minimum distance to maintain between infill and loops.
 	 * @param layerNumber The number of this layer, for infill orientation.
+	 * @param supp 0 for normal infill behavior, 1 for support, 2 for solid support layer.
 	 * @return A list of infill extrusions, ordered in a zig zag pattern across the part.
 	 */
-	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber, int angle){
-		boolean solid = s.allSolid||(layerNumber<s.botLayers || layerNumber>=s.topLayerStart);
-		double offset = solid ? s.extrusionWidth*1.09 : s.infillWidth;
-		offset *= s.infillFlowMultiple;
+	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber, int angle, int supp){
 		if(loops.size()==0) return null;
+		boolean solid = s.allSolid||(layerNumber<s.botLayers || layerNumber>=s.topLayerStart)||supp==2;
+		double offset = solid ? s.extrusionWidth*1.09 : s.infillWidth;
+		if(supp==1) offset=s.SupportDist;
+		offset *= s.infillFlowMultiple;
 		ArrayList<ArrayList<Point2D>> regionPs;
-//		System.out.println(ToPoints(loops));
 		if(distance!=0){
-			//Generate the inset, as a set of rings of points. Currently nonfunctional.
+			//Generate the inset, as a set of rings of points.
 			regionPs = NativeInset.inset(loops, distance);
 		}
 		else{
@@ -62,8 +63,9 @@ public class Infill {
 		int lineCount = 2+(int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/offset);
 		//Iterate through lines without checking that they actually intersect. getEdges returns an empty list for nonintersection,
 		//so addAll and iterating through it both do nothing.
+		ET eType = supp==0 ? ET.infill : supp==1 ? ET.support : ET.topSupport;
 		for(int i=0;i<lineCount;i++){
-			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,ET.infill);
+			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,eType);
 			if(i%2==0){
 				for(Extrusion2D e : es){
 					if(e.length()>s.minInfillLength) output.add(e);
@@ -72,7 +74,7 @@ public class Infill {
 			else{	//Add them flipped and in reverse order. This way the lines form a zig zag pattern across part.
 				for(int q=es.size()-1;q>=0;q--){
 					Extrusion2D e = es.get(q);
-					if(e.length()>s.minInfillLength) output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),ET.infill));
+					if(e.length()>s.minInfillLength) output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),eType));
 				}
 			}
 			//Move the line to the right.

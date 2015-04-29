@@ -33,23 +33,38 @@ import mesh3d.Surface3D;
 public class Slicer {
 	public Model3D part; // The mesh of the part being printed
 	public Surface3D shape; // A mesh representing the shape of the layers
+	public Model3D support; //A mesh representing all the support structures for this part.
 	public double layerHeight;
 	public double filD;
 	public double nozzleD;
 	public double extrusionWidth;
-	public int printTemp = 200;
-	public int xySpeed = 20;
-	public int zSpeed = 5;
-	public int numShells = 1;
-	public double infillWidth = 3;
-	public double infillDir = 45*Math.PI/180.0;	//Direction of infill on layer 0;
-	public double infillAngle = 90*Math.PI/180.0;	//Amount to change infill direction each layer, radians CW.
+	public int printTemp;
+	public int xySpeed;
+	public int zSpeed;
+	public int numShells;
 	public double lift;	//Amount to lift for travel moves.
 	public double EperL;	//E increase per unit L increase.
 	public double retraction;
 	public double retractSpeed;
 	public double retractThreshold;
-    public double xMax = 0;
+	public int topLayerStart;
+	public int botLayers;
+	public int layerCount;
+	//Inputs below are optional, above are mandatory.
+	public boolean cross = true;
+	public boolean allSolid = false;
+	public boolean OuterFirst = false;
+	public boolean EnableSupport = false;
+	public boolean FirmwareRetract = false;
+	public double infillWidth = 3;
+	public double infillDir = 45*Math.PI/180.0;	//Direction of infill on layer 0;
+	public double infillAngle = 90*Math.PI/180.0;	//Amount to change infill direction each layer, radians CW.
+	public int brimCount = 0;
+	public double TipRadius = 0.1; //Radius of the flat tip of the nozzle, NOT the hole itself. 
+	public double infillFlowMultiple = 1;
+	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
+	public double minInfillLength = 0.5;
+	public double xMax = 0;
     public double yMax = 0;
     public double zMax = 0;
     public double xMin = 0;
@@ -58,56 +73,10 @@ public class Slicer {
     public Vector3D bedMin = new Vector3D(0,0,0);
     public Vector3D bedMax = new Vector3D(0,0,0);
     public Vector3D bedCenter = new Vector3D(0,0,0);
-
-	public boolean FirmwareRetract = false;
-	public int topLayerStart;
-	public int botLayers;
-	public int layerCount;
-	//Inputs below are optional, above are mandatory.
-	public boolean cross = true;
-	public boolean allSolid = false;
-	public boolean OuterFirst = false;
-	public int brimCount = 0;
-	public double TipRadius = 0.1; //Radius of the flat tip of the nozzle, NOT the hole itself. 
-	public double infillFlowMultiple = 1;
-	public double infillInsetMultiple = 0;	//Number of extrusion widths to inset infill beyond innermost shell, or neg value to overlap.
-	public double minInfillLength = 0.5;
-	public Slicer(Model3D part, Surface3D shape, double layerHeight, double filD, double nozzleD, double extrusionWidth,
-			int printTemp, int xySpeed, int zSpeed, int numShells, double infillWidth, int infillDir, int infillAngle, 
-			double lift, double retraction, double retractSpeed, double retractThreshold, int topLayers, int botLayers,
-            double xMax, double yMax, double zMax, double xMin, double yMin, double zMin) throws IOException{
-		this.filD = filD;
-		this.nozzleD = nozzleD;
-		this.extrusionWidth = extrusionWidth;
-		this.printTemp = printTemp;
-		this.xySpeed = xySpeed;
-		this.zSpeed = zSpeed;
-		this.numShells = numShells;
-		this.infillWidth = infillWidth;
-		this.layerHeight = layerHeight;
-		this.infillDir = infillDir*Math.PI/180.0;
-		this.infillAngle = infillAngle*Math.PI/180.0;
-		this.part = part;
-		this.shape = shape;
-		shape.generateTopology();
-		this.lift = lift;
-		this.retraction = retraction;
-		this.retractSpeed = retractSpeed;
-		this.retractThreshold = retractThreshold;
-		this.layerCount = layerCount();
-		this.topLayerStart = layerCount-topLayers;
-		this.botLayers = botLayers;
-
-        this.setBedDimensions(new Vector3D(xMin, yMin, zMin), new Vector3D(xMax, yMax, zMax));
-
-		//Cross sectional area of the extrusion is the ratio of plastic volume/XYZ distance, units mm^2
-		//volume rate * filament distance/unit volume = filament rate. filament distance/unit volume is cx area of filament.
-		this.EperL = (((extrusionWidth-layerHeight)*extrusionWidth+3.14*Math.pow(layerHeight,2)/4))/Math.pow(filD,2);
-	}
-
+	public double SupportDist = 2;
 	/**
 	 * Load a slicer config for the given meshes.
-	 * @param config
+	 * @param config file to pull slicer settings from.
 	 */
 	public Slicer(Model3D part, Surface3D shape, String config){
 		this.part = part;
@@ -213,6 +182,13 @@ public class Slicer {
                 case "ZMin":
                     this.zMin = Double.parseDouble(line[1]);
                     break;
+				case "EnableSupport":
+					this.EnableSupport = Boolean.parseBoolean(line[1]);
+					break;
+			
+				case "SupportDist":
+					this.SupportDist = Double.parseDouble(line[1]);
+					break;
 				}
 			}
             this.setBedDimensions(new Vector3D(xMin, yMin, zMin), new Vector3D(xMax, yMax, zMax));
@@ -244,11 +220,12 @@ public class Slicer {
 		System.out.println("New max Z: " + shapeBb.getMaxZ());
 		Vector3D layerUp = new Vector3D(0,0,layerHeight);
 		Vector3D layerDown = new Vector3D(0,0,-layerHeight);
-		//TODO Figure out why the hell this is necessary... Bounding Box implementation is probably broken junk?
+		//Moving Down should never be printed unless boundingBox is broken.
 		while(!checkEmpty(-1)){
 			System.out.println("Moving Down");
 			shape.move(layerDown);
 		}
+		//This is necessary because contacting bounding boxes does not imply contacting meshes.
 		while(checkEmpty(0)){
 			System.out.println("Moving up");
 			shape.move(layerUp);
@@ -374,5 +351,12 @@ public class Slicer {
 
     public void setBedCenter(){
         this.bedCenter = bedMax.minus(bedMin).times(0.5);
+    }
+    public void AddSupport(Model3D supp){
+    	this.support = supp;
+    	Box3D partBb = part.boundingBox();
+    	double xOffset = bedCenter.getX() - ((partBb.getMaxX() - partBb.getMinX()) * 0.5);
+        double yOffset = bedCenter.getY() - ((partBb.getMaxY() - partBb.getMinY()) * 0.5);
+        this.support.move(new Vector3D(xOffset,yOffset,0));
     }
 }

@@ -23,7 +23,9 @@ public class Extrusion2D extends LineSegment2D{
 		travel,
 		infill,
 		shell,
-		nonretracting
+		nonretracting,
+		support,
+		topSupport
 	}
 	public Extrusion2D(Point2D point1, Point2D point2, ET ExtrusionType) {
 		super(point1, point2);

@@ -10,5 +10,7 @@
 	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/Bread/lib/ClipperJNA.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/Bread/lib/jna-4.1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/Bread/lib/jts-1.8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/Bread/lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nick/Documents/Eclipse/Dslicer/Bread/lib/commons-cli-1.2-javadoc.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

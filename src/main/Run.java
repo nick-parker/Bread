@@ -18,16 +18,21 @@ import mesh3d.Surface3D;
 public class Run {
 
 	public static void main(String[] args) throws IOException {
-		execute(args[0], args[1], args[2],args[3]);
+		execute(args[0], args[1], args[2],args[3],args[4]);
 	}
-	private static void execute(String partStr, String surfaceStr, String configStr, String output){
+	private static void execute(String partStr, String surfaceStr, String configStr, String output, String suppStr){
 		Model3D part = null;
+		Model3D support = null;
 		Surface3D surface = null;		
 		Slicer s = null;
 		try {
 			part = Stli.importModel(partStr, false);
 			surface = Stli.importSurface(surfaceStr, false);
 			s = new Slicer(part, surface, configStr);
+			if(s.EnableSupport){
+				support = Stli.importModel(suppStr, false);
+				s.AddSupport(support);
+			}
 		} catch (FileNotFoundException e){
 			System.out.println(e.getMessage());
 			return;

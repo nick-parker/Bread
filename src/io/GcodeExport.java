@@ -85,7 +85,7 @@ public class GcodeExport {
 				w.println(";unretract");
 				retract(false); //push out
 			}
-			if(e.ExtrusionType==ET.infill||e.ExtrusionType==ET.shell){
+			if(e.ExtrusionType==ET.infill||e.ExtrusionType==ET.shell||e.ExtrusionType==ET.support||e.ExtrusionType==ET.topSupport){
 				//Infill or shell.
 				currE +=s.EperL*Utils3D.length(e);
 				if(e.ExtrusionType==ET.infill&&prev.ExtrusionType!=ET.infill) w.println(";infill");

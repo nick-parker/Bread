@@ -3,6 +3,7 @@ package structs;
 import java.util.ArrayList;
 
 import process.Flatten;
+import process.Infill;
 import process.Order;
 import main.Slicer;
 import math.geom2d.Point2D;
@@ -64,7 +65,22 @@ public class SmartLayer {
 			int sz = output.size();
 			if(sz>0) p = output.get(sz-1).lastPoint();
 		}
+		if(s.EnableSupport){
+			ArrayList<Extrusion2D> supp = getSupport();
+			if(supp!=null){
+				System.out.println("Actually making some support!");
+				for(Extrusion2D e : supp) Layer.ConnectSplitAppend(s, p, e, output);
+			}
+		}
 		return output;
+	}
+	/**
+	 * Generate the support paths for this layer. This might get real screwy with SmartLayer and LayerChunk...
+	 * @return An ArrayList<Extrusion2D> that needs connecting.
+	 */
+	public ArrayList<Extrusion2D> getSupport(){
+		ArrayList<Loop> supportLoops = Order.ListOrder(Flatten.FlattenZ(s.shape.overlap(s.support)));
+		return Infill.getInfill(s, supportLoops, 0.5, 0, 0,1);
 	}
 	/**
 	 * Indicates that something was wrong with the intersection which forms the very basis of a layer.

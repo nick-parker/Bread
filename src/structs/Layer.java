@@ -42,10 +42,10 @@ public class Layer {
 	public ArrayList<Extrusion2D> getInfill(double distance){
 		if(!loopsMade) makeLoops();
 		boolean solid = s.allSolid||(layerNo<s.botLayers || layerNo>=s.topLayerStart);
-		if(!s.cross||solid) return Infill.getInfill(s, loops, distance, layerNo,0);
+		if(!s.cross||solid) return Infill.getInfill(s, loops, distance, layerNo,0,0);
 		else{
-			ArrayList<Extrusion2D> output = Infill.getInfill(s,loops,distance, layerNo, 0);
-			if(output!=null) output.addAll(Infill.getInfill(s,loops,distance,layerNo,90));
+			ArrayList<Extrusion2D> output = Infill.getInfill(s,loops,distance, layerNo, 0,0);
+			if(output!=null) output.addAll(Infill.getInfill(s,loops,distance,layerNo,90,0));
 			return output;
 		}
 	}
@@ -87,13 +87,13 @@ public class Layer {
 		Point2D last = lastPoint;	//End of last segment added to output.
 		if(shells!=null){
 			for(Extrusion2D e: shells){
-				ConnectSplitAppend(last,e,output);
+				ConnectSplitAppend(s,last,e,output);
 				last = e.lastPoint();
 			}
 		}
 		if(infill!=null){
 			for(Extrusion2D e: infill){
-				ConnectSplitAppend(last,e,output);
+				ConnectSplitAppend(s,last,e,output);
 				last = e.lastPoint();
 			}
 		}
@@ -107,7 +107,7 @@ public class Layer {
 	 * @param e Segment to add to output.
 	 * @param output Continuous path composed of Extrusion2D objects.
 	 */
-	private void ConnectSplitAppend(Point2D lp, Extrusion2D e, ArrayList<Extrusion2D> output){
+	public static void ConnectSplitAppend(Slicer s, Point2D lp, Extrusion2D e, ArrayList<Extrusion2D> output){
 		//If last point isn't the start of e, add a travel between them and retract if necessary.
 		Point2D np = e.firstPoint();
 		if(!Utils2D.equiv(lp, np)){
