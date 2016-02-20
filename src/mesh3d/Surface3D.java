@@ -14,6 +14,7 @@ import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
 import math.geom3d.line.StraightLine3D;
+import structs.Point6D;
 
 public class Surface3D extends Mesh3D{
 	double offset;	//Z offset applied to this surface.
@@ -127,10 +128,10 @@ public class Surface3D extends Mesh3D{
 	/**
 	 * Project point P onto this surface in the Z axis.
 	 * @param p Point2D to project
-	 * @return The projected point as a Point3D object, or null if p is not in the domain of
+	 * @return The projected point as a Point6D object, or null if p is not in the domain of
 	 * this surface.
 	 */
-	public Point3D project(Point2D p){
+	public Point6D project(Point2D p){
 		StraightLine3D l = new StraightLine3D(new Point3D(p.getX(),p.getY(),0),Constants.zplus);
 		for(Point2D tp : ps){
 			//If the largest edge in the mesh could connect these points
@@ -138,7 +139,7 @@ public class Surface3D extends Mesh3D{
 				//Test the triangle associated with this point.
 				Tri3D t = TriMap.get(tp);
 				Point3D hit = t.lineIntersection(l);
-				if(hit!=null) return hit;
+				if(hit!=null) return new Point6D(hit,t.normal());
 			}
 			//Otherwise the associated triangle can't possibly reach this point.
 		}

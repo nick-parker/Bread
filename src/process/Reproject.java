@@ -2,12 +2,14 @@ package process;
 
 import java.util.ArrayList;
 
+import main.Constants;
 import main.Slicer;
 import math.geom2d.Point2D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import structs.Extrusion2D;
 import structs.Extrusion3D;
+import structs.Point6D;
 import structs.Extrusion2D.ET;
 import utils.Utils2D;
 import utils.Utils3D;
@@ -16,8 +18,7 @@ import utils.Utils3D;
  *  
  * @author Nick
  * Translate an Extrusion2D path into Extrusion3D by projecting it onto the 
- * layer shape mesh.
- * Requires that s.shape.offset==0
+ * layer shape mesh without moving the mesh itself.
  */
 public class Reproject {
 	private double offset;
@@ -31,7 +32,7 @@ public class Reproject {
 	 * s.shape.
 	 */
 	public Reproject(double offset, Slicer s){
-		this.offset = offset;
+		setOffset(offset);
 		this.s = s;
 	}
 	/**
@@ -84,20 +85,20 @@ public class Reproject {
 	 * @param p Point to project
 	 * @return A new Point3D object.
 	 */
-	private Point3D projectPoint(Point2D p){
-		Point3D hit = s.shape.project(p);
+	private Point6D projectPoint(Point2D p){
+		Point6D hit = s.shape.project(p);
 
         if(hit == null) {
             // If we failed to project the point, just project the 2d point in 
         	//to 3d space by directly converting a 2d point in to a 3d point, 
         	//using a calculated z height.
-            hit = new Point3D(p.getX(), p.getY(), to());
+            hit = new Point6D(p.getX(), p.getY(), to(),Constants.zplus);
         }
         //TODO Reimplement this check in a way that doesn't cause discontinuities.
 		if(hit.getZ()+to()<s.zMin){
-			return new Point3D(hit.getX(),hit.getY(),s.zMin);
+			return new Point6D(hit.getX(), hit.getY(), s.zMin, hit.normal);
 		}
-		return new Point3D(hit.getX(),hit.getY(),hit.getZ()+to());
+		return new Point6D(hit.getX(), hit.getY(), hit.getZ()+to(), hit.normal);
 	}
 	/**
 	 * Place an Extrusion2D at a given z to create a flat Extrusion3D.
