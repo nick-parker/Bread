@@ -15,17 +15,14 @@ import math.geom2d.line.LineSegment2D;
 /**
  * Stores information on a single layer and outputs a continuous 2D path.
  */
-public class Layer {
+public abstract class Layer {
 	Slicer s;	//Parent slicer object
 	int layerNo;
 	public double offset;
 	ArrayList<Loop> loops;
 	protected boolean loopsMade = false;
 	
-	public Layer(Slicer s, int layerNo){
-		this.s=s;
-		this.layerNo=layerNo;
-		this.offset = layerNo*s.layerHeight;
+	public Layer(){
 	}
 	protected void makeLoops(){
 		s.shape.setOffset(offset);

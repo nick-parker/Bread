@@ -301,18 +301,6 @@ public class Slicer {
 		g.addLayer(path,n);
 		return last;
 	}
-    public void debug(String fileLoc){
-		PositionShape();
-		part.move(new Vector3D(0, 0, zMin));
-		int lc = layerCount;
-		IntersectTest t = new IntersectTest(fileLoc);
-		for(int n=0;n<lc;n++){
-			Layer l = new Layer(this,n);
-			shape.setOffset(l.offset);
-			t.export(shape.overlap(part));
-		}
-		t.close();
-	}
     public void setBedDimensions(Vector3D min, Vector3D max) {
         this.setBedMin(min);
         this.setBedMax(max);

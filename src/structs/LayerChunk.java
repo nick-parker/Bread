@@ -8,7 +8,9 @@ import main.Slicer;
 public class LayerChunk extends Layer{
 	public final Loop rim;
 	public LayerChunk(Slicer s, int layerNo, Loop rim) {
-		super(s, layerNo);
+		this.s=s;
+		this.layerNo=layerNo;
+		this.offset = layerNo*s.layerHeight;
 		this.rim = rim;
 		this.loops = new ArrayList<Loop>();
 		this.loops.add(rim);
