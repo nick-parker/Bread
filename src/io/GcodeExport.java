@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 
 import structs.Extrusion3D;
+import structs.Point6D;
 import structs.Extrusion2D.ET;
 import utils.Utils3D;
 import main.Constants;
@@ -24,7 +25,7 @@ import math.geom3d.line.LineSegment3D;
  *
  */
 public class GcodeExport {
-	private Point3D last;
+	private Point6D last;
 	private double currE;
 	private double CurrSpeed = 0;
 	//Formatting just matches the conventions set by other slicers for precision in various axes.
@@ -33,7 +34,7 @@ public class GcodeExport {
 	Slicer s;
 	public GcodeExport(String fileLoc, Slicer s){
 		this.s = s;
-		this.last = new Point3D(0,0,0);
+		this.last = new Point6D(0,0,0,Constants.zplus);
 		try {
 			this.w = new PrintWriter(new FileWriter(fileLoc));
 //			w.println("Testing the printwriter.");
@@ -43,7 +44,7 @@ public class GcodeExport {
 	}
 	public GcodeExport(Writer w, Slicer s){
 		this.s = s;
-		this.last = new Point3D(0,0,0);
+		this.last = new Point6D(0,0,0,Constants.zplus);
 		this.w = new PrintWriter(w);
 	}
 	/**
@@ -145,7 +146,7 @@ public class GcodeExport {
 	 * Write a gcode command to move to an absolute position.
 	 * @param p
 	 */
-	private void G1(Point3D p){
+	private void G1(Point6D p){
 		Vector3D mv = new Vector3D(last,p);
 		double cos = Vector3D.dotProduct(mv, Constants.zplus)/mv.norm();
 		//Limit the speed based on the maximum z speed and XY speeds specified in the slicer object.
@@ -154,7 +155,18 @@ public class GcodeExport {
 		else{
 			SetSpeed(Math.min(Math.abs(s.zSpeed/cos),s.xySpeed));
 		}
-		w.println("G1 X"+Constants.xyz.format(p.getX())+" Y"+Constants.xyz.format(p.getY())+" Z"+Constants.xyz.format(p.getZ())+" E"+Constants.ext.format(currE));
+		w.print("G1 X"+Constants.xyz.format(p.getX()) + " Y" +
+				Constants.xyz.format(p.getY()) + " Z" +
+				Constants.xyz.format(p.getZ()) +
+				" E"+Constants.ext.format(currE));
+		if(p.normal == Constants.zero){
+			w.print("\n");
+		} else {
+			Vector3D n = p.normal.normalize();
+			w.print(" I" + Constants.xyz.format(n.getX()) +
+					" J" + Constants.xyz.format(n.getY()) +
+					" K" + Constants.xyz.format(n.getZ()) + "\n");
+		}
 	}
 	/**
 	 * Send a command to go to the current E position without moving XYZ, at the given speed.

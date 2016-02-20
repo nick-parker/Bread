@@ -13,4 +13,12 @@ public class Point6D extends Point3D{
 		super(p.getX(),p.getY(),p.getZ());
 		this.normal = n;
 	}
+	@Override
+	public Point6D plus(Vector3D v){
+		return new Point6D(this.getX() + v.getX(),
+						   this.getY()+ v.getY(),
+						   this.getZ() + v.getZ(),
+						   this.normal);
+					
+	}
 }
