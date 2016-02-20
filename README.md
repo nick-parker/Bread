@@ -1,3 +1,13 @@
+Incomplete Branch
+==========
+This branch contains an incomplete implementation of multiple layer shapes in a
+single print. This could be useful for goals like:
+
+-Printing curved top layers and flat structural layers
+
+-Aligning layer structure to bear different loads in different parts of a print
+
+
 Bread
 ==========
 
