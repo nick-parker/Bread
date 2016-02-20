@@ -35,29 +35,32 @@ public class Infill {
 												   int angle,
 												   int supp){
 		if(loops.size()==0) return null;
+		//TODO implement better logic for solid areas so that only the parts
+		//of top layers which are actually near the surface are solid.
 		boolean solid = s.allSolid||(layerNumber<s.botLayers || 
 				layerNumber>=s.topLayerStart)||supp==2;
-		double offset = solid ? s.extrusionWidth*1.09 : s.infillWidth;
-		if(supp==1) offset=s.SupportDist;
-		offset *= s.infillFlowMultiple;
+		double width = solid ? s.extrusionWidth*Constants.solidSpacing : 
+			s.infillWidth;
+		if(supp==1) width=s.SupportDist;
+		width *= s.infillFlowMultiple;
 		ArrayList<ArrayList<Point2D>> regionPs;
 		if(distance!=0){
-			//Generate the inset, as a set of rings of points.
+			//Generate the inset shape, as a set of rings of points.
 			regionPs = NativeInset.inset(loops, distance);
 		}
 		else{
 			regionPs = ToPoints(loops);
 		}
 		if(regionPs==null) return null;
-		//Convert to a set of edges for intersecting with.
 		//Convert to a multipolygon for some convenience.
 		MultiPolygon2D region = NativeInset.GetRegion(regionPs);
 		//Get the edges of the multipolygon
 		Collection<LineSegment2D> edges = region.edges();
 		//Fix degenerateLines that seem to only turn up here.
 		edges.removeIf(new TinyPred());
-		//Calculate the CW angle from +x to run infill on this layer.
-		//CW angle infill lines make with x axis. %(2*Math.PI)
+		//CW angle infill lines make with x axis.
+		//TODO Should have a '%(2*Math.PI)' on it, but I think this caused
+		//a bug? Test it at some point.
 		double a = (s.infillDir+layerNumber*s.infillAngle);
 		
 		//Direction perpendicular to infill
@@ -65,31 +68,27 @@ public class Infill {
 		//Direction parallel to infill.
 		Vector2D dir = Utils2D.AngleVector(a+angle*Math.PI/180);
 		
-		//Get the point furthest in the -move direction from the set of rings 
-		//of points.
-		Point2D firstP = getStart(move,regionPs,offset);
+		//Start at the -[move] extreme of the inset shape.
+		Point2D firstP = getStart(move,regionPs,width);
 		StraightLine2D l = new StraightLine2D(firstP, dir);
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Box2D b = region.boundingBox();
 		
-		//Calculate the worst case scenario number of lines necessary, because 
-		//calculating width in a given vector direction is implemented wrong.
-		int lineCount = 2+(int) (Math.sqrt(Math.pow(b.getHeight(),2) +
-				Math.pow(b.getWidth(),2))/offset);
-		//Iterate through lines without checking that they actually intersect.
-		//getEdges returns an empty list for nonintersection, so addAll and 
-		//iterating through it both do nothing.
 		ET eType = supp==0 ? ET.infill : supp==1 ? ET.support : ET.topSupport;
+		
+		//Calculate the worst case scenario number of lines necessary
+		int lineCount = 2+(int) (Math.sqrt(Math.pow(b.getHeight(),2) +
+				Math.pow(b.getWidth(),2))/width);
+
 		for(int i=0;i<lineCount;i++){
 			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,eType);
+			//Alternate the direction of infill passes to form a zigzag.
 			if(i%2==0){
 				for(Extrusion2D e : es){
 					if(e.length()>s.minInfillLength) output.add(e);
 				}
 			}
-			else{	
-				//Add them flipped and in reverse order. This way the lines 
-				//form a zig zag pattern across part.
+			else{
 				for(int q=es.size()-1;q>=0;q--){
 					Extrusion2D e = es.get(q);
 					if(e.length()>s.minInfillLength) output.add(
@@ -98,11 +97,16 @@ public class Infill {
 											eType));
 				}
 			}
-			//Move the line to the right.
-			l = l.parallel(offset);
+			//Move the intersecting line to the right for the next iteration.
+			l = l.parallel(width);
 		}
 		return output;
 	}
+	/**
+	 * Predicate for detecting very short line segments.
+	 * @author nick
+	 *
+	 */
 	private static class TinyPred implements Predicate<LineSegment2D>{
 
 		@Override
@@ -204,10 +208,11 @@ public class Infill {
 		}
 		//Check that there's an even number of intersections.
 		if(ps.size()%2!=0){
+			//If this test fails, there's an unclosed loop in the input edges.
 			System.out.println("Odd number of intersections.");
 			return output;
 		}
-		//Sort the intersections along l
+		//Sort the intersection points along l
 		ArrayList<Point2D> sorted = Utils2D.orderPoints(v, ps);
 		boolean used = false; //Checks whether k has been used.
 		//connect points (0,1), (2,3) etc unless a pair is 0 length, then step 
