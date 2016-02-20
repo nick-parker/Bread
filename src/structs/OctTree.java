@@ -210,7 +210,7 @@ public class OctTree<T> {
 		this.min = this.min.plus(v);
 		this.center = this.center.plus(v);
 		this.max = this.max.plus(v);
-		for(OctTree o : children){
+		for(OctTree<T> o : children){
 			if(o!=null) o.move(v);
 		}
 	}

@@ -20,7 +20,6 @@ import structs.Layer;
 import structs.SmartLayer;
 import tests.IntersectTest;
 import math.geom2d.Point2D;
-import math.geom2d.line.LineSegment2D;
 import math.geom3d.Box3D;
 import math.geom3d.Vector3D;
 import mesh3d.Model3D;

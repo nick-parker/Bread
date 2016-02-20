@@ -3,7 +3,6 @@ package main;
 import java.io.IOException;
 
 import math.geom3d.Point3D;
-import math.geom3d.Vector3D;
 import mesh3d.Model3D;
 import mesh3d.Tri3D;
 import io.Stli;

@@ -1,10 +1,7 @@
 package mesh3d;
 
-import structs.OctTree;
 import main.Constants;
-import math.geom3d.Box3D;
 import math.geom3d.Point3D;
-import math.geom3d.Vector3D;
 import math.geom3d.line.LineSegment3D;
 
 public class Model3D extends Mesh3D{

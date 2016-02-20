@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import main.Slicer;
 import math.geom2d.Point2D;
-import math.geom3d.Box3D;
 import math.geom3d.Point3D;
 import math.geom3d.Vector3D;
 import structs.Extrusion2D;
@@ -191,6 +190,7 @@ public class Reproject {
 	 * @param e Extrusion to offset.
 	 * @return A new Extrusion3D instance moved in the +Z direction.
 	 */
+	@SuppressWarnings("unused")
 	private Extrusion3D liftE(Extrusion3D e){
 		return new Extrusion3D(liftP(e.firstPoint(),to()),liftP(e.lastPoint(),to()),e.ExtrusionType);
 	}

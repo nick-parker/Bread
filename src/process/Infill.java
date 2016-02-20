@@ -23,12 +23,20 @@ public class Infill {
 	 * @param loops The set of loops representing the layer domain in 2D.
 	 * @param distance Minimum distance to maintain between infill and loops.
 	 * @param layerNumber The number of this layer, for infill orientation.
-	 * @param supp 0 for normal infill behavior, 1 for support, 2 for solid support layer.
-	 * @return A list of infill extrusions, ordered in a zig zag pattern across the part.
+	 * @param supp 0 for normal infill behavior, 1 for support, 2 for solid 
+	 * support layer.
+	 * @return A list of infill extrusions, ordered in a zig zag pattern across
+	 * the part.
 	 */
-	public static ArrayList<Extrusion2D> getInfill(Slicer s, ArrayList<Loop> loops, double distance, int layerNumber, int angle, int supp){
+	public static ArrayList<Extrusion2D> getInfill(Slicer s,
+												   ArrayList<Loop> loops,
+												   double distance,
+												   int layerNumber,
+												   int angle,
+												   int supp){
 		if(loops.size()==0) return null;
-		boolean solid = s.allSolid||(layerNumber<s.botLayers || layerNumber>=s.topLayerStart)||supp==2;
+		boolean solid = s.allSolid||(layerNumber<s.botLayers || 
+				layerNumber>=s.topLayerStart)||supp==2;
 		double offset = solid ? s.extrusionWidth*1.09 : s.infillWidth;
 		if(supp==1) offset=s.SupportDist;
 		offset *= s.infillFlowMultiple;
@@ -42,27 +50,35 @@ public class Infill {
 		}
 		if(regionPs==null) return null;
 		//Convert to a set of edges for intersecting with.
-		MultiPolygon2D region = NativeInset.GetRegion(regionPs);	//Convert to a multipolygon for some convenience.
-		Collection<LineSegment2D> edges = region.edges();	//Get the edges of the multipolygon
-		edges.removeIf(new Tiny()); //Fix degenerateLines that seem to only turn up here.
+		//Convert to a multipolygon for some convenience.
+		MultiPolygon2D region = NativeInset.GetRegion(regionPs);
+		//Get the edges of the multipolygon
+		Collection<LineSegment2D> edges = region.edges();
+		//Fix degenerateLines that seem to only turn up here.
+		edges.removeIf(new TinyPred());
 		//Calculate the CW angle from +x to run infill on this layer.
-		double a = (s.infillDir+layerNumber*s.infillAngle);	//CW angle infill lines make with x axis. %(2*Math.PI)
+		//CW angle infill lines make with x axis. %(2*Math.PI)
+		double a = (s.infillDir+layerNumber*s.infillAngle);
 		
-		//Calculate a perpendicular vector to the infill.
-		Vector2D move = Utils2D.AngleVector(a+Math.PI/2+angle*Math.PI/180);	//Direction perpendicular to infill to move intersection line.
-		Vector2D dir = Utils2D.AngleVector(a+angle*Math.PI/180);				//Direction parallel to infill.
+		//Direction perpendicular to infill
+		Vector2D move = Utils2D.AngleVector(a+Math.PI/2+angle*Math.PI/180);
+		//Direction parallel to infill.
+		Vector2D dir = Utils2D.AngleVector(a+angle*Math.PI/180);
 		
-		//Get the point furthest in the -move direction from the set of rings of points.
+		//Get the point furthest in the -move direction from the set of rings 
+		//of points.
 		Point2D firstP = getStart(move,regionPs,offset);
 		StraightLine2D l = new StraightLine2D(firstP, dir);
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		Box2D b = region.boundingBox();
 		
-		//Calculate the worst case scenario number of lines necessary, because calculating width in a given vector direction 
-		//is implemented wrong.
-		int lineCount = 2+(int) (Math.sqrt(Math.pow(b.getHeight(),2)+Math.pow(b.getWidth(),2))/offset);
-		//Iterate through lines without checking that they actually intersect. getEdges returns an empty list for nonintersection,
-		//so addAll and iterating through it both do nothing.
+		//Calculate the worst case scenario number of lines necessary, because 
+		//calculating width in a given vector direction is implemented wrong.
+		int lineCount = 2+(int) (Math.sqrt(Math.pow(b.getHeight(),2) +
+				Math.pow(b.getWidth(),2))/offset);
+		//Iterate through lines without checking that they actually intersect.
+		//getEdges returns an empty list for nonintersection, so addAll and 
+		//iterating through it both do nothing.
 		ET eType = supp==0 ? ET.infill : supp==1 ? ET.support : ET.topSupport;
 		for(int i=0;i<lineCount;i++){
 			ArrayList<Extrusion2D> es = getEdges(l,edges,dir,eType);
@@ -71,10 +87,15 @@ public class Infill {
 					if(e.length()>s.minInfillLength) output.add(e);
 				}
 			}
-			else{	//Add them flipped and in reverse order. This way the lines form a zig zag pattern across part.
+			else{	
+				//Add them flipped and in reverse order. This way the lines 
+				//form a zig zag pattern across part.
 				for(int q=es.size()-1;q>=0;q--){
 					Extrusion2D e = es.get(q);
-					if(e.length()>s.minInfillLength) output.add(new Extrusion2D(e.lastPoint(),e.firstPoint(),eType));
+					if(e.length()>s.minInfillLength) output.add(
+							new Extrusion2D(e.lastPoint(),
+											e.firstPoint(),
+											eType));
 				}
 			}
 			//Move the line to the right.
@@ -82,7 +103,7 @@ public class Infill {
 		}
 		return output;
 	}
-	private static class Tiny implements Predicate<LineSegment2D>{
+	private static class TinyPred implements Predicate<LineSegment2D>{
 
 		@Override
 		public boolean test(LineSegment2D t) {
@@ -107,7 +128,9 @@ public class Infill {
 	 * @param offset Distance between lines in the grid
 	 * @return
 	 */
-	public static Point2D getStart(Vector2D v, ArrayList<ArrayList<Point2D>> ps, double offset){
+	public static Point2D getStart(Vector2D v,
+								   ArrayList<ArrayList<Point2D>> ps,
+								   double offset){
 		Point2D p = getExtreme(v, ps, false);
 		Vector2D vec = new Vector2D(p);
 		double d = Vector2D.dot(vec, v.normalize());
@@ -118,7 +141,9 @@ public class Infill {
 	 * @param ps
 	 * @return The point in ps farthest in the given direction.
 	 */
-	public static Point2D getExtreme(Vector2D v, ArrayList<ArrayList<Point2D>> ps, boolean max){
+	public static Point2D getExtreme(Vector2D v, 
+									 ArrayList<ArrayList<Point2D>> ps,
+									 boolean max){
 //		System.out.println("Seeking max? "+max);
 //		System.out.println("Vector: "+v);
 		Point2D min = ps.get(0).get(0);
@@ -146,20 +171,28 @@ public class Infill {
 	 * @param ps
 	 * @return ps' width along v.
 	 */
-	public static double getWidth(Vector2D v, ArrayList<ArrayList<Point2D>> ps){
-		Vector2D delta = new Vector2D(getExtreme(v,ps,false),getExtreme(v,ps,true));
+	public static double getWidth(Vector2D v,
+								  ArrayList<ArrayList<Point2D>> ps){
+		Vector2D delta = new Vector2D(getExtreme(v,ps,false),
+									  getExtreme(v,ps,true));
 		return v.dot(delta);
 	}
 	
 	/**
-	 * Intersect a line with a set of edges, then connect the pairs of intersections.
+	 * Intersect a line with a set of edges, then connect the pairs of 
+	 * intersections.
 	 * 
 	 * @param l Line to intersect
-	 * @param v Direction of l, passing this in saves some calculations since it's the same for a whole layer.
+	 * @param v Direction of l, passing this in saves some calculations 
+	 * since it's the same for a whole layer.
 	 * @param edges Set of edges to intersect with
-	 * @return Segments of l inside the domain represented by edges. Empty list if edges and l don't intersect.
+	 * @return Segments of l inside the domain represented by edges. Empty list
+	 * if edges and l don't intersect.
 	 */
-	public static ArrayList<Extrusion2D> getEdges(StraightLine2D l, Collection<LineSegment2D> edges, Vector2D v, ET type){
+	public static ArrayList<Extrusion2D> getEdges(StraightLine2D l,
+												  Collection<LineSegment2D> edges,
+												  Vector2D v,
+												  ET type){
 		ArrayList<Point2D> ps = new ArrayList<Point2D>();
 		ArrayList<Extrusion2D> output = new ArrayList<Extrusion2D>();
 		//Generate the intersections of l with the edges
@@ -177,13 +210,15 @@ public class Infill {
 		//Sort the intersections along l
 		ArrayList<Point2D> sorted = Utils2D.orderPoints(v, ps);
 		boolean used = false; //Checks whether k has been used.
-		//connect points (0,1), (2,3) etc unless a pair is 0 length, then step over it and connect its end with the point following it.
+		//connect points (0,1), (2,3) etc unless a pair is 0 length, then step 
+		//over it and connect its end with the point following it.
 		for(int k=0;k<sorted.size()-1;k+=1){
 			if(used){
 				used = false;
 				continue;
 			}
-			if(Utils2D.equiv(sorted.get(k), sorted.get(k+1))) continue;	//Don't make 0 length edges.
+			//Don't make 0 length edges.
+			if(Utils2D.equiv(sorted.get(k), sorted.get(k+1))) continue;
 			else{
 				used = true;
 				output.add(new Extrusion2D(sorted.get(k),sorted.get(k+1),type));
