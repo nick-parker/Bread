@@ -157,16 +157,15 @@ public class GcodeExport {
 		}
 		w.print("G1 X"+Constants.xyz.format(p.getX()) + " Y" +
 				Constants.xyz.format(p.getY()) + " Z" +
-				Constants.xyz.format(p.getZ()) +
-				" E"+Constants.ext.format(currE));
-		if(p.normal == Constants.zero){
-			w.print("\n");
-		} else {
+				Constants.xyz.format(p.getZ()));
+		if(p.normal != Constants.zero){
 			Vector3D n = p.normal.normalize();
 			w.print(" I" + Constants.xyz.format(n.getX()) +
 					" J" + Constants.xyz.format(n.getY()) +
-					" K" + Constants.xyz.format(n.getZ()) + "\n");
+					" K" + Constants.xyz.format(n.getZ()));
 		}
+		w.print(" E"+Constants.ext.format(currE) + "\n");
+		
 	}
 	/**
 	 * Send a command to go to the current E position without moving XYZ, at the given speed.
