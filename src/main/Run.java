@@ -21,7 +21,7 @@ public class Run {
 		if(args.length==4){
 			execute(args[0],args[1],args[2],args[3]);
 		} else {
-			execute(args[0], args[1], args[2],args[3],args[4]);
+			System.out.println("Usage: [Part.stl] [Surface.stl] [config.txt] [output path.g]");
 		}
 	}
 	private static void execute(String partStr, String surfaceStr, String configStr, String output){
