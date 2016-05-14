@@ -159,14 +159,14 @@ public class GcodeExport {
 				Constants.xyz.format(p.getY()) + " Z" +
 				Constants.xyz.format(p.getZ()) +
 				" E"+Constants.ext.format(currE));
-		if(p.normal == Constants.zero || !this.s.fiveaxis){
-			w.print("\n");
-		} else {
+		if(p.normal != Constants.zero && this.s.fiveaxis){
 			Vector3D n = p.normal.normalize();
 			w.print(" I" + Constants.xyz.format(n.getX()) +
 					" J" + Constants.xyz.format(n.getY()) +
-					" K" + Constants.xyz.format(n.getZ()) + "\n");
+					" K" + Constants.xyz.format(n.getZ()));
 		}
+		w.print(" E"+Constants.ext.format(currE) + "\n");
+		
 	}
 	/**
 	 * Send a command to go to the current E position without moving XYZ, at the given speed.
