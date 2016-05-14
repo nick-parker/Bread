@@ -159,7 +159,7 @@ public class GcodeExport {
 				Constants.xyz.format(p.getY()) + " Z" +
 				Constants.xyz.format(p.getZ()) +
 				" E"+Constants.ext.format(currE));
-		if(p.normal == Constants.zero){
+		if(p.normal == Constants.zero || !this.s.fiveaxis){
 			w.print("\n");
 		} else {
 			Vector3D n = p.normal.normalize();

@@ -49,6 +49,7 @@ public class Slicer {
 	public int topLayerStart;
 	public int botLayers;
 	public int layerCount;
+	public boolean fiveaxis = false;
 	//Inputs below are optional, above are mandatory.
 	public boolean cross = true;
 	public boolean allSolid = false;
@@ -99,38 +100,38 @@ public class Slicer {
 			String lineRead;
 			while((lineRead = f.readLine())!=null){
 				String[] line = lineRead.split("[ \t]");
-				switch(line[0]){
-				case "layerHeight":
+				switch(line[0].toLowerCase()){
+				case "layerheight":
 					this.layerHeight = Double.parseDouble(line[1]);
 					break;
-				case "filD":
+				case "fild":
 					this.filD = Double.parseDouble(line[1]);
 					break;
-				case "nozzleD":
+				case "nozzled":
 					this.nozzleD = Double.parseDouble(line[1]);
 					break;
-				case "extrusionWidth":
+				case "extrusionwidth":
 					this.extrusionWidth = Double.parseDouble(line[1]);
 					break;
-				case "printTemp":
+				case "printtemp":
 					this.printTemp = Integer.parseInt(line[1]);
 					break;
-				case "xySpeed":
+				case "xyspeed":
 					this.xySpeed = Integer.parseInt(line[1]);
 					break;
-				case "zSpeed":
+				case "zspeed":
 					this.zSpeed = Integer.parseInt(line[1]);
 					break;
-				case "numShells":
+				case "numshells":
 					this.numShells = Integer.parseInt(line[1]);
 					break;
-				case "infillWidth":
+				case "infillwidth":
 					this.infillWidth = Double.parseDouble(line[1]);
 					break;
-				case "infillDir":
+				case "infilldir":
 					this.infillDir = Double.parseDouble(line[1])*Math.PI/180;
 					break;
-				case "infillAngle":
+				case "infillangle":
 					this.infillAngle = Double.parseDouble(line[1])*Math.PI/180;
 					break;
 				case "lift":
@@ -139,53 +140,55 @@ public class Slicer {
 				case "retraction":
 					this.retraction = Double.parseDouble(line[1]);
 					break;
-				case "retractSpeed":
+				case "retractspeed":
 					this.retractSpeed = Double.parseDouble(line[1]);
 					break;
-				case "retractThreshold":
+				case "retractthreshold":
 					this.retractThreshold = Double.parseDouble(line[1]);
 					break;
-				case "topLayers":
+				case "toplayers":
 					this.topLayerStart = Integer.parseInt(line[1]);
 					break;
-				case "AllSolid":
+				case "allsolid":
 					this.allSolid = Boolean.parseBoolean(line[1]);
 					break;
-				case "FirmwareRetract":
+				case "firmwareretract":
 					this.FirmwareRetract = Boolean.parseBoolean(line[1]);
 					break;
-				case "TipRadius":
+				case "tipradius":
 					this.TipRadius = Double.parseDouble(line[1]);
 					break;
-				case "brimCount":
+				case "brimcount":
 					this.brimCount = Integer.parseInt(line[1]);
 					break;
-				case "OuterFirst":
+				case "outerfirst":
 					this.OuterFirst = Boolean.parseBoolean(line[1]);
 					break;
-                case "XMax":
+                case "xmax":
                     this.xMax = Double.parseDouble(line[1]);
                     break;
-                case "YMax":
+                case "ymax":
                     this.yMax = Double.parseDouble(line[1]);
                     break;
-                case "ZMax":
+                case "zmax":
                     this.zMax = Double.parseDouble(line[1]);
                     break;
-                case "XMin":
+                case "xmin":
                     this.xMin = Double.parseDouble(line[1]);
                     break;
-                case "YMin":
+                case "ymin":
                     this.yMin = Double.parseDouble(line[1]);
                     break;
-                case "ZMin":
+                case "zmin":
                     this.zMin = Double.parseDouble(line[1]);
                     break;
-				case "EnableSupport":
+				case "enablesupport":
 					this.EnableSupport = Boolean.parseBoolean(line[1]);
 					break;
-			
-				case "SupportDist":
+				case "fiveaxis":
+					this.fiveaxis = Boolean.parseBoolean(line[1]);
+					break;
+				case "supportdist":
 					this.SupportDist = Double.parseDouble(line[1]);
 					break;
 				}
