@@ -1,17 +1,15 @@
 Bread
 ==========
 
-This is an experimental slicer which allows users to print with 3D layers on conventional FDM machines.
+This is an experimental slicer which allows users to print with 3D layers on conventional FDM machines. It also has rudimentary support for five-axis toolpaths with FANUC-2 style coordinates.
 
 Why 3D Layers?
 ==========
-In short, why not? We have these machines that can move in 3 dimensions, we should probably make them move in 3 dimensions. In terms of actual tangible benefits, adjusting your layer shape can:
+In short, why not? We have these machines that can move in 3 dimensions, we should probably make them move in 3 dimensions. More specific benefits include:
 
--Eliminate the stairstep pattern typically seen on angled surfaces
+-Smooth, stairstep free top surfaces with curves and slopes.
 
--Reduce and manipulate the directional weakness caused by layer-layer bonds
-
--Print steeper overhangs without support material
+-The ability to manipulate and orient the directional weakness of interlayer bonds, particularly on five-axis machines.
 
 -Manipulate which parts get printed first to reduce the number of material switches in multimaterial printing (future feature)
 
@@ -25,13 +23,13 @@ At this time, I can make absolutely no guarantees about the behavior of this Sli
 To simply use this Slicer:
 
 
-1. Make sure you're running a 32 bit installation of Java.
+1. Make sure you're running a 32 bit installation of Java 1.8.
 
 2. Place Bread.jar, config.txt, start.gcode, and end.gcode in a directory of your choice.
 
 3. Change the relevant settings in config.txt for your machine, and configure start.gcode and end.gcode to your liking. Set very conservative values for speeds on your first print. 
 
-4. Choose a part to print, and model the layer shape you want to use in a second .stl. /Prints/wave.stl and /Prints/wavesurface.stl is one example. Alignment between part and surface currently must be done in your design software, assuming you're using the command line interface.
+4. Choose a part to print, and model the layer shape you want to use in a second .stl. /Prints/wave.stl and /Prints/wavesurface.stl is one example. Alignment between part and surface currently must be done in your design software.
 
 5. In command line or shell, navigate to your chosen directory and execute Bread.jar [path to part.stl] [path to surface.stl] [path to config.txt] [path to write to]
 
@@ -45,8 +43,6 @@ You may notice that with steep layer shapes the surface finish gets awful very q
 Contributing
 ==========
 While people are free to jump on this now, I'll be doing some pretty significant restructuring over the Summer. If you're eager to make a lasting contribution, the best way to do so is to optimize or improve some of the core components. For example, an octree implementation of Mesh3D.overlap could be dramatically faster than the current radix check, but I haven't gotten around to writing one. Surface3D.project(Point2D p) could benefit from similar optimizations.
-
-Also, if you want to follow development more closely, we have a Slack at bread3d.slack.com. Email slack@nicholasparker.org to get yourself added.
 
 Lastly, please submit issues if you find any. There are plenty.
 
