@@ -3,9 +3,6 @@ package process;
 import java.util.ArrayList;
 import java.util.List;
 
-import representation.ClipperJNA;
-import representation.Domain;
-import representation.IntPoint;
 import structs.Extrusion2D;
 import structs.Loop;
 import structs.Extrusion2D.ET;
@@ -25,7 +22,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 import com.vividsolutions.jts.operation.buffer.BufferOp;
 /**
- * Wrapper for the C++ library Clipper, which I've packaged into ClipperLib2.dll with a pretty ugly little string interface.
+ * Wrapper for JTS's polygon insetting capabilities.
  * @author Nick
  *
  */
@@ -39,12 +36,6 @@ public class NativeInset {
 	 */
 	public static ArrayList<ArrayList<Point2D>> inset(ArrayList<Loop> loops, double d){
 		return jtsInset(-d,loops);
-	}
-	public static ArrayList<ArrayList<Point2D>> inset(double d, ArrayList<ArrayList<Point2D>> ps){
-		Domain LoopDom = new Domain(ps);
-		Domain output = Domain.parse(ClipperJNA.inset(LoopDom.toString(),(int)Math.round(d*-1*IntPoint.conv)));
-//		System.out.println(output);
-		return output==null ? null : output.conv();
 	}
 	public static ArrayList<ArrayList<Point2D>> jtsInset(double d, ArrayList<Loop> ls){
 		MultiPolygon mp = ToMultiPoly(ls);

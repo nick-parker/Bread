@@ -6,12 +6,7 @@
 	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/javaGeom-0.11.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/vecmath-1.3.1.jar"/>
-	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/gpcj-2.2.0-full.jar"/>
 	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/Jama-1.0.3.jar"/>
-	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/ClipperJNA.jar"/>
-	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/jna-4.1.0.jar"/>
 	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/jts-1.8.jar"/>
-	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/commons-cli-1.2-javadoc.jar"/>
-	<classpathentry kind="lib" path="/home/nick/eclipse/java-mars/eclipse/Bread/lib/commons-cli-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
