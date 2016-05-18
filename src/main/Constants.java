@@ -1,6 +1,8 @@
 package main;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import math.geom2d.Point2D;
 import math.geom3d.Point3D;
@@ -18,7 +20,8 @@ public class Constants {
 	static public final Vector3D zminus = new Vector3D(0,0,-1);
 	static public final double tol = 1e-4;
 	static public final double solidSpacing = 1.09;
-	static public DecimalFormat ext = new DecimalFormat("#.#####");	//Extrusion
-	static public DecimalFormat xyz = new DecimalFormat("#.###");		//Position
+	static private java.text.DecimalFormatSymbols enus = new DecimalFormatSymbols(Locale.ENGLISH);
+	static public DecimalFormat ext = new DecimalFormat("#.#####", enus);	//Extrusion
+	static public DecimalFormat xyz = new DecimalFormat("#.###", enus);		//Position
 	static public Vector3D zero =  new Vector3D(0,0,0);
 }
