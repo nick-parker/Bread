@@ -165,7 +165,7 @@ public class GcodeExport {
 					" J" + Constants.xyz.format(n.getY()) +
 					" K" + Constants.xyz.format(n.getZ()));
 		}
-		w.print(" E"+Constants.ext.format(currE) + "\n");
+		w.print("\n");
 		
 	}
 	/**
